@@ -1,41 +1,39 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependency directories
+node_modules/
+jspm_packages/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Next.js build output
+.next/
+out/
 
-# testing
-/coverage
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
 
-# next.js
-/.next/
-/out/
+# Environment variables (KRİTİK: Şifrelerin gitmemeli!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.sample
 
-# production
-/build
-
-# misc
+# OS metadata
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
+# Prisma logs and sqlite db (eğer kullanıyorsan)
+prisma/*.db
+prisma/*.db-journal
+
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
