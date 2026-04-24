@@ -30,7 +30,7 @@ export default function WorldMap({ viewMode, countryStats = [], cityStats = [] }
             <ComposableMap projectionConfig={{ scale: 140 }} className="w-full h-full" style={{ width: "100%", height: "100%" }}>
                 <ZoomableGroup zoom={position.zoom} center={position.coordinates as [number, number]} onMoveEnd={setPosition}>
                     <Geographies geography={geoUrl}>
-                        {({ geographies }) =>
+                        {({ geographies }: { geographies: any[] }) =>
                             geographies.filter(g => g.id !== "ATA").map((geo) => {
                                 // DB'den gelen TR'yi TUR yapıp haritada buluyoruz:
                                 const d = countryStats.find((s: any) => isoMap[s.id] === geo.id || s.id === geo.id);
