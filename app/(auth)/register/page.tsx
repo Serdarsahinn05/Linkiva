@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { User, Mail, Lock, Sparkles, ArrowRight } from "lucide-react";
+// Eye ve EyeOff ikonlarını ekledik
+import { User, Mail, Lock, Sparkles, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 function RegisterForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // URL'den gelen ismi sadece İLK AÇILIŞTA alıyoruz.
     const initialUsername = searchParams.get("username") || "";
 
     const [formData, setFormData] = useState({
@@ -20,7 +20,8 @@ function RegisterForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-
+    // Şifre görünürlüğü için state
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,15 +35,12 @@ function RegisterForm() {
                 body: JSON.stringify(formData),
             });
 
-            // 1. ÖNCE METİN OLARAK OKU (Sunucu HTML veya düz yazı atarsa patlamayalım)
             const textContent = await res.text();
 
             let data;
             try {
-                // 2. JSON'A ÇEVİRMEYİ DENE
                 data = JSON.parse(textContent);
             } catch (err) {
-                // JSON değilse backend patlamıştır, o ham hatayı ekrana bas
                 throw new Error(textContent || "Sunucudan anlamsız bir yanıt geldi.");
             }
 
@@ -50,10 +48,8 @@ function RegisterForm() {
                 throw new Error(data.message || "Bir şeyler ters gitti");
             }
 
-            // Kayıt başarılı!
             router.push("/login?registered=true");
         } catch (err: any) {
-            // Ekranda JSON hatası yerine gerçek hatayı gösterecek
             setError(err.message.replace("Error: ", ""));
         } finally {
             setLoading(false);
@@ -113,13 +109,22 @@ function RegisterForm() {
                         <Lock size={18} />
                     </div>
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"} // Dinamik tip
                         placeholder="Şifre"
                         required
-                        className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
+                        className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-12 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
+                    {/* Göz İkonu Butonu */}
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors"
+                        tabIndex={-1}
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                 </div>
 
                 <button
@@ -137,7 +142,6 @@ function RegisterForm() {
         </div>
     );
 }
-
 
 export default function RegisterPage() {
     return (

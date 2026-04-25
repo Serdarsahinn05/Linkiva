@@ -4,13 +4,13 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+// Eye ve EyeOff ikonlarını ekledik
+import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // URL parametrelerini yakalıyoruz
     const registered = searchParams.get("registered");
     const verified = searchParams.get("verified");
 
@@ -18,6 +18,8 @@ function LoginForm() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,11 +33,9 @@ function LoginForm() {
         });
 
         if (res?.error) {
-            // lib/auth.ts içinde fırlattığımız "Maili onayla" hatası buraya düşer
             setError(res.error);
             setLoading(false);
         } else {
-            // Giriş başarılıysa dashboard'a git
             window.location.href = "/dashboard";
         }
     };
@@ -54,7 +54,6 @@ function LoginForm() {
                 <p className="text-gray-500 text-center text-sm font-medium mt-2">Tekrar hoş geldin.</p>
             </div>
 
-            {/* DURUM 1: Kayıt oldu ama henüz onaylamadıysa */}
             {registered && !verified && !error && (
                 <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold p-4 rounded-2xl mb-6 text-center animate-in fade-in slide-in-from-top-4 duration-300">
                     Hesabın oluşturuldu! 🚀 <br />
@@ -62,7 +61,6 @@ function LoginForm() {
                 </div>
             )}
 
-            {/* DURUM 2: Mailini başarıyla doğrulayıp geldiyse */}
             {verified && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold p-4 rounded-2xl mb-6 flex flex-col items-center gap-2 text-center animate-in zoom-in duration-300">
                     <CheckCircle2 size={20} />
@@ -70,14 +68,12 @@ function LoginForm() {
                 </div>
             )}
 
-            {/* DURUM 3: Hata varsa (Yanlış şifre VEYA Doğrulanmamış mail) */}
             {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold p-4 rounded-2xl mb-6 text-center animate-shake">
                     {error}
                 </div>
             )}
 
-            {/* GOOGLE İLE GİRİŞ */}
             <button
                 onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center gap-3 bg-[#111] text-white border border-[#333] p-4 rounded-2xl font-black text-sm hover:bg-white hover:text-black transition-all active:scale-[0.98] mb-6 uppercase tracking-tighter"
@@ -116,14 +112,24 @@ function LoginForm() {
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-white transition-colors">
                         <Lock size={18} />
                     </div>
+                    {/* Input tipini dinamik yaptık */}
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Şifre"
                         required
-                        className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
+                        className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-12 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    {/* Göz İkonu Butonu */}
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors"
+                        tabIndex={-1}
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                 </div>
 
                 <button
