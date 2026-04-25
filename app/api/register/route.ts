@@ -9,7 +9,7 @@ import { headers } from "next/headers"; // IP almak için
 export async function POST(req: Request) {
     try {
         // --- RATE LIMIT KONTROLÜ (EN BAŞTA) ---
-        const headerList = headers();
+        const headerList = await headers();
         // Vercel'de gerçek IP "x-forwarded-for" header'ındadır
         const ip = headerList.get("x-forwarded-for") || "127.0.0.1";
 
