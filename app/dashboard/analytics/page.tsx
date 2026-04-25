@@ -2,8 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Eye, MousePointerClick, Activity, TrendingDown, Clock } from "lucide-react";
-
+import { Eye, MousePointerClick, Activity, TrendingDown, TrendingUp, Clock } from "lucide-react";
 
 import MapWrapper from "@/app/components/MapWrapper";
 import ActivityOverviewChart from "@/app/components/charts/ActivityOverviewChart";
@@ -38,7 +37,41 @@ export default async function AnalyticsPage() {
     const profileViews = user.visits.length;
     const realTotalClicks = allClicks.length;
     const totalEngagement = profileViews + realTotalClicks;
-    const engagementRate = profileViews > 0 ? ((realTotalClicks / profileViews) * 100).toFixed(1) : "0";
+    const engagementRateValue = profileViews > 0 ? (realTotalClicks / profileViews) * 100 : 0;
+    const engagementRate = engagementRateValue.toFixed(1);
+
+    // --- YENİ EKLENEN: GERÇEK TREND HESAPLAMASI (Son 7 Gün vs Önceki 7 Gün) ---
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    // Ziyaretler
+    const currentViews = user.visits.filter(v => new Date(v.createdAt) >= sevenDaysAgo).length;
+    const previousViews = user.visits.filter(v => new Date(v.createdAt) >= fourteenDaysAgo && new Date(v.createdAt) < sevenDaysAgo).length;
+
+    // Tıklamalar
+    const currentClicks = allClicks.filter(c => new Date(c.createdAt) >= sevenDaysAgo).length;
+    const previousClicks = allClicks.filter(c => new Date(c.createdAt) >= fourteenDaysAgo && new Date(c.createdAt) < sevenDaysAgo).length;
+
+    // Etkileşim & Oran
+    const currentInteractions = currentViews + currentClicks;
+    const previousInteractions = previousViews + previousClicks;
+    const currentRate = currentViews > 0 ? (currentClicks / currentViews) * 100 : 0;
+    const previousRate = previousViews > 0 ? (previousClicks / previousViews) * 100 : 0;
+
+    // Trend Oranı Bulucu
+    const getTrend = (curr: number, prev: number) => {
+        if (curr === 0 && prev === 0) return 0;
+        if (prev === 0 && curr > 0) return 100;
+        const diff = ((curr - prev) / prev) * 100;
+        return parseFloat(diff.toFixed(1));
+    };
+
+    const viewTrend = getTrend(currentViews, previousViews);
+    const clickTrend = getTrend(currentClicks, previousClicks);
+    const interactionTrend = getTrend(currentInteractions, previousInteractions);
+    const rateTrend = getTrend(currentRate, previousRate);
+
 
     // --- 2. BİRLEŞİK GRAFİK VERİSİ (ACTIVITY OVERVIEW) ---
     const hourlyVisits = new Array(24).fill(0);
@@ -104,10 +137,9 @@ export default async function AnalyticsPage() {
 
     allClicks.forEach(click => {
         const ua = (click.userAgent || "").toLowerCase();
-        // Cihaz
         if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) deviceCounts.Mobile++;
         else deviceCounts.Desktop++;
-        // OS
+
         if (ua.includes("iphone") || ua.includes("ipad")) osCounts.iOS++;
         else if (ua.includes("android")) osCounts.Android++;
         else if (ua.includes("windows")) osCounts.Windows++;
@@ -129,7 +161,6 @@ export default async function AnalyticsPage() {
     return (
         <div className="max-w-[1400px] mx-auto space-y-6 pb-20 text-white selection:bg-blue-500/30 font-geistSans">
 
-            {/* ÜST HEADER */}
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-3xl font-black text-white tracking-tighter italic uppercase">Analytics</h1>
@@ -138,74 +169,63 @@ export default async function AnalyticsPage() {
                 <DatePickerWithExport clicks={allClicks} visits={user.visits} />
             </div>
 
-            {/* 1. SATIR: ÜST METRİKLER */}
+            {/* GERÇEK VERİLER BURAYA BAĞLANDI */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard title="Profile Views" value={profileViews} trend="+100.0%" icon={<Eye size={18} />} color="purple" />
-                <StatCard title="Link Clicks" value={realTotalClicks} trend="+5.2%" icon={<MousePointerClick size={18} />} color="pink" />
-                <StatCard title="Total Interactions" value={totalEngagement} trend="+10.1%" icon={<Activity size={18} />} color="blue" />
-                <StatCard title="Engagement Rate" value={`%${engagementRate}`} trend="-1.2%" icon={<TrendingDown size={18} />} color="green" />
+                <StatCard title="Profile Views" value={profileViews} trend={viewTrend} icon={<Eye size={18} />} color="purple" />
+                <StatCard title="Link Clicks" value={realTotalClicks} trend={clickTrend} icon={<MousePointerClick size={18} />} color="pink" />
+                <StatCard title="Total Interactions" value={totalEngagement} trend={interactionTrend} icon={<Activity size={18} />} color="blue" />
+                <StatCard
+                    title="Engagement Rate"
+                    value={`%${engagementRate}`}
+                    trend={rateTrend}
+                    icon={rateTrend >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+                    color="green"
+                />
             </div>
 
-            {/* 2. SATIR: BİRLEŞİK ANA GRAFİK */}
+            {/* Diğer Bileşenler Aynı Kalıyor... */}
             <ActivityOverviewChart data={chartData} />
 
-            {/* 3. SATIR: LINK PERFORMANCE & HEALTH CHECK */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="lg:col-span-1">
-                    <TrafficSourcesDonut data={linkStats} total={realTotalClicks} />
-                </div>
-                <div className="lg:col-span-2">
-                    <TopLinksLeaderboard data={linkStats} total={realTotalClicks} />
-                </div>
-                <div className="lg:col-span-1">
-                    <LinkHealthStatus links={links} />
-                </div>
+                <div className="lg:col-span-1"><TrafficSourcesDonut data={linkStats} total={realTotalClicks} /></div>
+                <div className="lg:col-span-2"><TopLinksLeaderboard data={linkStats} total={realTotalClicks} /></div>
+                <div className="lg:col-span-1"><LinkHealthStatus links={links} /></div>
             </div>
 
-            {/* 4. SATIR: CİHAZ DAĞILIMI & CANLI AKIŞ */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-1">
-                    <DeviceOSBreakdown deviceData={deviceCounts} osData={osCounts} />
-                </div>
-                <div className="lg:col-span-2">
-                    <LiveActivityFeed initialClicks={allClicks} initialVisits={user.visits} />
-                </div>
+                <div className="lg:col-span-1"><DeviceOSBreakdown deviceData={deviceCounts} osData={osCounts} /></div>
+                <div className="lg:col-span-2"><LiveActivityFeed initialClicks={allClicks} initialVisits={user.visits} /></div>
             </div>
 
-            {/* 5. SATIR: DÖNÜŞÜM HUNİSİ & TOP REFERRERS */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
-                    <ConversionFunnel
-                        views={profileViews}
-                        clicks={realTotalClicks}
-                        topLinkClicks={linkStats.length > 0 ? linkStats[0].value : 0}
-                    />
+                    <ConversionFunnel views={profileViews} clicks={realTotalClicks} topLinkClicks={linkStats.length > 0 ? linkStats[0].value : 0} />
                 </div>
-                <div className="lg:col-span-1">
-                    <TopReferrers data={referrersData} />
-                </div>
+                <div className="lg:col-span-1"><TopReferrers data={referrersData} /></div>
             </div>
 
-            {/* 6. SATIR: ACTIVITY HEATMAP */}
             <ActivityHeatmap data={heatmapData} />
 
-            {/* 7. SATIR: HARİTA */}
             <div className="bg-[#050505] border border-[#1A1A1A] rounded-[2rem] overflow-hidden w-full shadow-2xl">
                 <MapWrapper countryStats={countryStats} cityStats={cityStats} />
-
             </div>
 
-            {/* 8. SATIR: ALT TRACKER KARTLARI */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <BottomCard label="Active Days" value="1" icon="📅" />
                 <BottomCard label="Daily Average" value={realTotalClicks > 0 ? (realTotalClicks / 1).toFixed(1) : 0} icon="📊" />
-                <BottomCard label="Overall Growth" value="+100.0%" icon="🚀" highlight />
+                <BottomCard
+                    label="Overall Growth"
+                    value={interactionTrend === 0 ? "%0" : (interactionTrend > 0 ? `+${interactionTrend}%` : `${interactionTrend}%`)}
+                    icon="🚀"
+                    highlight={interactionTrend > 0}
+                />
             </div>
         </div>
     );
 }
 
-// --- UI YARDIMCI BİLEŞENLERİ ---
+// --- YARDIMCI BİLEŞENLER ---
+
 function StatCard({ title, value, trend, icon, color }: any) {
     const colorMap: any = {
         purple: "text-purple-500 bg-purple-500/10",
@@ -213,14 +233,24 @@ function StatCard({ title, value, trend, icon, color }: any) {
         blue: "text-blue-500 bg-blue-500/10",
         green: "text-green-500 bg-green-500/10"
     };
+
+    const isNeutral = trend === 0;
+    const isPositive = trend > 0;
+
     return (
         <div className="bg-[#050505] border border-[#1A1A1A] p-6 rounded-[2rem] hover:border-white/10 transition-all group">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${colorMap[color]}`}>{icon}</div>
             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.15em]">{title}</p>
             <h2 className="text-4xl font-mono font-medium mt-2 tabular-nums tracking-tighter text-white leading-none">{value}</h2>
             <div className="flex items-center gap-2 mt-5">
-                <span className={`text-[10px] font-black ${trend.startsWith('+') ? 'text-green-500 bg-green-500/10' : 'text-pink-500 bg-pink-500/10'} px-2 py-0.5 rounded-full`}>▲ {trend}</span>
-                <span className="text-[9px] text-gray-600 font-bold uppercase tracking-tighter opacity-70">vs last period</span>
+                {isNeutral ? (
+                    <span className="text-[10px] font-black text-gray-500 bg-gray-500/10 px-2 py-0.5 rounded-full border border-gray-500/20">0.0%</span>
+                ) : (
+                    <span className={`text-[10px] font-black ${isPositive ? 'text-green-500 bg-green-500/10 border border-green-500/20' : 'text-pink-500 bg-pink-500/10 border border-pink-500/20'} px-2 py-0.5 rounded-full`}>
+                        {isPositive ? '▲' : '▼'} {Math.abs(trend)}%
+                    </span>
+                )}
+                <span className="text-[9px] text-gray-600 font-bold uppercase tracking-tighter opacity-70">vs last 7 days</span>
             </div>
         </div>
     );

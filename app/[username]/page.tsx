@@ -1,4 +1,4 @@
-import { Metadata } from 'next'; // YENİ: SEO için eklendi
+import { Metadata } from 'next';
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { User as UserIcon } from "lucide-react";
@@ -61,8 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProfilePage({ params }: Props) {
     const { username } = await params;
 
+    // URL'den gelen o garip karakterleri (örn: %20, %24) temizle
+    const decodedUsername = decodeURIComponent(username);
+
     const user = await prisma.user.findUnique({
-        where: { username: username },
+        where: { username: decodedUsername },
         include: {
             links: {
                 where: { isActive: true },
@@ -79,8 +82,6 @@ export default async function ProfilePage({ params }: Props) {
     const city = headersList.get("x-vercel-ip-city") || "Unknown";
     const userAgent = headersList.get("user-agent") || "Unknown";
     const referer = headersList.get("referer") || "Direct";
-
-
 
     prisma.visit.create({
         data: {
@@ -125,7 +126,15 @@ export default async function ProfilePage({ params }: Props) {
                             </div>
                         )}
                     </div>
-                    <h1 className="text-2xl font-black tracking-tight">{user.fullName || `@${user.username}`}</h1>
+
+                    {/* İSİM VE NİCK DÜZENİ */}
+                    <h1 className="text-2xl font-black tracking-tight">
+                        {user.fullName || user.username}
+                    </h1>
+                    <p className="text-sm font-bold opacity-50 mt-1">
+                        @{user.username}
+                    </p>
+
                     {user.bio && (
                         <p className="mt-4 text-sm font-medium opacity-60 leading-relaxed max-w-sm">
                             {user.bio}

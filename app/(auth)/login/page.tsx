@@ -4,7 +4,6 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-
 import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
@@ -112,7 +111,6 @@ function LoginForm() {
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-white transition-colors">
                         <Lock size={18} />
                     </div>
-                    {/* Input tipini dinamik yaptık */}
                     <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Şifre"
@@ -121,7 +119,6 @@ function LoginForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    {/* Göz İkonu Butonu */}
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -132,10 +129,17 @@ function LoginForm() {
                     </button>
                 </div>
 
+                {/* YENİ EKLENEN: Şifremi Unuttum Linki */}
+                <div className="flex justify-end w-full !mt-2 !mb-4">
+                    <Link href="/forgot-password" className="text-[11px] font-bold text-gray-500 hover:text-white transition-colors">
+                        Şifremi mi unuttun?
+                    </Link>
+                </div>
+
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-tighter shadow-lg"
+                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 uppercase tracking-tighter shadow-lg"
                 >
                     {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
                     <ArrowRight size={18} />

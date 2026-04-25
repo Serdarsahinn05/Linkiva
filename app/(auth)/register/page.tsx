@@ -19,14 +19,21 @@ function RegisterForm() {
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-
-    // Şifre görünürlüğü için state
     const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
+
+        // --- GÜVENLİK KONTROLÜ (Regex) ---
+        // Sadece küçük harf, rakam, nokta ve alt çizgiye izin verir.
+        const usernameRegex = /^[a-z0-9._]+$/;
+        if (!usernameRegex.test(formData.username)) {
+            setError("Kullanıcı adı sadece harf, rakam, nokta ve alt çizgi içerebilir.");
+            setLoading(false);
+            return;
+        }
 
         try {
             const res = await fetch("/api/register", {
@@ -59,7 +66,7 @@ function RegisterForm() {
     return (
         <div className="w-full max-w-md p-8 bg-[#0A0A0A] border border-[#1A1A1A] shadow-2xl rounded-[2.5rem]">
             <div className="flex flex-col items-center mb-8">
-                <div className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center mb-4 rotate-3">
+                <div className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center mb-4 rotate-3 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                     <Sparkles size={24} />
                 </div>
                 <h1 className="text-3xl font-black text-center text-white tracking-tight italic">Linkiva.</h1>
@@ -84,7 +91,11 @@ function RegisterForm() {
                         required
                         className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
                         value={formData.username}
-                        onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, "") })}
+                        /* GÜNCELLENEN ONCHANGE: Özel karakterleri anında siliyor */
+                        onChange={(e) => setFormData({
+                            ...formData,
+                            username: e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, "")
+                        })}
                     />
                 </div>
 
@@ -109,14 +120,13 @@ function RegisterForm() {
                         <Lock size={18} />
                     </div>
                     <input
-                        type={showPassword ? "text" : "password"} // Dinamik tip
+                        type={showPassword ? "text" : "password"}
                         placeholder="Şifre"
                         required
                         className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-12 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
-                    {/* Göz İkonu Butonu */}
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -129,7 +139,7 @@ function RegisterForm() {
 
                 <button
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-tighter"
+                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-tighter shadow-lg"
                 >
                     {loading ? "Hesap Oluşturuluyor..." : "Ücretsiz Katıl"}
                     <ArrowRight size={18} />

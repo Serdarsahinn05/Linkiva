@@ -2,7 +2,6 @@
 
 import { Eye, MousePointerClick, Target, ArrowRight } from "lucide-react";
 
-
 interface ConversionFunnelProps {
     views?: number;
     clicks?: number;
@@ -11,7 +10,8 @@ interface ConversionFunnelProps {
 
 export default function ConversionFunnel({ views = 0, clicks = 0, topLinkClicks = 0 }: ConversionFunnelProps) {
 
-    const viewPct = 100;
+    // EĞER ZİYARET 0 İSE BAR %0 OLMALI, DEĞİLSE %100
+    const viewPct = views > 0 ? 100 : 0;
     const clickPct = views > 0 ? Math.min((clicks / views) * 100, 100) : 0;
     const targetPct = views > 0 ? Math.min((topLinkClicks / views) * 100, 100) : 0;
 
@@ -21,7 +21,7 @@ export default function ConversionFunnel({ views = 0, clicks = 0, topLinkClicks 
             label: "Profile Views",
             value: views,
             pct: viewPct,
-            dropoff: views > 0 ? Math.max(0, 100 - clickPct) : 0, // Math.max ile negatif dropoff'u engelledik
+            dropoff: views > 0 ? Math.max(0, 100 - clickPct) : 0,
             icon: <Eye size={16} />,
             color: "bg-purple-500",
             textColor: "text-purple-500",
@@ -102,9 +102,16 @@ export default function ConversionFunnel({ views = 0, clicks = 0, topLinkClicks 
                                     <ArrowRight size={14} className="text-gray-500" />
                                 </div>
                                 <div className="absolute -top-8 w-max text-center">
-                                    <span className="text-[9px] font-mono font-bold text-pink-500 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20">
-                                        -{step.dropoff?.toFixed(1)}% drop
-                                    </span>
+                                    {/* SIFIRSA GRİ RENKLİ NÖTR, DEĞİLSE PEMBE RENKLİ NEGATİF */}
+                                    {step.dropoff === 0 ? (
+                                        <span className="text-[9px] font-mono font-bold text-gray-500 bg-gray-500/10 px-2 py-0.5 rounded-full border border-gray-500/20">
+                                            0.0% drop
+                                        </span>
+                                    ) : (
+                                        <span className="text-[9px] font-mono font-bold text-pink-500 bg-pink-500/10 px-2 py-0.5 rounded-full border border-pink-500/20">
+                                            -{step.dropoff?.toFixed(1)}% drop
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         )}

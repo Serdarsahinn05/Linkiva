@@ -123,43 +123,67 @@ export async function incrementClick(linkId: string) {
 
 /**
  * Genel Profil ve Görünüm Güncelleme
+ * (YENİ: useActionState uyumluluğu için prevState eklendi)
  */
-export async function updateProfile(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) throw new Error("Yetkin yok!");
+export async function updateProfile(prevState: any, formData: FormData) {
+    try {
+        const session = await getServerSession(authOptions);
 
-    const usernameRaw = formData.get("username") as string;
-    const fullName = formData.get("fullName") as string;
-    const bio = formData.get("bio") as string;
-    const avatarUrl = formData.get("avatarUrl") as string;
-    const themeColor = formData.get("themeColor") as string;
+        // 1. YETKİ KONTROLÜ
+        if (!session?.user?.email) {
+            return { error: "Yetkin yok, lütfen tekrar giriş yap!" };
+        }
 
-    const cleanUsername = usernameRaw ? usernameRaw.toLowerCase().trim().replace(/\s+/g, '') : null;
+        const usernameRaw = formData.get("username") as string;
+        const fullName = formData.get("fullName") as string;
+        const bio = formData.get("bio") as string;
+        const avatarUrl = formData.get("avatarUrl") as string;
+        const themeColor = formData.get("themeColor") as string;
 
-    if (cleanUsername) {
-        const existingUser = await prisma.user.findUnique({
-            where: { username: cleanUsername }
+        // 2. TEMİZLİK
+        const cleanUsername = usernameRaw ? usernameRaw.toLowerCase().trim().replace(/\s+/g, '') : null;
+
+        if (cleanUsername) {
+            // 3. KARAKTER KONTROLÜ (REGEX)
+            // Sadece a-z, 0-9, nokta ve alt çizgi.
+            const usernameRegex = /^[a-z0-9._]+$/;
+            if (!usernameRegex.test(cleanUsername)) {
+                return { error: "Kullanıcı adı sadece harf, rakam, nokta ve alt çizgi içerebilir!" };
+            }
+
+            // 4. BENZERSİZLİK KONTROLÜ
+            const existingUser = await prisma.user.findUnique({
+                where: { username: cleanUsername }
+            });
+
+            if (existingUser && existingUser.email !== session.user.email) {
+                return { error: "Bu kullanıcı adı başkası tarafından alınmış!" };
+            }
+        }
+
+        // 5. VERİTABANI GÜNCELLEME
+        const updatedUser = await prisma.user.update({
+            where: { email: session.user.email },
+            data: {
+                username: cleanUsername,
+                fullName,
+                bio,
+                avatarUrl,
+                themeColor
+            }
         });
 
-        if (existingUser && existingUser.email !== session.user.email) {
-            throw new Error("Bu kullanıcı adı başkası tarafından alınmış!");
+        // 6. CACHE TEMİZLEME
+        revalidatePath("/dashboard/appearance");
+        if (updatedUser.username) {
+            revalidatePath(`/${updatedUser.username}`);
         }
-    }
 
-    const updatedUser = await prisma.user.update({
-        where: { email: session.user.email },
-        data: {
-            username: cleanUsername,
-            fullName,
-            bio,
-            avatarUrl,
-            themeColor
-        }
-    });
+        return { success: true, message: "Profilin başarıyla güncellendi! 🚀" };
 
-    revalidatePath("/dashboard/appearance");
-    if (updatedUser.username) {
-        revalidatePath(`/${updatedUser.username}`);
+    } catch (error: any) {
+        console.error("Profil güncelleme hatası:", error);
+        return { error: "Sunucu tarafında bir hata oluştu. Lütfen tekrar dene." };
     }
 }
 
