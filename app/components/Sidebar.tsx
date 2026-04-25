@@ -36,6 +36,7 @@ export default function Sidebar({ user }: { user: any }) {
                         <Link
                             key={item.name}
                             href={item.href}
+                            prefetch={true}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
                                 isActive
                                     ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]"

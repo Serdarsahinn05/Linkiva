@@ -5,6 +5,7 @@ import { updateProfile } from "@/lib/actions";
 import { Type, AlignLeft, Sparkles, AtSign } from "lucide-react";
 import AvatarUploader from "./AvatarUploader"; // Bileşeni dahil ettik
 
+
 export default async function AppearancePage() {
     const session = await getServerSession(authOptions);
     const user = await prisma.user.findUnique({
