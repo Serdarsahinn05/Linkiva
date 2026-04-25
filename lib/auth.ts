@@ -15,6 +15,8 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
+            allowDangerousEmailAccountLinking: true,
         }),
         CredentialsProvider({
             name: "Credentials",
@@ -23,14 +25,13 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Şifre", type: "password" }
             },
             async authorize(credentials) {
+                // Bu fonksiyon SADECE e-posta/şifre girişinde çalışır
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("Giriş bilgileri eksik!");
                 }
 
-                // E-posta VEYA Kullanıcı adını temsil eden değer
                 const identifier = credentials.email.toLowerCase().trim();
 
-                // Kullanıcıyı veritabanından E-POSTA veya KULLANICI ADI ile bul
                 const user = await prisma.user.findFirst({
                     where: {
                         OR: [
@@ -47,7 +48,12 @@ export const authOptions: NextAuthOptions = {
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
                 if (!isPasswordValid) {
-                    throw new Error("Şifre hatalı kral!");
+                    throw new Error("Şifre hatalı!");
+                }
+
+                // E-posta doğrulanmamışsa şifreyle girişi engelle
+                if (!user.emailVerified) {
+                    throw new Error("Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın! Mail kutunuzu kontrol edin.");
                 }
 
                 return user;
@@ -55,6 +61,24 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
+        // --- YENİ EKLENEN KISIM: OTOMATİK ONAY ---
+        async signIn({ user, account }) {
+            // Eğer Google ile giriliyorsa ve mail onaylı değilse, otomatik onayla
+            if (account?.provider === "google" && user.email) {
+                const dbUser = await prisma.user.findUnique({
+                    where: { email: user.email }
+                });
+
+                if (dbUser && !dbUser.emailVerified) {
+                    await prisma.user.update({
+                        where: { id: dbUser.id },
+                        data: { emailVerified: new Date() }
+                    });
+                }
+            }
+            return true;
+        },
+
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;

@@ -4,14 +4,15 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Sparkles, ArrowRight } from "lucide-react";
+import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
 function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Register sayfasından başarılı gelirse yeşil bildirim göstermek için
+    // URL parametrelerini yakalıyoruz
     const registered = searchParams.get("registered");
+    const verified = searchParams.get("verified");
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -30,10 +31,11 @@ function LoginForm() {
         });
 
         if (res?.error) {
+            // lib/auth.ts içinde fırlattığımız "Maili onayla" hatası buraya düşer
             setError(res.error);
             setLoading(false);
         } else {
-            // Tarayıcıyı zorla yönlendiriyoruz ki şifre kaydetme çıksın
+            // Giriş başarılıysa dashboard'a uçur
             window.location.href = "/dashboard";
         }
     };
@@ -45,28 +47,37 @@ function LoginForm() {
     return (
         <div className="w-full max-w-md p-8 bg-[#0A0A0A] border border-[#1A1A1A] shadow-2xl rounded-[2.5rem]">
             <div className="flex flex-col items-center mb-8">
-                <div className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center mb-4 rotate-3">
+                <div className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center mb-4 rotate-3 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                     <Sparkles size={24} />
                 </div>
                 <h1 className="text-3xl font-black text-center text-white tracking-tight italic">Linkiva.</h1>
                 <p className="text-gray-500 text-center text-sm font-medium mt-2">Tekrar hoş geldin.</p>
             </div>
 
-            {/* Kayıt başarılıysa çıkan uyarı */}
-            {registered && (
-                <div className="bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-bold p-4 rounded-2xl mb-6 text-center">
-                    Hesabın mermi gibi oluşturuldu! Şimdi giriş yapabilirsin.
+            {/* DURUM 1: Kayıt oldu ama henüz onaylamadıysa */}
+            {registered && !verified && !error && (
+                <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold p-4 rounded-2xl mb-6 text-center animate-in fade-in slide-in-from-top-4 duration-300">
+                    Hesabın oluşturuldu! 🚀 <br />
+                    <span className="text-white/60 font-medium">Lütfen mail kutunu kontrol et ve hesabını onayla.</span>
                 </div>
             )}
 
-            {/* Hata uyarısı */}
+            {/* DURUM 2: Mailini başarıyla doğrulayıp geldiyse */}
+            {verified && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold p-4 rounded-2xl mb-6 flex flex-col items-center gap-2 text-center animate-in zoom-in duration-300">
+                    <CheckCircle2 size={20} />
+                    <span>🎉 Harika! Mailin doğrulandı. Şimdi giriş yapabilirsin.</span>
+                </div>
+            )}
+
+            {/* DURUM 3: Hata varsa (Yanlış şifre VEYA Doğrulanmamış mail) */}
             {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold p-4 rounded-2xl mb-6 text-center animate-shake">
                     {error}
                 </div>
             )}
 
-            {/* GOOGLE İLE GİRİŞ BUTONU */}
+            {/* GOOGLE İLE GİRİŞ */}
             <button
                 onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center gap-3 bg-[#111] text-white border border-[#333] p-4 rounded-2xl font-black text-sm hover:bg-white hover:text-black transition-all active:scale-[0.98] mb-6 uppercase tracking-tighter"
@@ -86,17 +97,13 @@ function LoginForm() {
                 <div className="flex-1 border-t border-white/5"></div>
             </div>
 
-            {/* E-POSTA ŞİFRE FORMU - action="#" EKLENDİ */}
-            <form action="#" onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-white transition-colors">
                         <Mail size={18} />
                     </div>
                     <input
                         type="text"
-                        name="username"
-                        id="username"
-                        autoComplete="username"
                         placeholder="E-posta veya Kullanıcı Adı"
                         required
                         className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
@@ -111,9 +118,6 @@ function LoginForm() {
                     </div>
                     <input
                         type="password"
-                        name="password"
-                        id="password"
-                        autoComplete="current-password"
                         placeholder="Şifre"
                         required
                         className="w-full bg-[#080808] border border-[#1A1A1A] rounded-2xl pl-12 pr-4 py-4 text-white outline-none focus:border-white transition-all font-bold placeholder:text-gray-700"
@@ -125,7 +129,7 @@ function LoginForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-tighter"
+                    className="w-full flex items-center justify-center gap-3 bg-white text-black p-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-tighter shadow-lg"
                 >
                     {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
                     <ArrowRight size={18} />
@@ -139,7 +143,6 @@ function LoginForm() {
     );
 }
 
-// Next.js 15 zorunluluğu: useSearchParams içeren component Suspense içine alınmalı
 export default function LoginPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-black px-6 py-12">

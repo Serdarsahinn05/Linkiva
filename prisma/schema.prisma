@@ -27,6 +27,8 @@ model User {
   name            String?
   image           String?
   emailVerified   DateTime?
+  verificationToken String?   @unique // Maile göndereceğimiz benzersiz kod
+  tokenExpires    DateTime?         // Tokenın son kullanma tarihi
   accounts        Account[]
   links           Link[]
 
