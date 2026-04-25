@@ -22,18 +22,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         select: { fullName: true, bio: true, avatarUrl: true, themeColor: true, backgroundImage: true }
     });
 
-    if (!user) return {
-        title: "Profil Bulunamadı | Linkiva",
-        description: "Böyle bir Linkiva profili henüz oluşturulmamış.",
-        openGraph: {
-            // 🚩 DİKKAT: OG resimlerinde her zaman tam URL (https:// ile başlayan) kullanmalısın.
-            images: [{ url: 'https://linkiva.space/linkiva_default_og.png', width: 1200, height: 630 }]
-        },
-        twitter: {
-            card: "summary_large_image",
-            images: ['https://linkiva.space/linkiva_default_og.png']
-        }
-    };
+    // Kullanıcı yoksa (Random sallanmış linkse) Default OG ve Başlık bas
+    if (!user) {
+        return {
+            title: "Profil Bulunamadı | Linkiva",
+            description: "Böyle bir profil henüz oluşturulmamış.",
+            openGraph: {
+                title: "Profil Bulunamadı | Linkiva",
+                description: "Böyle bir profil henüz oluşturulmamış.",
+                images: [{ url: 'https://linkiva.space/linkiva_default_og.png', width: 1200, height: 630 }]
+            },
+            twitter: {
+                card: "summary_large_image",
+                images: ['https://linkiva.space/linkiva_default_og.png']
+            }
+        };
+    }
 
     const ogUrl = new URL('https://linkiva.space/api/og');
 
