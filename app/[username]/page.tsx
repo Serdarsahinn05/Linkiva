@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
 import { User as UserIcon } from "lucide-react";
 import { FaInstagram, FaGithub, FaLinkedin, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import LinkItem from "@/app/components/LinkItem";
 import { headers } from "next/headers";
+
+
 
 type Props = {
     params: Promise<{ username: string }>
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const decodedUsername = decodeURIComponent(username);
 
     const user = await prisma.user.findUnique({
-        where: { username: decodedUsername }, // Ham 'username' değil, 'decodedUsername' olmalıydı!
+        where: { username: decodedUsername },
         select: { fullName: true, bio: true, avatarUrl: true, themeColor: true, backgroundImage: true }
     });
 
@@ -41,22 +42,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const ogUrl = new URL('https://linkiva.space/api/og');
 
-    // OG API'sine tertemiz verileri paslıyoruz
     ogUrl.searchParams.set('username', decodedUsername);
     if (user.fullName) ogUrl.searchParams.set('fullName', user.fullName);
     if (user.bio) ogUrl.searchParams.set('bio', user.bio);
-
 
     ogUrl.searchParams.set('theme', user.themeColor || 'dark');
 
     if (user.avatarUrl) ogUrl.searchParams.set('avatar', user.avatarUrl);
 
-
     if (user.backgroundImage && user.backgroundImage.length > 10) {
         ogUrl.searchParams.set('backgroundImage', user.backgroundImage);
     }
 
-    // CACHE BUSTER: Sosyal medyanın (WhatsApp vb.) eski resmi göstermemesi için timestamp
     ogUrl.searchParams.set('v', Date.now().toString());
 
     return {
@@ -94,7 +91,24 @@ export default async function ProfilePage({ params }: Props) {
         }
     });
 
-    if (!user) notFound();
+
+
+    if (!user) {
+        return (
+            <div className="min-h-screen w-full flex flex-col items-center justify-center bg-black text-white p-6">
+                <h1 className="text-6xl font-black mb-4 drop-shadow-lg">404</h1>
+                <p className="text-gray-400 mb-8 text-center font-medium">
+                    @{decodedUsername} adında bir profil henüz oluşturulmamış.
+                </p>
+                <a
+                    href="/"
+                    className="px-8 py-4 bg-white text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                >
+                    Linkiva'ya Dön
+                </a>
+            </div>
+        );
+    }
 
     // Ziyaretçi takibi
     const headersList = await headers();
@@ -116,7 +130,6 @@ export default async function ProfilePage({ params }: Props) {
         glass: "bg-[#050505]"
     };
 
-    // Resim URL kontrolü (Boş string "" durumunu engellemek için)
     const hasBg = (user.backgroundImage && user.backgroundImage.length > 10);
 
     const socialPlatforms = [
