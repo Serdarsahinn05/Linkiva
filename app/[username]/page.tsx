@@ -1,12 +1,64 @@
+import { Metadata } from 'next'; // YENİ: SEO için eklendi
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { User as UserIcon } from "lucide-react";
 import LinkItem from "@/app/components/LinkItem";
-import { headers } from "next/headers"; // YENİ: Ziyaretçi bilgilerini yakalamak için
+import { headers } from "next/headers";
 
-export default async function ProfilePage({params}: {
+type Props = {
     params: Promise<{ username: string }>
-}) {
+};
+
+// --- 1. SEO VE SOSYAL MEDYA KARTLARI (BÜYÜ BURADA) ---
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { username } = await params;
+
+    const user = await prisma.user.findUnique({
+        where: { username },
+        select: { fullName: true, bio: true, avatarUrl: true }
+    });
+
+    if (!user) {
+        return {
+            title: "Profil Bulunamadı | Linkiva",
+            description: "Böyle bir Linkiva profili mevcut değil.",
+        };
+    }
+
+    const title = `${user.fullName || username} (@${username}) | Linkiva`;
+    const description = user.bio || `${user.fullName || username} kişisinin tüm bağlantılarına tek bir yerden ulaşın.`;
+    const imageUrl = user.avatarUrl || "https://linkiva.vercel.app/og-default.jpg";
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            url: `https://linkiva.vercel.app/${username}`,
+            siteName: "Linkiva",
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: `${username} Linkiva Profil Önizlemesi`,
+                }
+            ],
+            locale: "tr_TR",
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [imageUrl],
+        }
+    };
+}
+
+// --- 2. ANA SAYFA BİLEŞENİ ---
+export default async function ProfilePage({ params }: Props) {
     const { username } = await params;
 
     const user = await prisma.user.findUnique({
@@ -22,15 +74,15 @@ export default async function ProfilePage({params}: {
     if (!user) notFound();
 
     // --- ZİYARETÇİYİ SOYMA OPERASYONU ---
-    // Vercel üzerinden gelen header'ları okuyup adamın seceresini döküyoruz
     const headersList = await headers();
     const country = headersList.get("x-vercel-ip-country") || "Unknown";
     const city = headersList.get("x-vercel-ip-city") || "Unknown";
     const userAgent = headersList.get("user-agent") || "Unknown";
     const referer = headersList.get("referer") || "Direct";
 
-    // Geliştirilmiş Ziyaret (Visit) Kaydı
-    await prisma.visit.create({
+    // KRİTİK HIZLANDIRMA: "await" kelimesini sildik.
+    // Artık sayfa veritabanını beklemeden şak diye açılacak!
+    prisma.visit.create({
         data: {
             userId: user.id,
             country,

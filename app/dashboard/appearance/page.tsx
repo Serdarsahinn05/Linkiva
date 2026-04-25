@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // Auth options eklendi
+import { authOptions } from "@/lib/auth";
 import { updateProfile } from "@/lib/actions";
-import { User, Image as ImageIcon, Type, AlignLeft, Sparkles, AtSign } from "lucide-react";
+import { Type, AlignLeft, Sparkles, AtSign } from "lucide-react";
+import AvatarUploader from "./AvatarUploader"; // Bileşeni dahil ettik
 
 export default async function AppearancePage() {
-    // Session çağrısına authOptions eklendi
     const session = await getServerSession(authOptions);
     const user = await prisma.user.findUnique({
         where: { email: session?.user?.email || "" }
@@ -27,7 +27,7 @@ export default async function AppearancePage() {
             </div>
 
             <form action={updateProfile} className="space-y-8">
-                {/* KULLANICI ADI (USERNAME) ALANI */}
+                {/* KULLANICI ADI ALANI */}
                 <div>
                     <label className="text-[10px] uppercase font-black text-gray-500 tracking-widest ml-1">Kullanıcı Adı (URL'in)</label>
                     <div className="relative mt-1">
@@ -47,30 +47,8 @@ export default async function AppearancePage() {
                 {/* 1. BÖLÜM: PROFİL BİLGİLERİ */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                    {/* SOL: AVATAR DÜZENLEME */}
-                    <div className="md:col-span-1 bg-black border border-[#1A1A1A] rounded-[2.5rem] p-8 flex flex-col items-center justify-center space-y-4 shadow-xl">
-                        <div className="w-24 h-24 rounded-full border-2 border-[#1A1A1A] p-1 overflow-hidden bg-[#080808]">
-                            {user?.avatarUrl ? (
-                                <img src={user.avatarUrl} alt="" className="w-full h-full object-cover rounded-full" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-[#111]">
-                                    <User size={40} className="text-gray-700" />
-                                </div>
-                            )}
-                        </div>
-                        <div className="w-full text-left">
-                            <label className="text-[10px] uppercase font-black text-gray-500 tracking-widest ml-1">Avatar URL</label>
-                            <div className="relative mt-1">
-                                <ImageIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
-                                <input
-                                    name="avatarUrl"
-                                    defaultValue={user?.avatarUrl || ""}
-                                    placeholder="https://..."
-                                    className="w-full bg-[#080808] border border-[#1A1A1A] rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-white transition-all"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    {/* SOL: YENİ AVATAR DÜZENLEYİCİMİZ BURAYA GELDİ */}
+                    <AvatarUploader defaultUrl={user?.avatarUrl || ""} />
 
                     {/* SAĞ: İSİM VE BİO */}
                     <div className="md:col-span-2 bg-black border border-[#1A1A1A] rounded-[2.5rem] p-8 space-y-6 shadow-xl text-left">
@@ -103,7 +81,7 @@ export default async function AppearancePage() {
                     </div>
                 </div>
 
-                {/* 2. BÖLÜM: TEMA SEÇİMİ (Vibe Kartları) */}
+                {/* 2. BÖLÜM: TEMA SEÇİMİ */}
                 <div className="bg-black border border-[#1A1A1A] rounded-[2.5rem] p-8 space-y-6 shadow-xl text-left">
                     <div className="flex items-center gap-2">
                         <Sparkles size={16} className="text-white/40" />
