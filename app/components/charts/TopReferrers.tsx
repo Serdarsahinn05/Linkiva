@@ -1,13 +1,14 @@
 "use client";
 
 import { Share2, Globe, Link as LinkIcon } from "lucide-react";
-import { FaInstagram, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export default function TopReferrers({ data = [] }: { data?: any[] }) {
     // İsme göre ikon seçen motor
     const getIcon = (name: string) => {
         if (name === "Instagram") return <FaInstagram size={14} className="text-pink-500" />;
-        if (name === "Twitter / X") return <FaTwitter size={14} className="text-blue-400" />;
+        if (name === "X") return <FaXTwitter size={14} className="text-blue-400" />;
         if (name === "LinkedIn") return <FaLinkedinIn size={14} className="text-blue-700" />;
         if (name === "Direct / Email") return <LinkIcon size={14} className="text-gray-400" />;
         return <Globe size={14} className="text-gray-500" />;

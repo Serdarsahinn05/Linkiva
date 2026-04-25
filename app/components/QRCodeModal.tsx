@@ -34,7 +34,7 @@ export default function QRCodeModal({ username }: { username: string }) {
                 className="flex items-center justify-center p-4 bg-[#111] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-2xl transition-all group shrink-0 cursor-pointer shadow-lg"
                 title="QR Kodunu Oluştur"
             >
-                {/* DÜZELTME: İkon varsayılan olarak gri, hover olunca beyaza dönüyor */}
+
                 <QrCode size={20} className="text-gray-500 group-hover:text-white transition-colors" />
             </button>
 

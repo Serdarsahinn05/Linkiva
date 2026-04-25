@@ -123,45 +123,57 @@ export async function incrementClick(linkId: string) {
 
 /**
  * Genel Profil ve Görünüm Güncelleme
- * (YENİ: useActionState uyumluluğu için prevState eklendi)
+ * (useActionState uyumluluğu için prevState eklendi)
  */
 export async function updateProfile(prevState: any, formData: FormData) {
     try {
         const session = await getServerSession(authOptions);
 
-        // 1. YETKİ KONTROLÜ
         if (!session?.user?.email) {
             return { error: "Yetkin yok, lütfen tekrar giriş yap!" };
         }
 
+        // 1. FORM VERİLERİNİ TOPLA
         const usernameRaw = formData.get("username") as string;
         const fullName = formData.get("fullName") as string;
         const bio = formData.get("bio") as string;
         const avatarUrl = formData.get("avatarUrl") as string;
         const themeColor = formData.get("themeColor") as string;
+        const backgroundImage = formData.get("backgroundImage") as string;
 
-        // 2. TEMİZLİK
+        // Sosyal medya hesaplarını topluyoruz (Burayı Prisma'ya göndermeyi unutmuşsun)
+        const socialData = {
+            instagram: formData.get("instagram") as string || "",
+            x: formData.get("x") as string || "",
+            github: formData.get("github") as string || "",
+            linkedin: formData.get("linkedin") as string || "",
+            youtube: formData.get("youtube") as string || "",
+        };
+
+        // 2. USERNAME TEMİZLİĞİ VE KONTROLÜ
         const cleanUsername = usernameRaw ? usernameRaw.toLowerCase().trim().replace(/\s+/g, '') : null;
 
         if (cleanUsername) {
-            // 3. KARAKTER KONTROLÜ (REGEX)
-            // Sadece a-z, 0-9, nokta ve alt çizgi.
+            // Basit bir regex kontrolü (Sadece harf, rakam, nokta, alt çizgi)
             const usernameRegex = /^[a-z0-9._]+$/;
             if (!usernameRegex.test(cleanUsername)) {
-                return { error: "Kullanıcı adı sadece harf, rakam, nokta ve alt çizgi içerebilir!" };
+                return { error: "Kullanıcı adı geçersiz karakterler içeriyor!" };
             }
 
-            // 4. BENZERSİZLİK KONTROLÜ
-            const existingUser = await prisma.user.findUnique({
-                where: { username: cleanUsername }
+            // Benzersizlik kontrolü
+            const existingUser = await prisma.user.findFirst({
+                where: {
+                    username: cleanUsername,
+                    NOT: { email: session.user.email }
+                }
             });
 
-            if (existingUser && existingUser.email !== session.user.email) {
-                return { error: "Bu kullanıcı adı başkası tarafından alınmış!" };
+            if (existingUser) {
+                return { error: "Bu kullanıcı adı zaten alınmış!" };
             }
         }
 
-        // 5. VERİTABANI GÜNCELLEME
+        // 3. VERİTABANI GÜNCELLEME
         const updatedUser = await prisma.user.update({
             where: { email: session.user.email },
             data: {
@@ -169,21 +181,25 @@ export async function updateProfile(prevState: any, formData: FormData) {
                 fullName,
                 bio,
                 avatarUrl,
-                themeColor
+                themeColor: themeColor || "dark",
+                backgroundImage: backgroundImage || "", // Boş gelirse string olarak sakla
+                ...socialData // ✅ SOSYAL MEDYALARI BURADA PRISMA'YA GÖNDERİYORUZ
             }
         });
 
-        // 6. CACHE TEMİZLEME
+        // 4. CACHE TEMİZLEME (Önemli)
         revalidatePath("/dashboard/appearance");
         if (updatedUser.username) {
             revalidatePath(`/${updatedUser.username}`);
         }
+        // Tüm sayfaları etkilemesi için (OG cache vb. için bazen gerekir)
+        revalidatePath("/", "layout");
 
         return { success: true, message: "Profilin başarıyla güncellendi! 🚀" };
 
     } catch (error: any) {
-        console.error("Profil güncelleme hatası:", error);
-        return { error: "Sunucu tarafında bir hata oluştu. Lütfen tekrar dene." };
+        console.error("❌ PROFIL GÜNCELLEME HATASI:", error);
+        return { error: "Sunucu tarafında bir hata oluştu." };
     }
 }
 
@@ -197,7 +213,6 @@ export async function updateAccountEmail(newEmail: string) {
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) throw new Error("Kullanıcı bulunamadı");
 
-    // Google ile giriş yapanların ana maili Google'a bağlıdır, değiştirilemez.
     if (!user.password) {
         throw new Error("Google ile bağlı hesapların e-postası değiştirilemez.");
     }
@@ -208,7 +223,6 @@ export async function updateAccountEmail(newEmail: string) {
     const existing = await prisma.user.findUnique({ where: { email: cleanEmail } });
     if (existing) throw new Error("Bu e-posta zaten başka bir hesaba ait!");
 
-    // Yeni doğrulama süreci başlasın
     const token = uuidv4();
     const expires = new Date(Date.now() + 3600 * 1000 * 24); // 24 Saat
 
@@ -222,7 +236,6 @@ export async function updateAccountEmail(newEmail: string) {
         }
     });
 
-    // Yeni maile doğrulama bağlantısını gönder
     await sendVerificationEmail(cleanEmail, token);
 }
 

@@ -40,7 +40,7 @@ export default async function AnalyticsPage() {
     const engagementRateValue = profileViews > 0 ? (realTotalClicks / profileViews) * 100 : 0;
     const engagementRate = engagementRateValue.toFixed(1);
 
-    // --- YENİ EKLENEN: GERÇEK TREND HESAPLAMASI (Son 7 Gün vs Önceki 7 Gün) ---
+    // --- 2. GERÇEK TREND HESAPLAMASI (Son 7 Gün vs Önceki 7 Gün) ---
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
@@ -72,8 +72,16 @@ export default async function AnalyticsPage() {
     const interactionTrend = getTrend(currentInteractions, previousInteractions);
     const rateTrend = getTrend(currentRate, previousRate);
 
+    // --- 3. AKTİF GÜN SAYISI HESAPLAMA (YENİ EKLENDİ) ---
+    // Ziyaret ve tıklamaların yapıldığı benzersiz günleri buluyoruz
+    const activeDaysSet = new Set([
+        ...user.visits.map(v => new Date(v.createdAt).toDateString()),
+        ...allClicks.map(c => new Date(c.createdAt).toDateString())
+    ]);
+    const activeDaysCount = activeDaysSet.size || 1; // Hiç veri yoksa 1 kabul edelim ki sıfıra bölünme hatası olmasın
 
-    // --- 2. BİRLEŞİK GRAFİK VERİSİ (ACTIVITY OVERVIEW) ---
+
+    // --- 4. BİRLEŞİK GRAFİK VERİSİ (ACTIVITY OVERVIEW) ---
     const hourlyVisits = new Array(24).fill(0);
     const hourlyClicks = new Array(24).fill(0);
     user.visits.forEach(v => hourlyVisits[new Date(v.createdAt).getHours()]++);
@@ -90,7 +98,7 @@ export default async function AnalyticsPage() {
         daily: { labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], visits: dailyVisits, clicks: dailyClicks }
     };
 
-    // --- 3. TRAFİK VE HARİTA VERİSİ ---
+    // --- 5. TRAFİK VE HARİTA VERİSİ ---
     const linkStats = links.map(link => ({
         name: link.title || "Unnamed",
         value: link.clickCount
@@ -111,12 +119,12 @@ export default async function AnalyticsPage() {
     }, {}));
 
 
-    // --- 4. TOP REFERRERS HESAPLAMA ---
-    const refererCounts: Record<string, number> = { "Instagram": 0, "Twitter / X": 0, "LinkedIn": 0, "Direct / Email": 0, "Other": 0 };
+    // --- 6. TOP REFERRERS HESAPLAMA ---
+    const refererCounts: Record<string, number> = { "Instagram": 0, "X": 0, "LinkedIn": 0, "Direct / Email": 0, "Other": 0 };
     allClicks.forEach(click => {
         const ref = (click.referer || "").toLowerCase();
         if (ref.includes("instagram.com")) refererCounts["Instagram"]++;
-        else if (ref.includes("t.co") || ref.includes("twitter.com")) refererCounts["Twitter / X"]++;
+        else if (ref.includes("t.co") || ref.includes("x.com")) refererCounts["X"]++;
         else if (ref.includes("linkedin.com")) refererCounts["LinkedIn"]++;
         else if (!ref || ref === "direct" || ref === "null") refererCounts["Direct / Email"]++;
         else refererCounts["Other"]++;
@@ -131,7 +139,7 @@ export default async function AnalyticsPage() {
         .filter(r => r.value > 0)
         .sort((a, b) => b.value - a.value);
 
-    // --- 5. CİHAZ VE İŞLETİM SİSTEMİ HESAPLAMA ---
+    // --- 7. CİHAZ VE İŞLETİM SİSTEMİ HESAPLAMA ---
     const deviceCounts = { Mobile: 0, Desktop: 0 };
     const osCounts: Record<string, number> = { iOS: 0, Android: 0, Windows: 0, Mac: 0, Other: 0 };
 
@@ -147,7 +155,7 @@ export default async function AnalyticsPage() {
         else osCounts.Other++;
     });
 
-    // --- 6. ACTIVITY HEATMAP VERİSİ ---
+    // --- 8. ACTIVITY HEATMAP VERİSİ ---
     const heatmapDataMap: Record<string, number> = {};
     allClicks.forEach(click => {
         const dateStr = click.createdAt.toISOString().split('T')[0];
@@ -169,7 +177,6 @@ export default async function AnalyticsPage() {
                 <DatePickerWithExport clicks={allClicks} visits={user.visits} />
             </div>
 
-            {/* GERÇEK VERİLER BURAYA BAĞLANDI */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard title="Profile Views" value={profileViews} trend={viewTrend} icon={<Eye size={18} />} color="purple" />
                 <StatCard title="Link Clicks" value={realTotalClicks} trend={clickTrend} icon={<MousePointerClick size={18} />} color="pink" />
@@ -183,7 +190,6 @@ export default async function AnalyticsPage() {
                 />
             </div>
 
-            {/* Diğer Bileşenler Aynı Kalıyor... */}
             <ActivityOverviewChart data={chartData} />
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -211,8 +217,9 @@ export default async function AnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <BottomCard label="Active Days" value="1" icon="📅" />
-                <BottomCard label="Daily Average" value={realTotalClicks > 0 ? (realTotalClicks / 1).toFixed(1) : 0} icon="📊" />
+                {/* AKTİF GÜN VE ORTALAMA BURADA DİNAMİK OLARAK EKLENDİ */}
+                <BottomCard label="Active Days" value={activeDaysCount} icon="📅" />
+                <BottomCard label="Daily Average" value={activeDaysCount > 0 ? (realTotalClicks / activeDaysCount).toFixed(1) : 0} icon="📊" />
                 <BottomCard
                     label="Overall Growth"
                     value={interactionTrend === 0 ? "%0" : (interactionTrend > 0 ? `+${interactionTrend}%` : `${interactionTrend}%`)}
