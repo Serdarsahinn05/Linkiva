@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { v4 as uuidv4 } from "uuid"; // Token üretmek için
-import { sendVerificationEmail } from "@/lib/mail"; // Mail gönderme fonksiyonumuz
+import { v4 as uuidv4 } from "uuid";
+import { sendVerificationEmail } from "@/lib/mail";
 
 /**
  * Yeni Link Ekleme
@@ -192,7 +192,7 @@ export async function updateAccountEmail(newEmail: string) {
         where: { email: session.user.email },
         data: {
             email: cleanEmail,
-            emailVerified: null, // Kritik: Kilidi tekrar kapatıyoruz!
+            emailVerified: null,
             verificationToken: token,
             tokenExpires: expires
         }

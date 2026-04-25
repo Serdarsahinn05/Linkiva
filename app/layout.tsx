@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google"; // Fontları güncelledik
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Genel arayüz fontu (Modern ve temiz)
+
 const inter = Inter({
     variable: "--font-inter",
     subsets: ["latin"],
 });
 
-// Sayılar ve teknik detaylar için (Senin favorin)
+
 const jbMono = JetBrains_Mono({
     variable: "--font-jb-mono",
     subsets: ["latin"],
@@ -17,7 +17,7 @@ const jbMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
     title: "Linkiva",
-    description: "Bento grid yapısıyla bağlantılarını yönet.",
+    description: "Geleceğin link yönetimi...",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

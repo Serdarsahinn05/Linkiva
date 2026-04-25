@@ -12,7 +12,7 @@ export default async function LandingPage() {
         <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black font-sans">
             <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-md">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="text-2xl font-black italic tracking-tighter">Linkiva.</div>
+                    <div className="text-2xl font-black italic tracking-tighter">Linkiva</div>
                     <div className="flex items-center gap-6">
                         {isLoggedIn ? (
                             <Link
@@ -91,7 +91,7 @@ export default async function LandingPage() {
                         </div>
                         <h3 className="text-2xl font-black mb-4 uppercase tracking-tight italic">Analiz Et</h3>
                         <p className="text-gray-500 font-medium leading-relaxed">
-                            Linklerine kimin, ne zaman tıkladığını takip et. Etkileşimini mermi gibi artır.
+                            Linklerine kimin, ne zaman tıkladığını takip et. Etkileşimlerini roket gibi uçur.
                         </p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default async function LandingPage() {
             <footer className="border-t border-white/5 py-24">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12">
                     <div className="flex flex-col items-center md:items-start gap-4">
-                        <div className="text-2xl font-black italic tracking-tighter opacity-40">Linkiva.</div>
+                        <div className="text-2xl font-black italic tracking-tighter opacity-40">Linkiva</div>
 
                     </div>
 

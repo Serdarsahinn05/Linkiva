@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { updateProfile } from "@/lib/actions";
 import { Type, AlignLeft, Sparkles, AtSign } from "lucide-react";
-import AvatarUploader from "./AvatarUploader"; // Bileşeni dahil ettik
+import AvatarUploader from "./AvatarUploader";
 
 
 export default async function AppearancePage() {

@@ -35,7 +35,7 @@ function LoginForm() {
             setError(res.error);
             setLoading(false);
         } else {
-            // Giriş başarılıysa dashboard'a uçur
+            // Giriş başarılıysa dashboard'a git
             window.location.href = "/dashboard";
         }
     };

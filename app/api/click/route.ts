@@ -5,7 +5,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const linkId = searchParams.get("linkId");
 
-    // Parametre yoksa ana sayfaya postala
+    // Parametre yoksa ana sayfaya yönlendir
     if (!linkId) {
         return NextResponse.redirect(new URL("/", request.url));
     }
@@ -20,14 +20,13 @@ export async function GET(request: Request) {
             return NextResponse.redirect(new URL("/", request.url));
         }
 
-        // 2. KULLANICIYI SOYMA OPERASYONU (Vercel Header'ları)
+        // 2. Kullanıcının bilgilerini al
         const country = request.headers.get("x-vercel-ip-country") || "Unknown";
         const city = request.headers.get("x-vercel-ip-city") || "Unknown";
         const userAgent = request.headers.get("user-agent") || "Unknown";
         const referer = request.headers.get("referer") || "Direct";
 
         // 3. Veritabanına Yazma (Asenkron - Yönlendirmeyi Geciktirmesin Diye)
-        // DİKKAT: prisma.click DEĞİL, prisma.clickEvent KULLANIYORUZ!
         Promise.all([
             prisma.clickEvent.create({
                 data: {
@@ -45,7 +44,6 @@ export async function GET(request: Request) {
         ]).catch(err => console.error("Tıklama kaydedilemedi:", err));
 
         // 4. Sessizce asıl hedefe şutla
-        // Hedef URL'nin başında http/https yoksa ekleyelim ki yönlendirme patlamasın
         const targetUrl = link.url.startsWith("http") ? link.url : `https://${link.url}`;
         return NextResponse.redirect(new URL(targetUrl));
 

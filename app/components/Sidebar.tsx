@@ -54,7 +54,7 @@ export default function Sidebar({ user }: { user: any }) {
             {/* ALT ALAN: PROFİL, CANLI LİNK VE ÇIKIŞ */}
             <div className="p-4 border-t border-[#1A1A1A] space-y-4">
 
-                {/* DÜZELTİLEN KISIM: Link ve QR Modal artık yanyana kardeş elementler */}
+                {/*Link ve QR Modal artık yanyana kardeş elementler */}
                 <div className="flex gap-2 w-full items-stretch">
                     <Link
                         href={`/${user?.username}`}

@@ -5,7 +5,7 @@ import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "re
 
 const geoUrl = "https://raw.githubusercontent.com/lotusms/world-map-data/main/world.json";
 
-// KRİTİK: DB'den gelen 2'li kodları haritanın 3'lü kodlarına çevirir
+
 const isoMap: Record<string, string> = {
     "TR": "TUR", "US": "USA", "DE": "DEU", "GB": "GBR", "FR": "FRA", "AZ": "AZE", "NL": "NLD", "RU": "RUS"
 };

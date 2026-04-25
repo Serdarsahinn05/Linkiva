@@ -1,4 +1,4 @@
-import Sidebar from "@/app/components/Sidebar"; // Dosya yoluna dikkat
+import Sidebar from "@/app/components/Sidebar";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 

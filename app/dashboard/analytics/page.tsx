@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Eye, MousePointerClick, Activity, TrendingDown, Clock } from "lucide-react";
 
-// DOĞRU BİLEŞENLER
+
 import MapWrapper from "@/app/components/MapWrapper";
 import ActivityOverviewChart from "@/app/components/charts/ActivityOverviewChart";
 import TrafficSourcesDonut from "@/app/components/charts/TrafficSourcesDonut";

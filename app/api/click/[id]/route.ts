@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 // params'ı Promise olarak tanımlıyoruz
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 
-    // 1. ADIM: params'ı await ile açıyoruz (Hatanın çözümü burada)
+    // 1. ADIM: params'ı await ile açıyoruz
     const { id: linkId } = await params;
 
     try {
@@ -15,7 +15,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             return NextResponse.json({ error: "Link bulunamadı" }, { status: 404 });
         }
 
-        // --- Geri kalan kodlar tamamen aynı kalacak ---
         const forwardedFor = request.headers.get("x-forwarded-for");
         const ip = forwardedFor ? forwardedFor.split(',')[0] : "127.0.0.1";
 

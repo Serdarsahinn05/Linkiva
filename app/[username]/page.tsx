@@ -9,7 +9,7 @@ type Props = {
     params: Promise<{ username: string }>
 };
 
-// --- 1. SEO VE SOSYAL MEDYA KARTLARI (BÜYÜ BURADA) ---
+// --- 1. SEO VE SOSYAL MEDYA KARTLARI  ---
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { username } = await params;
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const title = `${user.fullName || username} (@${username}) | Linkiva`;
     const description = user.bio || `${user.fullName || username} kişisinin tüm bağlantılarına tek bir yerden ulaşın.`;
-    const imageUrl = user.avatarUrl || "https://linkiva.vercel.app/og-default.jpg";
+    const imageUrl = user.avatarUrl || "https://linkiva.space/og-default.jpg";
 
     return {
         title,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title,
             description,
-            url: `https://linkiva.vercel.app/${username}`,
+            url: `https://linkiva.space/${username}`,
             siteName: "Linkiva",
             images: [
                 {
@@ -80,8 +80,8 @@ export default async function ProfilePage({ params }: Props) {
     const userAgent = headersList.get("user-agent") || "Unknown";
     const referer = headersList.get("referer") || "Direct";
 
-    // KRİTİK HIZLANDIRMA: "await" kelimesini sildik.
-    // Artık sayfa veritabanını beklemeden şak diye açılacak!
+
+
     prisma.visit.create({
         data: {
             userId: user.id,

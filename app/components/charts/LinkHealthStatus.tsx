@@ -13,10 +13,10 @@ export default function LinkHealthStatus({ links = [] }: LinkHealthStatusProps) 
     const handleCheck = () => {
         setChecking(true);
         setTimeout(() => setChecking(false), 2000);
-        // İleride buraya gerçek bir arka plan Ping (URL doğrulama) API isteği koyabilirsin
+
     };
 
-    // UI taşmasın diye ilk 5 linki gösterelim
+
     const displayLinks = links.slice(0, 5);
 
     return (
@@ -54,7 +54,7 @@ export default function LinkHealthStatus({ links = [] }: LinkHealthStatusProps) 
                     </p>
                 ) : (
                     displayLinks.map((link, i) => {
-                        // GERÇEK VERİ: Link aktif değilse "Broken/Offline" sayalım
+
                         const isBroken = link.isActive === false;
 
                         return (

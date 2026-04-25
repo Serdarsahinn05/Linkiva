@@ -32,7 +32,7 @@ export default function ActivityHeatmap({ data = [] }: { data?: any[] }) {
                         <CalendarHeatmap
                             startDate={startDate}
                             endDate={today}
-                            values={data} // GERÇEK VERİ BURAYA BAĞLANDI
+                            values={data}
                             gutterSize={1.5}
                             classForValue={(value) => {
                                 if (!value || value.count === 0) return 'fill-[#111]';

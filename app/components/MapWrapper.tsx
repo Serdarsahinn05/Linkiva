@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Activity } from "lucide-react";
 
-// SSR kapatıyoruz çünkü harita kütüphaneleri "window" objesi arar ve sunucuda patlar
+
 const WorldMap = dynamic(() => import("./WorldMap"), {
     ssr: false,
     loading: () => <div className="flex items-center justify-center h-[580px] text-gray-500 font-mono text-xs uppercase tracking-widest animate-pulse">Initializing Map Engine...</div>
@@ -23,7 +23,7 @@ interface MapWrapperProps {
 export default function MapWrapper({ countryStats = [], cityStats = [] }: MapWrapperProps) {
     const [mapView, setMapView] = useState<"countries" | "cities">("countries");
 
-    // GERÇEK VERİ DÜZENLEMESİ: En çok tıklanan 4 ülkeyi karta basmak için sıralıyoruz
+    // En çok tıklanan 4 ülkeyi karta basmak için sıralıyoruz
     const sortedCountries = [...countryStats].sort((a, b) => b.events - a.events);
     // Yüzdelik barı hesaplamak için en yüksek tıklamayı referans alıyoruz
     const topCountryEvents = sortedCountries.length > 0 ? sortedCountries[0].events : 1;

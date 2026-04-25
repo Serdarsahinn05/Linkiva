@@ -11,7 +11,7 @@ export default function DatePickerWithExport({ clicks = [], visits = [] }: { cli
 
     const ranges = ["Today", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "All Time"];
 
-    // GERÇEK EXPORT FONKSİYONU
+
     const handleExport = () => {
         setIsExporting(true);
 

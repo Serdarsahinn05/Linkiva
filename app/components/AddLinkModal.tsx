@@ -27,7 +27,7 @@ export default function AddLinkModal({ isOpen, onClose }: { isOpen: boolean; onC
                     />
                     <input
                         name="url"
-                        type="text" // BURASI TEXT OLDU
+                        type="text"
                         placeholder="URL (Örn: github.com/username)"
                         className="w-full bg-[#080808] border border-[#1A1A1A] rounded-xl px-4 py-3 text-white outline-none focus:border-white transition-colors"
                         required

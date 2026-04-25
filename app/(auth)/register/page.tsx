@@ -20,8 +20,7 @@ function RegisterForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // NOT: Önceki kodda burada olan useEffect'i TAMAMEN SİLDİK.
-    // Böylece sen değiştirdiğinde URL'deki eski isim geri gelmeyecek.
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,7 +53,7 @@ function RegisterForm() {
             // Kayıt başarılı!
             router.push("/login?registered=true");
         } catch (err: any) {
-            // Ekranda o iğrenç JSON hatası yerine gerçek hatayı gösterecek
+            // Ekranda JSON hatası yerine gerçek hatayı gösterecek
             setError(err.message.replace("Error: ", ""));
         } finally {
             setLoading(false);
@@ -139,7 +138,7 @@ function RegisterForm() {
     );
 }
 
-// Next.js 15+ kullanımı için Suspense şart
+
 export default function RegisterPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-black px-6 py-12">

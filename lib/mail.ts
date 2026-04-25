@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-    // Canlıya çıkınca burası https://linkiva.vercel.app olacak
+
     const confirmLink = `${process.env.NEXTAUTH_URL}/api/verify?token=${token}`;
 
     await resend.emails.send({

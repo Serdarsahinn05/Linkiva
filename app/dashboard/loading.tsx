@@ -8,7 +8,7 @@ export default function LinksLoading() {
             </div>
 
             {/* FİYAKALI 'YENİ LİNK EKLE' BUTONU İSKELETİ */}
-            {/* O kesikli (dashed) kenarlığı ve içindeki yapıyı taklit ediyoruz */}
+
             <div className="h-28 bg-[#0A0A0A] rounded-[2rem] border-2 border-dashed border-[#222] p-8 flex items-center justify-between shadow-lg">
                 <div className="flex items-center gap-4">
                     {/* Yuvarlak simge placeholder */}

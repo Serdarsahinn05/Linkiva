@@ -8,7 +8,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <NextThemesProvider
             attribute="class"
             defaultTheme="light"
-            themes={['light', 'dark', 'midnight']} // Burası çok önemli
+            themes={['light', 'dark', 'midnight']}
         >
             <SessionProvider>{children}</SessionProvider>
         </NextThemesProvider>

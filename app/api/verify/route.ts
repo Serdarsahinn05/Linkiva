@@ -29,6 +29,5 @@ export async function GET(request: Request) {
         }
     });
 
-    // İşlem bitince giriş sayfasına yönlendir, sonuna da verified=true ekle ki uyarı gösterelim
     redirect("/login?verified=true");
 }

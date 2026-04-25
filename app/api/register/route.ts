@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "@/lib/mail";
-import { registerRateLimit } from "@/lib/ratelimit"; // Yeni ekledik
-import { headers } from "next/headers"; // IP almak için
+import { registerRateLimit } from "@/lib/ratelimit";
+import { headers } from "next/headers";
 
 export async function POST(req: Request) {
     try {
-        // --- RATE LIMIT KONTROLÜ (EN BAŞTA) ---
+        // --- RATE LIMIT KONTROLÜ ---
         const headerList = await headers();
-        // Vercel'de gerçek IP "x-forwarded-for" header'ındadır
+
         const ip = headerList.get("x-forwarded-for") || "127.0.0.1";
 
         const { success, limit, reset, remaining } = await registerRateLimit.limit(ip);

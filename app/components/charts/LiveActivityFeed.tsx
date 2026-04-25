@@ -6,12 +6,11 @@ import { Activity, MousePointerClick, Eye } from "lucide-react";
 export default function LiveActivityFeed({ initialClicks = [], initialVisits = [] }: { initialClicks?: any[], initialVisits?: any[] }) {
     const [mounted, setMounted] = useState(false);
 
-    // Hydration (Saat uyuşmazlığı) hatasını önlemek için kalkanı açıyoruz
+
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // Tıklama ve Ziyaretleri birleştirip tek bir "Activity" listesi yapıyoruz
     const feed = [
         ...initialClicks.map(c => ({
             id: c.id,

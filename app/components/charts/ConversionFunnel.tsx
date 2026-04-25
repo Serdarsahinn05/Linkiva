@@ -2,7 +2,7 @@
 
 import { Eye, MousePointerClick, Target, ArrowRight } from "lucide-react";
 
-// 1. DÜZELTME: 'any' tipini kaldırıp TypeScript'e uygun Interface yazdık
+
 interface ConversionFunnelProps {
     views?: number;
     clicks?: number;
@@ -10,7 +10,7 @@ interface ConversionFunnelProps {
 }
 
 export default function ConversionFunnel({ views = 0, clicks = 0, topLinkClicks = 0 }: ConversionFunnelProps) {
-    // 2. DÜZELTME: Tıklamalar görüntülenmeyi aşarsa bar taşmasın diye Math.min ile %100'e sabitledik
+
     const viewPct = 100;
     const clickPct = views > 0 ? Math.min((clicks / views) * 100, 100) : 0;
     const targetPct = views > 0 ? Math.min((topLinkClicks / views) * 100, 100) : 0;

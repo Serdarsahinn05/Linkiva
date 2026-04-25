@@ -9,7 +9,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         return NextResponse.json({ error: "Dosya bulunamadı" }, { status: 400 });
     }
 
-    // Dosyayı Vercel Blob'a yüklüyoruz
+
     const blob = await put(filename, request.body, {
         access: 'public',
     });
