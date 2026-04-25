@@ -1,4 +1,4 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { prisma } from "@/lib/prisma";
 
@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
         });
 
         if (!user) {
-
             return new ImageResponse(
                 (
                     <div style={{
@@ -58,19 +57,19 @@ export async function GET(req: NextRequest) {
 
         const bgImage = (user.backgroundImage && user.backgroundImage.length > 10) ? user.backgroundImage : null;
 
-
         const avatar = (user.avatarUrl && user.avatarUrl.startsWith('http')) ? user.avatarUrl : null;
 
 
-        const themeGradients: Record<string, string> = {
-            dark: '#000000',
-            midnight: 'linear-gradient(135deg, #111827, #000000)',
-            sunset: 'linear-gradient(135deg, #ea580c, #e11d48)',
-            emerald: 'linear-gradient(135deg, #059669, #134e4a)',
-            glass: '#0a0a0a',
+        // Gradyanlar için backgroundImage, solid renkler için backgroundColor kullanmalıyız.
+        const themeStyles: Record<string, any> = {
+            dark: { backgroundColor: '#000000' },
+            midnight: { backgroundImage: 'linear-gradient(135deg, #111827, #000000)' },
+            sunset: { backgroundImage: 'linear-gradient(135deg, #ea580c, #e11d48)' },
+            emerald: { backgroundImage: 'linear-gradient(135deg, #059669, #134e4a)' },
+            glass: { backgroundColor: '#0a0a0a' },
         };
 
-        const currentBg = themeGradients[theme] || '#000000';
+        const currentStyle = themeStyles[theme] || themeStyles.dark;
 
         return new ImageResponse(
             (
@@ -87,7 +86,7 @@ export async function GET(req: NextRequest) {
                         overflow: 'hidden',
                     }}
                 >
-                    {/* KATMAN 1: Arkaplan - Satori için inset: 0 yerine top/left/width 100% */}
+                    {/* KATMAN 1: Arkaplan */}
                     {bgImage ? (
                         <img
                             src={bgImage}
@@ -95,12 +94,12 @@ export async function GET(req: NextRequest) {
                         />
                     ) : (
                         <div
-                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', background: currentBg }}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', ...currentStyle }}
                         />
                     )}
 
-                    {/* KATMAN 2: Karartma Katmanı */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', background: 'rgba(0, 0, 0, 0.4)' }} />
+                    {/* KATMAN 2: Karartma Katmanı (background yerine backgroundColor yapıldı) */}
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', backgroundColor: 'rgba(0, 0, 0, 0.4)' }} />
 
                     {/* KATMAN 3: İçerik */}
                     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -118,7 +117,7 @@ export async function GET(req: NextRequest) {
                                     style={{ width: 190, height: 190, borderRadius: 100, border: '6px solid rgba(255,255,255,0.2)', objectFit: 'cover' }}
                                 />
                             ) : (
-                                <div style={{ width: 190, height: 190, borderRadius: 100, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '6px solid rgba(255,255,255,0.1)' }}>
+                                <div style={{ width: 190, height: 190, borderRadius: 100, backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '6px solid rgba(255,255,255,0.1)' }}>
                                     <span style={{ fontSize: 90 }}>👤</span>
                                 </div>
                             )}
