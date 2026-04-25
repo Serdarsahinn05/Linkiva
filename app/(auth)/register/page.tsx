@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-// Eye ve EyeOff ikonlarını ekledik
+
 import { User, Mail, Lock, Sparkles, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 function RegisterForm() {

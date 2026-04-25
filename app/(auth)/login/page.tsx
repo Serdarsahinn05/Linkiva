@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-// Eye ve EyeOff ikonlarını ekledik
+
 import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
