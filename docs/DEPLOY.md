@@ -6,6 +6,8 @@ Sıra önemli: **eski veritabanı en son silinir**, yoksa canlı v1 sitesi geçi
 ## 1. Veritabanı (Supabase)
 
 1. Supabase'de **yeni bir proje** aç (ör. `linkiva-v2`). Temiz başlangıç budur. Eski veri taşınmıyor.
+   Bölge kullanıcılara ve Vercel fonksiyonlarına yakın olmalı: Türkiye için **Frankfurt (eu-central-1)** ve Vercel → Settings → Functions → Region **fra1**. DB ile fonksiyon farklı kıtadaysa panelde her sorgu ~150–250 ms gecikir.
+   Şifre olarak Supabase'in ürettiği güçlü şifreyi kullan.
 2. Project Settings → Database → Connection string:
    - `DATABASE_URL`: **Transaction pooler** (port 6543), sonuna `?pgbouncer=true` ekle.
    - `DIRECT_URL`: **Session pooler / direct** (port 5432). Migration'lar bunu kullanır.
