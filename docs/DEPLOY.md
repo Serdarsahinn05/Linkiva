@@ -68,16 +68,17 @@ console.cloud.google.com → üstten doğru projeyi seç → **Google Auth Platf
    v1'in `/api/auth/callback/google` adresi aynı yolda. Farklıysa eskisini geçişten sonra kaldır.
 3. Client ID/Secret → Vercel env.
 
-## 5. `hello@linkiva.space` posta kutusu
+## 5. `hello@linkiva.space` posta kutusu (kurulu)
 
-Resend yalnızca **gönderir**, gelen maili almaz. Gelen için yönlendirme en kolayı:
+Resend yalnızca **gönderir**. Gelen mail ImprovMX ile yönlendiriliyor (Zoho'nun ücretsiz planı yeni kayda kapalı çıktı).
 
-- **ImprovMX** (ücretsiz): alan adını ekle, `hello` → kendi Gmail'in. DNS'e kök alan (`@`) için
-  MX `mx1.improvmx.com` (10), `mx2.improvmx.com` (20) ve TXT `v=spf1 include:spf.improvmx.com ~all`.
-  Resend'in kayıtları `send.` alt alanında olduğu için çakışmaz.
-- DNS Cloudflare'deyse: Cloudflare → Email → Email Routing aynı işi yapar.
-- Gmail'den `hello@` adına **yanıt** vermek için: Gmail → Ayarlar → Hesaplar → "Postayı farklı gönder" →
-  SMTP `smtp.resend.com`, port 465, kullanıcı `resend`, şifre = Resend API anahtarı.
+- **ImprovMX** (ücretsiz): kök alan (`@`) için MX `mx1.improvmx.com` (10), `mx2.improvmx.com` (20),
+  TXT `v=spf1 include:spf.improvmx.com ~all`. Resend'in kayıtları `send.` ve `resend._domainkey`'de, çakışmaz.
+- Alias'lar `hello`, `abuse`, `postmaster` → **Linkiva'ya ayrılmış ayrı bir Gmail hesabı** (kişisel mail değil).
+- O Gmail'de "Postayı farklı gönder": `hello@linkiva.space`, SMTP `smtp.resend.com`, port 465 SSL,
+  kullanıcı `resend`, şifre = ayrı bir Resend API anahtarı (`gmail`, Sending access). Varsayılan adres ve
+  "iletinin gönderildiği adresten yanıtla" açık. Elle gönderilen mailler Resend kotasından düşer.
+- Ücretli gerçek kutu gerekirse: Purelymail, Zoho Mail Lite, Google Workspace (DNS'te yalnız MX/SPF değişir).
 
 ## 6. Önce dene, sonra birleştir
 
@@ -92,3 +93,21 @@ Resend yalnızca **gönderir**, gelen maili almaz. Gelen için yönlendirme en k
 - Yerel DB: `docker compose up -d`, `.env.local` → `linkiva_dev`. `npm run db:migrate` hem migration hem client üretir.
 - Yerelde sahte istatistik varsa: `DELETE FROM event WHERE "visitorHash" LIKE 'demo-%';`
 - E2E: `PW_CHANNEL=chrome npx playwright test`. Production modu: `npm run build && PW_PROD=1 PW_CHANNEL=chrome npx playwright test`. Port 3000 doluysa `PORT=3100 NEXT_PUBLIC_APP_URL=http://localhost:3100` ile.
+
+## Durum (2026-09-24)
+
+Yapıldı:
+- Supabase **Frankfurt** projesi açıldı, 3 migration uygulandı (boş). Mumbai denemesi silindi.
+- Vercel **Preview** env'leri v2'ye ayrıldı (`DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_APP_URL` = dal adresi,
+  `BETTER_AUTH_SECRET`, `TRACKING_SALT_SECRET`). **Production env'leri hâlâ v1'in**, canlı v1 onlarla çalışıyor.
+- Preview: `https://linkiva-git-rebuild-v2-serdarsahinn05s-projects.vercel.app` çalışıyor, Google girişi dahil
+  (redirect URI eklendi, Branding "Linkiva").
+- Resend alan adı doğrulandı. Posta kutusu yukarıdaki gibi kurulu. Blob: mevcut depo kullanılıyor.
+
+Geçiş günü (kullanıcı preview denemesini bitirince, onayıyla):
+1. Production env: `DATABASE_URL`, `DIRECT_URL` → Frankfurt; `NEXT_PUBLIC_APP_URL=https://linkiva.space`;
+   `BETTER_AUTH_SECRET`, `TRACKING_SALT_SECRET` Production'a da eklenir.
+2. Sil: `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NPM_CONFIG_LEGACY_PEER_DEPS`, çalışmayan `UPSTASH_*` (ya da yeni Upstash).
+3. Settings → Functions → Region **fra1**.
+4. `rebuild/v2` → `master` birleştir, production'da duman testi.
+5. Eski v1 Supabase projesini ve Blob'daki v1 dosyalarını sil.

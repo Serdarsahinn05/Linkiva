@@ -15,7 +15,7 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
 | [docs/AUDIT.md](docs/AUDIT.md) | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
 
-> **Durum (2026-09-24):** v2 yeniden kurulumu onaylandı ve `rebuild/v2` dalında sürüyor. v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Kod tarafı bitti (Faz 0–5, işlem mailleri dahil). Sırada kullanıcının preview denemesi ve `docs/DEPLOY.md` adımları var; `master`'a birleştirme kullanıcı onayıyla. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
+> **Durum (2026-09-24):** v2 yeniden kurulumu onaylandı ve `rebuild/v2` dalında sürüyor. v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Kod tarafı bitti (Faz 0–5, işlem mailleri dahil). Preview Vercel'de çalışıyor; sırada kullanıcının denemesi ve **geçiş günü** (`docs/DEPLOY.md` → Durum) var; `master`'a birleştirme kullanıcı onayıyla. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
 
 ## Stack
 
