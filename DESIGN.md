@@ -147,7 +147,23 @@ Başlık üstüne eyebrow/kicker konmaz. Vurgu, ağırlık ve boyutla yapılır.
 - Ortam ışığı + ortalanmış içerik (max 560px). Avatar 104px, çevresinde 1px cam halka.
 - İsim display 600, bio `--ink-2`, sosyal ikonlar 44px cam daireler.
 - **Link butonları:** tam genişlik, 60px, 20px köşe, `glass-interactive` (specular). Başlık ortada 500 ağırlık, sağda küçük ok. Öne çıkan link: `glass-strong` + yumuşak beyaz dış parlama (monokrom). Başlık bloğu: küçük, `--ink-2`, 600. Metin bloğu: `--ink-2`. Ayraç: kısa 1px çizgi.
-- Sistem temasına uyar (profil sahibi Faz 3'te sabitleyebilir).
+- Sistem temasına uyar (profil sahibi sabitleyebilir, aşağıda).
+
+### Profil temaları (kullanıcıya açık, `themes/index.ts`)
+Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
+
+| Tema | Mod | Font | Buton | Sahne ışığı | Vurgu |
+|---|---|---|---|---|---|
+| `cam` (varsayılan) | sistem | Geist | cam | monokrom | yok |
+| `gece` | koyu | Geist | cam | derin mor-mavi | yok |
+| `sade` | açık | Geist | çizgi | yok | yok |
+| `kum` | açık | Newsreader (serif) | dolu | sıcak kum | #3A2E26 |
+| `terminal` | koyu | Geist Mono | çizgi | yok | #7CF5A8 |
+| `afis` | açık | Bricolage Grotesque | dolu | vurgu renginden | #FF5A36 |
+
+- Özelleştirme: mod (ziyaretçiye göre/açık/koyu), font (5), buton stili (cam/dolu/çizgi), vurgu rengi (hazır + özel), arka plan görseli (kendi zemin rengiyle karartılır), "Linkiva" rozetini gizleme.
+- **Kontrast koruması:** Dolu butonda yazı rengi vurgu renginden otomatik seçilir (`inkOn`, ≥ 4.5:1 testli). Çizgi butonda vurgu, seçili modun zemininde 3:1'in altındaysa Görünüm sayfası uyarır.
+- Profil kendi sahnesini taşır (`.profile-scene` + `data-theme/scene/font/button`), bu yüzden önizlemeler ve tema kartları gerçek CSS ile çizilir.
 
 ### Landing (Persuade)
 - İlk ekran: ortam ışığı, display başlık "Her şeyin, tek bir adreste.", alt metin ve **cam bir adres çubuğu**: `linkiva.space/` + kullanıcı adı girişi + birincil hap buton. Yanında (mobilde altında) örnek bir profil (sentetik, "Örnek" etiketli) cam telefon içinde durur.

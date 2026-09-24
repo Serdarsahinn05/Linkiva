@@ -2,15 +2,18 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlignLeft, ArrowDown, ArrowUp, CircleAlert, GripVertical, Heading, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
+import { AlignLeft, ArrowDown, ArrowUp, CalendarClock, CircleAlert, GripVertical, Heading, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useNow, useTranslations } from "next-intl";
 import { Input, inputClass } from "@/components/ui/field";
 import { Menu } from "@/components/ui/menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/cn";
 import { parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { parseEmbed } from "@/lib/embeds";
 import { normalizeUrl } from "@/lib/validation/url";
+import { ScheduleDialog } from "./schedule-dialog";
 import type { EditorBlock } from "../types";
 
 /** Block types are told apart by icon, never by colour (DESIGN.md §6). */
@@ -32,13 +35,27 @@ type RowProps = {
   onFlags: (flags: { isVisible?: boolean; isHighlighted?: boolean }) => void;
   onMove: (direction: -1 | 1) => void;
   onDelete: () => void;
+  onSchedule: (schedule: { startsAt: string | null; endsAt: string | null }) => void;
 };
 
-export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, onMove, onDelete }: RowProps) {
+export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
   const [urlTouched, setUrlTouched] = useState(Boolean(block.data.url));
+  const [scheduling, setScheduling] = useState(false);
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 }).getTime();
+  const when = (iso: string) => format.dateTime(new Date(iso), { dateStyle: "medium", timeStyle: "short" });
+  const scheduleNote =
+    block.endsAt && Date.parse(block.endsAt) <= now
+      ? { tone: "text-ink-3", text: t("expired") }
+      : block.startsAt && Date.parse(block.startsAt) > now
+        ? { tone: "text-info", text: t("scheduledFor", { date: when(block.startsAt) }) }
+        : block.endsAt
+          ? { tone: "text-ink-2", text: t("activeUntil", { date: when(block.endsAt) }) }
+          : null;
+  const embedInvalid = block.type === "EMBED" && urlTouched && Boolean(block.data.url) && parseEmbed(block.data.url ?? "") === null;
 
   const complete = parseBlock(block.type, block.data) !== null;
   const urlInvalid = block.type === "LINK" && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
@@ -90,7 +107,8 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
                         },
                       ]
                     : []),
-                  { label: t("moveUp"), icon: <ArrowUp size={18} strokeWidth={1.75} />, onSelect: () => onMove(-1), disabled: index === 0 },
+                  { label: t("schedule"), icon: <CalendarClock size={18} strokeWidth={1.75} />, onSelect: () => setScheduling(true) },
+              { label: t("moveUp"), icon: <ArrowUp size={18} strokeWidth={1.75} />, onSelect: () => onMove(-1), disabled: index === 0 },
                   { label: t("moveDown"), icon: <ArrowDown size={18} strokeWidth={1.75} />, onSelect: () => onMove(1), disabled: index === count - 1 },
                   { label: t("delete"), icon: <Trash2 size={18} strokeWidth={1.75} />, onSelect: onDelete, danger: true },
                 ]}
@@ -148,9 +166,44 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
               className={cn(inputClass, "resize-y py-2 leading-normal")}
             />
           )}
+          {block.type === "EMBED" && (
+            <>
+              <Input
+                aria-label={t("embedUrl")}
+                placeholder={t("embedPlaceholder")}
+                value={field("url")}
+                inputMode="url"
+                autoCapitalize="none"
+                spellCheck={false}
+                maxLength={2048}
+                autoFocus={autoFocus}
+                aria-invalid={embedInvalid}
+                onChange={(e) => set("url", e.target.value)}
+                onBlur={() => setUrlTouched(true)}
+              />
+              {embedInvalid && <p className="text-sm text-negative">{t("embedInvalid")}</p>}
+            </>
+          )}
+          {block.type === "EMAIL_CAPTURE" && (
+            <>
+              <Input aria-label={t("captureTitle")} placeholder={t("captureTitle")} value={field("title")} maxLength={TITLE_MAX} autoFocus={autoFocus} onChange={(e) => set("title", e.target.value)} />
+              <p className="text-sm text-ink-3">
+                {t("captureHint")}{" "}
+                <Link href="/dashboard/audience" className="font-medium text-ink underline underline-offset-4">
+                  {t("captureLink")}
+                </Link>
+              </p>
+            </>
+          )}
           {block.type === "DIVIDER" && <hr className="my-3 border-glass-edge" aria-hidden />}
+          {scheduleNote && (
+            <p className={cn("flex items-center gap-1.5 text-sm", scheduleNote.tone)}>
+              <CalendarClock size={14} strokeWidth={1.75} aria-hidden />
+              {scheduleNote.text}
+            </p>
+          )}
 
-          {!complete && block.type !== "DIVIDER" && !urlInvalid && (
+          {!complete && block.type !== "DIVIDER" && !urlInvalid && !embedInvalid && (
             <p className="flex items-center gap-1.5 text-sm text-ink-2">
               <CircleAlert size={14} strokeWidth={1.75} aria-hidden />
               {t("incomplete")}
@@ -159,6 +212,17 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
         </div>
 
       </div>
+      {scheduling && (
+        <ScheduleDialog
+          open
+          initial={{ startsAt: block.startsAt, endsAt: block.endsAt }}
+          onClose={() => setScheduling(false)}
+          onSave={(schedule) => {
+            setScheduling(false);
+            onSchedule(schedule);
+          }}
+        />
+      )}
     </li>
   );
 }

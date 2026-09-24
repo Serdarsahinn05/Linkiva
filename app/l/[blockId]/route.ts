@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { isLive } from "@/features/profile/public";
+import { isLive } from "@/lib/schedule";
 import { parseBlock } from "@/lib/validation/blocks";
 
 /**

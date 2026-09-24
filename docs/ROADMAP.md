@@ -84,14 +84,22 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## Faz 3: Görünüm ve ek bloklar
 
-- [ ] Temalar (`cam` varsayılan; `sade`, `gece`, `kagit`, `terminal`, `afis`: DESIGN.md'deki cam diline uyumlu, profil sahibinin seçtiği) + özelleştirme (vurgu, font, buton stili, arka plan görseli, markayı gizle, açık/koyu sabitleme). Kontrast koruması.
-- [ ] Görünüm sayfasında canlı önizleme ile anında geri bildirim.
-- [ ] EMBED bloğu (YouTube, Spotify, SoundCloud; `lite` gömme: tıklanana kadar iframe yüklenmez, önce önizleme görseli gösterilir).
-- [ ] EMAIL_CAPTURE bloğu + "Kitle" sayfası (abone listesi, CSV dışa aktarma), rate limit, çift abone engeli.
-- [ ] Planlı bloklar (`startsAt`/`endsAt`), editörde "planlı" durum rozeti.
-- [ ] SEO ayarları (başlık, açıklama), profil yayında/gizli anahtarı.
+- [x] Temalar `cam, gece, sade, kum, terminal, afis` (DESIGN.md §7 tablo) + özelleştirme (mod, 5 font, buton stili, vurgu rengi, arka plan görseli, rozeti gizle). Kontrast koruması (`inkOn` + düşük kontrast uyarısı).
+- [x] Görünüm sayfası: gerçek CSS ile çizilen tema kartları, canlı önizleme (masaüstünde cam telefon, mobilde alt çubuktaki Önizle), otomatik kayıt.
+- [x] EMBED bloğu (YouTube, Spotify, SoundCloud). Hafif gömme: tıklanana kadar iframe yok, YouTube `youtube-nocookie`, iframe adresi daima ID'den yeniden kurulur.
+- [x] EMAIL_CAPTURE bloğu + Kitle sayfası (liste, silme, CSV, formül enjeksiyonu koruması). Honeypot, IP rate limit (Upstash ya da bellek yedeği), çift abonelik aynı cevap.
+- [x] Planlı bloklar (`startsAt`/`endsAt`): menüde "Planla", satırda durum ("… tarihinde yayında", "Süresi doldu"). Önizleme de yayındaki kuralla filtreler.
+- [x] SEO başlık/açıklama ve "Sayfa yayında" anahtarı (Ayarlar → Profil). Kapalı profil 404.
 
 **Kabul:** Her tema kontrast testinden geçiyor. Embed profili yavaşlatmıyor (iframe tembel yükleniyor). Abone formu JS kapalıyken de çalışıyor (progressive enhancement).
+
+**Faz 3 notları (2026-09-24):**
+- ✅ `tests/e2e/phase3.spec.ts`: tema public sayfaya yansıyor, iframe yalnızca tıklamayla yükleniyor, abonelik + çift kayıt + Kitle + CSV (sahibe özel), planlı link gizli, SEO başlığı, yayından kaldırınca 404. Dev ve production'da geçiyor.
+- ✅ Entegrasyon: başkasının bloğunu planlayamama, başkasının blob'unu arka plan yapamama, başkasının abonesini silememe.
+- ⚠️ Abone formunun JS kapalıyken çalışması bir server action formu olduğu için tasarım gereği sağlanıyor, ama JS kapalı ayrı bir e2e testi yazılmadı.
+- 🐞 Bulunan: rate limiter altyapısı erişilemezse abone olma çöküyordu (v1'in silinmiş Upstash DB'si). Artık bellek yedeğine düşüp logluyor.
+- Kitle mobilde alt çubukta yok (5 slot); E-posta bloğundaki "Aboneleri gör" bağlantısı ve masaüstü kenar çubuğundan erişiliyor. Faz 4'te İstatistik sayfasına sekme olarak da eklenebilir.
+- Yerel `.env.local` artık v1'in Upstash değişkenlerini de boşaltıyor.
 
 ## Faz 4: Analitik
 

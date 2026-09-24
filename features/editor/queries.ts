@@ -14,6 +14,7 @@ export async function getEditorData(userId: string): Promise<{ profile: EditorPr
       bio: profile.bio ?? "",
       avatarUrl: profile.avatarUrl,
       theme: profile.theme,
+      appearance: profile.appearance,
       showBranding: profile.showBranding,
     },
     blocks: profile.blocks.map((b) => ({
@@ -22,6 +23,8 @@ export async function getEditorData(userId: string): Promise<{ profile: EditorPr
       data: (b.data ?? {}) as Record<string, string>,
       isVisible: b.isVisible,
       isHighlighted: b.isHighlighted,
+      startsAt: b.startsAt?.toISOString() ?? null,
+      endsAt: b.endsAt?.toISOString() ?? null,
     })),
     socials: Object.fromEntries(profile.socials.map((s) => [s.platform, s.handle])),
   };

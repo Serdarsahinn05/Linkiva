@@ -140,7 +140,8 @@
     "analytics": "İstatistik",
     "settings": "Ayarlar",
     "preview": "Önizle",
-    "main": "Panel menüsü"
+    "main": "Panel menüsü",
+    "audience": "Kitle"
   },
   "editor": {
     "title": "Sayfan",
@@ -202,7 +203,24 @@
       "wrongType": "JPG, PNG ya da WebP bir görsel seç.",
       "tooBig": "Görsel 5 MB'tan küçük olmalı.",
       "failed": "Fotoğraf yüklenemedi. Tekrar dene."
-    }
+    },
+    "embedUrl": "Video ya da müzik linki",
+    "embedPlaceholder": "youtube.com/watch?v=… ya da open.spotify.com/…",
+    "embedInvalid": "YouTube, Spotify ya da SoundCloud linki yapıştır.",
+    "captureTitle": "Başlık (isteğe bağlı)",
+    "captureHint": "Aboneler Kitle sayfasında listelenir.",
+    "captureLink": "Aboneleri gör",
+    "schedule": "Planla",
+    "scheduleTitle": "Yayın zamanı",
+    "scheduleHint": "Boş bırakılan taraf sınırsızdır. Saatler senin saat diliminde.",
+    "startsAt": "Başlangıç",
+    "endsAt": "Bitiş",
+    "scheduleSave": "Kaydet",
+    "scheduleClear": "Planı kaldır",
+    "scheduleOrder": "Bitiş, başlangıçtan sonra olmalı.",
+    "scheduledFor": "{date} tarihinde yayında",
+    "activeUntil": "{date} tarihine kadar yayında",
+    "expired": "Süresi doldu, sayfada görünmüyor"
   },
   "share": {
     "address": "Adresin",
@@ -239,5 +257,88 @@
     "appearance": "Tema ve özelleştirme bir sonraki adımda geliyor.",
     "analytics": "İstatistikler, sayfan ziyaret almaya başladığında burada görünecek.",
     "back": "Linklere dön"
+  },
+  "appearance": {
+    "title": "Görünüm",
+    "theme": "Tema",
+    "themes": {
+      "cam": "Cam",
+      "gece": "Gece",
+      "sade": "Sade",
+      "kum": "Kum",
+      "terminal": "Terminal",
+      "afis": "Afiş"
+    },
+    "themeHints": {
+      "cam": "Buzlu cam, sisteme uyar",
+      "gece": "Derin, koyu cam",
+      "sade": "Beyaz ve çizgi",
+      "kum": "Sıcak, editoryal",
+      "terminal": "Mono, fosfor yeşili",
+      "afis": "Tek renk, cesur"
+    },
+    "customize": "Özelleştir",
+    "mode": "Mod",
+    "modes": {
+      "system": "Ziyaretçiye göre",
+      "light": "Açık",
+      "dark": "Koyu"
+    },
+    "font": "Yazı tipi",
+    "fonts": {
+      "geist": "Modern",
+      "serif": "Editoryal",
+      "rounded": "Yuvarlak",
+      "grotesk": "Karakterli",
+      "mono": "Mono"
+    },
+    "button": "Buton stili",
+    "buttons": {
+      "glass": "Cam",
+      "solid": "Dolu",
+      "outline": "Çizgi"
+    },
+    "accent": "Vurgu rengi",
+    "accentHint": "Dolu ve çizgi butonlarda kullanılır. Okunabilirlik otomatik korunur.",
+    "accentNone": "Renk yok",
+    "accentCustom": "Özel renk",
+    "background": "Arka plan görseli",
+    "backgroundChoose": "Görsel seç",
+    "backgroundRemove": "Kaldır",
+    "backgroundDisabled": "Görsel yükleme bu ortamda kapalı.",
+    "branding": "Linkiva yazısını göster",
+    "brandingHint": "Kaldırmak ücretsiz.",
+    "lowContrast": "Bu renk seçili modda zor okunabilir."
+  },
+  "blocks": {
+    "embedPlay": "Oynat",
+    "embedListen": "Dinle",
+    "embedOn": "{provider} üzerinde",
+    "subscribeTitle": "Haberdar ol",
+    "subscribePlaceholder": "E-posta adresin",
+    "subscribeButton": "Abone ol",
+    "subscribeDone": "Teşekkürler, listedesin.",
+    "subscribeInvalid": "Geçerli bir e-posta adresi yaz.",
+    "subscribeTooMany": "Çok fazla deneme. Biraz sonra tekrar dene.",
+    "subscribeError": "Şu an kaydedemedik. Tekrar dene."
+  },
+  "audience": {
+    "title": "Kitle",
+    "count": "{count, plural, =0 {Henüz abone yok} one {# abone} other {# abone}}",
+    "empty": "Sayfana bir E-posta bloğu ekle; abone olanlar burada listelenir.",
+    "export": "CSV indir",
+    "email": "E-posta",
+    "date": "Tarih",
+    "remove": "Kaldır",
+    "removed": "Abone kaldırıldı."
+  },
+  "publishing": {
+    "title": "Profil",
+    "published": "Sayfa yayında",
+    "publishedHint": "Kapatırsan adresin herkese 404 gösterir, verilerin silinmez.",
+    "seoTitle": "Arama motoru başlığı",
+    "seoTitleHint": "Boş bırakırsan adın ve kullanıcı adın kullanılır. En fazla 70 karakter.",
+    "seoDescription": "Arama motoru açıklaması",
+    "seoDescriptionHint": "Boş bırakırsan bio kullanılır. En fazla 160 karakter."
   }
 }

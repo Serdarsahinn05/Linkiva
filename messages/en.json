@@ -140,7 +140,8 @@
     "analytics": "Analytics",
     "settings": "Settings",
     "preview": "Preview",
-    "main": "Dashboard menu"
+    "main": "Dashboard menu",
+    "audience": "Audience"
   },
   "editor": {
     "title": "Your page",
@@ -202,7 +203,24 @@
       "wrongType": "Choose a JPG, PNG or WebP image.",
       "tooBig": "The image must be under 5 MB.",
       "failed": "Could not upload the photo. Try again."
-    }
+    },
+    "embedUrl": "Video or music link",
+    "embedPlaceholder": "youtube.com/watch?v=… or open.spotify.com/…",
+    "embedInvalid": "Paste a YouTube, Spotify or SoundCloud link.",
+    "captureTitle": "Title (optional)",
+    "captureHint": "Subscribers are listed on the Audience page.",
+    "captureLink": "See subscribers",
+    "schedule": "Schedule",
+    "scheduleTitle": "Publishing time",
+    "scheduleHint": "An empty side has no limit. Times are in your time zone.",
+    "startsAt": "Starts",
+    "endsAt": "Ends",
+    "scheduleSave": "Save",
+    "scheduleClear": "Remove schedule",
+    "scheduleOrder": "The end must be after the start.",
+    "scheduledFor": "Goes live {date}",
+    "activeUntil": "Live until {date}",
+    "expired": "Expired, not shown on your page"
   },
   "share": {
     "address": "Your address",
@@ -239,5 +257,88 @@
     "appearance": "Themes and customisation arrive in the next step.",
     "analytics": "Your stats appear here once your page gets visits.",
     "back": "Back to links"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "themes": {
+      "cam": "Glass",
+      "gece": "Night",
+      "sade": "Plain",
+      "kum": "Sand",
+      "terminal": "Terminal",
+      "afis": "Poster"
+    },
+    "themeHints": {
+      "cam": "Frosted glass, follows the system",
+      "gece": "Deep, dark glass",
+      "sade": "White and lines",
+      "kum": "Warm, editorial",
+      "terminal": "Mono, phosphor green",
+      "afis": "One colour, bold"
+    },
+    "customize": "Customise",
+    "mode": "Mode",
+    "modes": {
+      "system": "Visitor's choice",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "font": "Typeface",
+    "fonts": {
+      "geist": "Modern",
+      "serif": "Editorial",
+      "rounded": "Rounded",
+      "grotesk": "Characterful",
+      "mono": "Mono"
+    },
+    "button": "Button style",
+    "buttons": {
+      "glass": "Glass",
+      "solid": "Solid",
+      "outline": "Outline"
+    },
+    "accent": "Accent colour",
+    "accentHint": "Used by solid and outline buttons. Readability is protected automatically.",
+    "accentNone": "No colour",
+    "accentCustom": "Custom colour",
+    "background": "Background image",
+    "backgroundChoose": "Choose image",
+    "backgroundRemove": "Remove",
+    "backgroundDisabled": "Image uploads are turned off in this environment.",
+    "branding": "Show the Linkiva badge",
+    "brandingHint": "Removing it is free.",
+    "lowContrast": "This colour is hard to read in the selected mode."
+  },
+  "blocks": {
+    "embedPlay": "Play",
+    "embedListen": "Listen",
+    "embedOn": "on {provider}",
+    "subscribeTitle": "Stay in the loop",
+    "subscribePlaceholder": "Your email address",
+    "subscribeButton": "Subscribe",
+    "subscribeDone": "Thanks, you are on the list.",
+    "subscribeInvalid": "Enter a valid email address.",
+    "subscribeTooMany": "Too many attempts. Try again soon.",
+    "subscribeError": "We could not save that right now. Try again."
+  },
+  "audience": {
+    "title": "Audience",
+    "count": "{count, plural, =0 {No subscribers yet} one {# subscriber} other {# subscribers}}",
+    "empty": "Add an Email block to your page; subscribers are listed here.",
+    "export": "Download CSV",
+    "email": "Email",
+    "date": "Date",
+    "remove": "Remove",
+    "removed": "Subscriber removed."
+  },
+  "publishing": {
+    "title": "Profile",
+    "published": "Page is live",
+    "publishedHint": "Turn it off and your address shows a 404 to everyone; nothing is deleted.",
+    "seoTitle": "Search title",
+    "seoTitleHint": "Leave empty to use your name and username. Up to 70 characters.",
+    "seoDescription": "Search description",
+    "seoDescriptionHint": "Leave empty to use your bio. Up to 160 characters."
   }
 }

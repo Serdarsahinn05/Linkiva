@@ -5,22 +5,9 @@ import { User } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Notice } from "@/components/ui/notice";
+import { toWebp } from "@/lib/image";
 import { AVATAR_MAX_BYTES, AVATAR_TYPES, userUploadPrefix } from "@/lib/uploads";
 import { setAvatar } from "../actions";
-
-/** Square-crops and downsizes to 512px WebP in the browser; no image library needed. */
-async function toAvatarWebp(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const side = Math.min(bitmap.width, bitmap.height);
-  const size = Math.min(512, side);
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("no canvas");
-  ctx.drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, size, size);
-  bitmap.close();
-  return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode"))), "image/webp", 0.86));
-}
 
 type Props = { userId: string; url: string | null; enabled: boolean; onChange: (url: string | null) => void };
 
@@ -36,7 +23,7 @@ export function AvatarUploader({ userId, url, enabled, onChange }: Props) {
     if (file.size > AVATAR_MAX_BYTES) return setError(t("tooBig"));
     setBusy(true);
     try {
-      const blob = await upload(`${userUploadPrefix(userId)}avatar.webp`, await toAvatarWebp(file), {
+      const blob = await upload(`${userUploadPrefix(userId)}avatar.webp`, await toWebp(file, 512, { square: true }), {
         access: "public",
         handleUploadUrl: "/api/upload",
         contentType: "image/webp",

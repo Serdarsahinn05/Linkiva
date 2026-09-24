@@ -7,6 +7,9 @@ export type EditorBlock = {
   data: Record<string, string>;
   isVisible: boolean;
   isHighlighted: boolean;
+  /** ISO strings; null = no limit. */
+  startsAt: string | null;
+  endsAt: string | null;
 };
 
 export type EditorProfile = {
@@ -15,6 +18,7 @@ export type EditorProfile = {
   bio: string;
   avatarUrl: string | null;
   theme: string;
+  appearance: unknown;
   showBranding: boolean;
 };
 

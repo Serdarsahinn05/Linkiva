@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Eye, Link2, Palette, Settings, Share2, type LucideIcon } from "lucide-react";
+import { BarChart3, Eye, Link2, Palette, Settings, Share2, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -13,8 +13,8 @@ import { LogoutButton } from "@/features/account/components/logout-button";
 import { PreviewProvider, usePreview } from "./preview-context";
 import { SharePanel } from "./share-panel";
 
-type NavKey = "links" | "appearance" | "analytics" | "settings";
-type NavItem = { href: "/dashboard" | "/dashboard/appearance" | "/dashboard/analytics" | "/dashboard/settings"; key: NavKey; icon: LucideIcon };
+type NavKey = "links" | "appearance" | "analytics" | "audience" | "settings";
+type NavItem = { href: "/dashboard" | "/dashboard/appearance" | "/dashboard/analytics" | "/dashboard/audience" | "/dashboard/settings"; key: NavKey; icon: LucideIcon };
 
 const NAV: NavItem[] = [
   { href: "/dashboard", key: "links", icon: Link2 },
@@ -22,6 +22,9 @@ const NAV: NavItem[] = [
   { href: "/dashboard/analytics", key: "analytics", icon: BarChart3 },
   { href: "/dashboard/settings", key: "settings", icon: Settings },
 ];
+
+// The mobile tab bar keeps Instagram's five slots; Audience is reached from the sidebar (desktop) and the Email block.
+const SIDEBAR: NavItem[] = [...NAV.slice(0, 3), { href: "/dashboard/audience", key: "audience", icon: Users }, NAV[3]!];
 
 export function DashboardShell({ username, children }: { username: string; children: ReactNode }) {
   return (
@@ -51,7 +54,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
           </Link>
           <nav aria-label={t("nav.main")}>
             <ul className="flex flex-col gap-1">
-              {NAV.map(({ href, key, icon: Icon }) => {
+              {SIDEBAR.map(({ href, key, icon: Icon }) => {
                 const active = pathname === href;
                 return (
                   <li key={href}>

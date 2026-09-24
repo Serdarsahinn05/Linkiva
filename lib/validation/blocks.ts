@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { BlockType } from "@/prisma/generated/enums";
+import { parseEmbed } from "@/lib/embeds";
 import { normalizeUrl } from "./url";
 
 export const TITLE_MAX = 80;
@@ -20,15 +21,15 @@ export const blockDataSchemas = {
   HEADER: z.object({ text: z.string().trim().min(1).max(TITLE_MAX) }),
   TEXT: z.object({ text: z.string().trim().min(1).max(TEXT_MAX) }),
   DIVIDER: z.object({}),
-  // Phase 3 block types; schemas exist so stored rows always parse.
-  EMBED: z.object({ url }),
+  // Only YouTube / Spotify / SoundCloud URLs that lib/embeds.ts understands.
+  EMBED: z.object({ url: z.string().trim().max(2048).refine((v) => parseEmbed(v) !== null, "embed") }),
   EMAIL_CAPTURE: z.object({ title: z.string().trim().max(TITLE_MAX).optional() }),
 } satisfies Record<BlockType, z.ZodType>;
 
 export type BlockData = { [K in BlockType]: z.output<(typeof blockDataSchemas)[K]> };
 
 /** Types the editor can create today. */
-export const EDITABLE_BLOCK_TYPES = ["LINK", "HEADER", "TEXT", "DIVIDER"] as const satisfies readonly BlockType[];
+export const EDITABLE_BLOCK_TYPES = ["LINK", "HEADER", "TEXT", "EMBED", "EMAIL_CAPTURE", "DIVIDER"] as const satisfies readonly BlockType[];
 export type EditableBlockType = (typeof EDITABLE_BLOCK_TYPES)[number];
 
 /** Placeholder content for a freshly added block, so it is valid from the first render. */
@@ -36,6 +37,8 @@ export const blockDefaults: Record<EditableBlockType, Record<string, string>> = 
   LINK: { title: "", url: "" },
   HEADER: { text: "" },
   TEXT: { text: "" },
+  EMBED: { url: "" },
+  EMAIL_CAPTURE: { title: "" },
   DIVIDER: {},
 };
 

@@ -38,12 +38,14 @@ async function withProfile<T>(body: (profile: { id: string; username: string }) 
   }
 }
 
-const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean }): EditorBlock => ({
+const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
   id: b.id,
   type: b.type,
   data: (b.data ?? {}) as Record<string, string>,
   isVisible: b.isVisible,
   isHighlighted: b.isHighlighted,
+  startsAt: b.startsAt?.toISOString() ?? null,
+  endsAt: b.endsAt?.toISOString() ?? null,
 });
 
 // ─── Blocks ──────────────────────────────────────────────────────────────────
@@ -87,14 +89,30 @@ export async function setBlockFlags(id: string, flags: { isVisible?: boolean; is
   });
 }
 
-export type DeletedBlock = { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean };
+/** Scheduled publishing: show a block only between startsAt and endsAt (either may be open). */
+export async function setBlockSchedule(id: string, schedule: { startsAt: string | null; endsAt: string | null }): Promise<ActionResult> {
+  const parsed = z
+    .object({ startsAt: z.iso.datetime({ offset: true }).nullable(), endsAt: z.iso.datetime({ offset: true }).nullable() })
+    .refine((s) => !s.startsAt || !s.endsAt || Date.parse(s.startsAt) < Date.parse(s.endsAt), "order")
+    .safeParse(schedule);
+  if (!parsed.success) return fail("invalid");
+  return withProfile(async (profile) => {
+    const { count } = await db.block.updateMany({
+      where: { id, profileId: profile.id },
+      data: { startsAt: parsed.data.startsAt ? new Date(parsed.data.startsAt) : null, endsAt: parsed.data.endsAt ? new Date(parsed.data.endsAt) : null },
+    });
+    return count ? ok(undefined) : fail("notFound");
+  });
+}
+
+export type DeletedBlock = { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean; startsAt: string | null; endsAt: string | null };
 
 export async function deleteBlock(id: string): Promise<ActionResult<DeletedBlock>> {
   return withProfile(async (profile) => {
     const block = await db.block.findFirst({ where: { id, profileId: profile.id } });
     if (!block) return fail("notFound");
     await db.block.delete({ where: { id } });
-    return ok({ id: block.id, type: block.type, data: block.data, position: block.position, isVisible: block.isVisible, isHighlighted: block.isHighlighted });
+    return ok({ id: block.id, type: block.type, data: block.data, position: block.position, isVisible: block.isVisible, isHighlighted: block.isHighlighted, startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
   });
 }
 
@@ -108,13 +126,18 @@ export async function restoreBlock(snapshot: DeletedBlock): Promise<ActionResult
       position: z.number().int(),
       isVisible: z.boolean(),
       isHighlighted: z.boolean(),
+      startsAt: z.iso.datetime({ offset: true }).nullable(),
+      endsAt: z.iso.datetime({ offset: true }).nullable(),
     })
     .safeParse(snapshot);
   if (!parsed.success) return fail("invalid");
   const draft = draftSchema.safeParse(parsed.data.data);
   if (!draft.success) return fail("invalid");
   return withProfile(async (profile) => {
-    const block = await db.block.create({ data: { ...parsed.data, data: draft.data, profileId: profile.id } });
+    const { startsAt, endsAt, ...rest } = parsed.data;
+    const block = await db.block.create({
+      data: { ...rest, data: draft.data, profileId: profile.id, startsAt: startsAt ? new Date(startsAt) : null, endsAt: endsAt ? new Date(endsAt) : null },
+    });
     return ok(toEditorBlock(block));
   });
 }
@@ -196,4 +219,25 @@ export async function setAvatar(url: string | null): Promise<ActionResult> {
     console.error("setAvatar failed", error);
     return fail("unknown");
   }
+}
+
+// ─── Publishing & SEO ────────────────────────────────────────────────────────
+
+const publishingSchema = z.object({
+  isPublished: z.boolean(),
+  seoTitle: z.string().trim().max(70),
+  seoDescription: z.string().trim().max(160),
+});
+
+/** Unpublished profiles answer 404 publicly; SEO fields override the generated title/description. */
+export async function updatePublishing(input: z.input<typeof publishingSchema>): Promise<ActionResult> {
+  const parsed = publishingSchema.safeParse(input);
+  if (!parsed.success) return fail("invalid");
+  return withProfile(async (profile) => {
+    await db.profile.update({
+      where: { id: profile.id },
+      data: { isPublished: parsed.data.isPublished, seoTitle: parsed.data.seoTitle || null, seoDescription: parsed.data.seoDescription || null },
+    });
+    return ok(undefined);
+  });
 }

@@ -32,8 +32,10 @@
   --color-warning: var(--c-warning);
 }
 
-/* ─── Light (default) ──────────────────────────────────────────────────────── */
-:root {
+/* ─── Light (default) ─────────────────────────────────────────────────────────
+   Theme selectors also work on nested elements (profile previews force a mode). */
+:root,
+[data-theme="light"] {
   --c-bg: oklch(97% 0.006 270);
   --c-ink: oklch(20% 0.012 265);
   --c-ink-2: oklch(44% 0.012 265);
@@ -60,7 +62,7 @@
 }
 
 /* ─── Dark ─────────────────────────────────────────────────────────────────── */
-:root[data-theme="dark"] {
+[data-theme="dark"] {
   --c-bg: oklch(14% 0.01 260);
   --c-ink: oklch(97% 0.003 260);
   --c-ink-2: oklch(76% 0.01 260);
@@ -274,4 +276,122 @@
     transition-duration: 1ms !important;
   }
   .glass-interactive::before { display: none; }
+}
+
+/* A nested theme must recompute inherited colour from its own tokens. */
+[data-theme] {
+  color: var(--c-ink);
+}
+
+/* ─── Public profile scene (themes/index.ts, DESIGN.md §7) ─────────────────── */
+@layer components {
+  .profile-scene {
+    position: relative;
+    isolation: isolate;
+    min-height: 100%;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: var(--p-font, var(--font-sans));
+  }
+  .profile-scene[data-font="serif"] { --p-font: var(--font-serif), Georgia, serif; }
+  .profile-scene[data-font="rounded"] { --p-font: var(--font-rounded), ui-rounded, sans-serif; }
+  .profile-scene[data-font="grotesk"] { --p-font: var(--font-grotesk), ui-sans-serif, sans-serif; }
+  .profile-scene[data-font="mono"] { --p-font: var(--font-mono); }
+
+  /* Scene light: the ambient light, scoped to the profile so previews carry it too. */
+  .scene-light {
+    position: absolute;
+    inset: 0 0 auto;
+    height: min(100%, 120vh);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .scene-light::before,
+  .scene-light::after {
+    content: "";
+    position: absolute;
+    width: 80vmax;
+    height: 80vmax;
+    max-width: 1100px;
+    max-height: 1100px;
+    border-radius: 50%;
+    filter: blur(110px);
+    animation: ambient-drift 40s ease-in-out infinite alternate;
+  }
+  .scene-light::before { top: -40%; left: -30%; background: radial-gradient(circle, var(--s-1, var(--c-ambient-1)), transparent 65%); }
+  .scene-light::after { top: -30%; right: -35%; background: radial-gradient(circle, var(--s-2, var(--c-ambient-2)), transparent 65%); animation-delay: -20s; }
+  .profile-scene[data-scene="none"] .scene-light { display: none; }
+  .profile-scene[data-scene="gece"] { --s-1: oklch(48% 0.09 280); --s-2: oklch(40% 0.08 220); }
+  .profile-scene[data-scene="kum"] { --s-1: oklch(86% 0.06 70); --s-2: oklch(90% 0.05 35); }
+  [data-theme="dark"] .profile-scene[data-scene="kum"],
+  .profile-scene[data-scene="kum"][data-theme="dark"] { --s-1: oklch(40% 0.06 60); --s-2: oklch(34% 0.05 30); }
+  .profile-scene[data-scene="accent"] {
+    --s-1: color-mix(in oklch, var(--p-accent, var(--c-ink)) 55%, transparent);
+    --s-2: color-mix(in oklch, var(--p-accent, var(--c-ink)) 30%, transparent);
+  }
+
+  /* Owner's background image, dimmed with the theme's own ground so text keeps its contrast. */
+  .scene-image {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .scene-image img { width: 100%; height: 100%; object-fit: cover; }
+  .scene-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, color-mix(in oklch, var(--c-bg) 55%, transparent), color-mix(in oklch, var(--c-bg) 80%, transparent));
+  }
+
+  /* ─── Link buttons: glass | solid | outline ─── */
+  .p-btn {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 60px;
+    padding: 0.75rem 3rem;
+    border-radius: var(--radius-card);
+    text-align: center;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), opacity 160ms var(--ease-out);
+  }
+  .p-btn:active { transform: scale(0.985); }
+  [data-button="glass"] .p-btn {
+    background: var(--c-glass);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--c-glass-edge);
+    box-shadow: inset 0 1px 0 var(--c-glass-shine), var(--c-glass-shadow);
+  }
+  [data-button="glass"] .p-btn:hover { background: var(--c-glass-strong); }
+  [data-button="glass"] .p-btn[data-highlight] {
+    background: var(--c-glass-strong);
+    box-shadow: inset 0 1px 0 var(--c-glass-shine), 0 0 0 1px var(--c-glass-edge), 0 0 32px -8px var(--c-ink);
+  }
+  [data-button="solid"] .p-btn {
+    background: var(--p-accent, var(--c-accent));
+    color: var(--p-accent-ink, var(--c-accent-ink));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 10px 28px -14px rgb(0 0 0 / 0.55);
+  }
+  [data-button="solid"] .p-btn:hover { opacity: 0.92; }
+  [data-button="solid"] .p-btn[data-highlight] { box-shadow: 0 0 0 3px var(--c-bg), 0 0 0 5px var(--p-accent, var(--c-accent)); }
+  [data-button="outline"] .p-btn {
+    border: 1.5px solid color-mix(in oklch, var(--p-accent, var(--c-ink)) 75%, transparent);
+    color: var(--p-accent, var(--c-ink));
+  }
+  [data-button="outline"] .p-btn:hover { background: color-mix(in oklch, var(--p-accent, var(--c-ink)) 10%, transparent); }
+  [data-button="outline"] .p-btn[data-highlight] {
+    background: var(--p-accent, var(--c-ink));
+    color: var(--p-accent-ink, var(--c-bg));
+  }
 }

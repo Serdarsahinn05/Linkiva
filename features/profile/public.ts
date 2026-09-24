@@ -14,9 +14,12 @@ export type PublicProfile = {
   bio: string | null;
   avatarUrl: string | null;
   theme: string;
+  appearance: unknown;
   showBranding: boolean;
   locale: string;
   isPublished: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
   blocks: PublicBlock[];
   socials: { platform: SocialPlatform; handle: string }[];
 };
@@ -46,9 +49,12 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
     bio: profile.bio,
     avatarUrl: profile.avatarUrl,
     theme: profile.theme,
+    appearance: profile.appearance,
     showBranding: profile.showBranding,
     locale: profile.locale,
     isPublished: profile.isPublished,
+    seoTitle: profile.seoTitle,
+    seoDescription: profile.seoDescription,
     blocks: profile.blocks.map((b) => ({
       id: b.id,
       type: b.type,
@@ -71,15 +77,4 @@ export const getPublicProfile = cache((username: string) =>
   unstable_cache(() => loadProfile(username), ["public-profile", username], { tags: [profileTag(username)] })(),
 );
 
-/** Scheduled blocks are filtered at render time, so a cached profile still respects the clock. */
-export function isLive(block: Pick<PublicBlock, "startsAt" | "endsAt">, now = Date.now()): boolean {
-  if (block.startsAt && Date.parse(block.startsAt) > now) return false;
-  if (block.endsAt && Date.parse(block.endsAt) <= now) return false;
-  return true;
-}
-
-/** Blocks visible right now (request time). */
-export function liveBlocks<T extends Pick<PublicBlock, "startsAt" | "endsAt">>(blocks: T[]): T[] {
-  const now = Date.now();
-  return blocks.filter((b) => isLive(b, now));
-}
+export { isLive, liveBlocks } from "@/lib/schedule";

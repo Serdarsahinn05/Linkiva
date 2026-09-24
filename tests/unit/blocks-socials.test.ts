@@ -71,3 +71,34 @@ describe("isOwnBlobUrl", () => {
     expect(isOwnBlobUrl(`http://abc.public.blob.vercel-storage.com/u/user1/a.webp`, "user1")).toBe(false);
   });
 });
+
+describe("parseEmbed", () => {
+  it.each([
+    ["https://www.youtube.com/watch?v=dQw4w9WgXcQ", "youtube"],
+    ["youtu.be/dQw4w9WgXcQ", "youtube"],
+    ["https://youtube.com/shorts/dQw4w9WgXcQ", "youtube"],
+    ["https://open.spotify.com/intl-tr/track/4uLU6hMCjMI75M1A2tKUQC", "spotify"],
+    ["https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M", "spotify"],
+    ["https://soundcloud.com/artist/track-name", "soundcloud"],
+  ])("%s → %s", async (url, provider) => {
+    const { parseEmbed } = await import("@/lib/embeds");
+    expect(parseEmbed(url)?.provider).toBe(provider);
+  });
+
+  it("rebuilds the iframe src from ids and rejects everything else", async () => {
+    const { parseEmbed } = await import("@/lib/embeds");
+    expect(parseEmbed("https://www.youtube.com/watch?v=dQw4w9WgXcQ&x=<script>")?.src).toBe("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0");
+    expect(parseEmbed("https://evil.example/embed?youtube.com")).toBeNull();
+    expect(parseEmbed("https://www.youtube.com/watch?v=short")).toBeNull();
+    expect(parseEmbed("javascript:alert(1)")).toBeNull();
+  });
+});
+
+describe("csvCell", () => {
+  it("quotes and neutralises spreadsheet formulas", async () => {
+    const { csvCell } = await import("@/lib/csv");
+    expect(csvCell("a@b.com")).toBe('"a@b.com"');
+    expect(csvCell('=HYPERLINK("x")')).toBe(`"'=HYPERLINK(""x"")"`);
+    expect(csvCell("+1")).toBe(`"'+1"`);
+  });
+});

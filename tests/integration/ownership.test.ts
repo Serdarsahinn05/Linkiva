@@ -7,9 +7,12 @@ vi.mock("@/lib/session", () => ({
   UnauthorizedError: class extends Error {},
 }));
 vi.mock("next/cache", () => ({ updateTag: () => {}, unstable_cache: (fn: () => unknown) => fn }));
+vi.mock("next/headers", () => ({ headers: async () => new Headers({ "x-forwarded-for": "203.0.113.9" }), cookies: async () => new Map() }));
 
 const { db } = await import("@/lib/db");
 const actions = await import("@/features/editor/actions");
+const appearance = await import("@/features/appearance/actions");
+const audience = await import("@/features/audience/actions");
 
 const suffix = Date.now().toString(36);
 const ids = { alice: `own-a-${suffix}`, bob: `own-b-${suffix}` };
@@ -66,5 +69,26 @@ describe("editor actions only touch the caller's own profile (v1 bug S1)", () =>
     const { parseBlock } = await import("@/lib/validation/blocks");
     const block = await db.block.findUniqueOrThrow({ where: { id: bobBlock } });
     expect(parseBlock(block.type, block.data)).toBeNull();
+  });
+});
+
+describe("phase 3 actions stay inside the caller's profile", () => {
+  it("cannot schedule someone else's block, and rejects an end before the start", async () => {
+    expect(await actions.setBlockSchedule(aliceBlock, { startsAt: null, endsAt: "2030-01-01T00:00:00.000Z" })).toEqual({ ok: false, error: "notFound" });
+    expect(await actions.setBlockSchedule(bobBlock, { startsAt: "2030-02-01T00:00:00.000Z", endsAt: "2030-01-01T00:00:00.000Z" })).toEqual({ ok: false, error: "invalid" });
+    expect(await actions.setBlockSchedule(bobBlock, { startsAt: "2030-01-01T00:00:00.000Z", endsAt: null })).toEqual({ ok: true, data: undefined });
+  });
+
+  it("cannot use another user's blob as a background image", async () => {
+    const foreign = `https://x.public.blob.vercel-storage.com/u/${ids.alice}/background.webp`;
+    expect(await appearance.updateAppearance({ theme: "cam", appearance: { backgroundUrl: foreign }, showBranding: true })).toEqual({ ok: false, error: "invalid" });
+    expect(await appearance.updateAppearance({ theme: "gece", appearance: { font: "mono" }, showBranding: false })).toEqual({ ok: true });
+  });
+
+  it("cannot remove someone else's subscriber", async () => {
+    const alice = await db.profile.findUniqueOrThrow({ where: { userId: ids.alice } });
+    const sub = await db.subscriber.create({ data: { profileId: alice.id, email: `sub-${suffix}@example.com` } });
+    expect(await audience.removeSubscriber(sub.id)).toEqual({ ok: false });
+    expect(await db.subscriber.count({ where: { id: sub.id } })).toBe(1);
   });
 });

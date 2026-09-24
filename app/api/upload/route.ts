@@ -22,7 +22,8 @@ export async function POST(request: Request) {
       request,
       body,
       onBeforeGenerateToken: async (pathname) => {
-        if (!pathname.startsWith(`${userUploadPrefix(session.user.id)}avatar`)) throw new Error("forbidden path");
+        const prefix = userUploadPrefix(session.user.id);
+        if (!pathname.startsWith(`${prefix}avatar`) && !pathname.startsWith(`${prefix}background`)) throw new Error("forbidden path");
         return {
           allowedContentTypes: [...AVATAR_TYPES],
           maximumSizeInBytes: AVATAR_MAX_BYTES,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { getPublicProfile, liveBlocks } from "@/features/profile/public";
 import { defaultLocale, isLocale } from "@/i18n/config";
@@ -24,8 +25,8 @@ export async function generateMetadata({ params }: PageProps<"/[username]">): Pr
   const profile = await load(params);
   if (!profile) return { title: site.name, robots: { index: false } };
   const name = profile.displayName || profile.username;
-  const title = `${name} (@${profile.username}) · ${site.name}`;
-  const description = profile.bio ?? `${name} · ${site.host}/${profile.username}`;
+  const title = profile.seoTitle || `${name} (@${profile.username}) · ${site.name}`;
+  const description = profile.seoDescription || profile.bio || `${name} · ${site.host}/${profile.username}`;
   return {
     metadataBase: new URL(site.url),
     title,
@@ -41,11 +42,11 @@ export default async function ProfilePage({ params }: PageProps<"/[username]">) 
   if (!profile) notFound();
 
   const locale = isLocale(profile.locale) ? profile.locale : defaultLocale;
-  const t = await getTranslations({ locale, namespace: "profile" });
+  const t = await getTranslations({ locale });
 
   return (
     <main className="min-h-dvh">
-      <ProfileView profile={{ ...profile, blocks: liveBlocks(profile.blocks) }} labels={{ madeWith: t("madeWith") }} />
+      <ProfileView profile={{ ...profile, blocks: liveBlocks(profile.blocks) }} labels={profileLabels(t)} />
     </main>
   );
 }

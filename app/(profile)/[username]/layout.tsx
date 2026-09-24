@@ -2,9 +2,10 @@ import type { Viewport } from "next";
 import { getPublicProfile } from "@/features/profile/public";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { DESIGN_CONTRACT } from "@/lib/design-contract";
-import { Ambient, LiquidFilter } from "@/components/ui/surface";
+import { LiquidFilter } from "@/components/ui/surface";
 import { Specular } from "@/components/ui/specular";
 import { fontVariables } from "@/lib/fonts";
+import { resolveAppearance } from "@/themes";
 import "../../globals.css";
 
 export const viewport: Viewport = {
@@ -22,12 +23,13 @@ export default async function ProfileRootLayout({ children, params }: LayoutProp
   const { username } = await params;
   const profile = await getPublicProfile(decodeURIComponent(username).toLowerCase());
   const lang = profile && isLocale(profile.locale) ? profile.locale : defaultLocale;
+  // A theme may pin light or dark; "system" follows the visitor.
+  const mode = profile ? resolveAppearance(profile.theme, profile.appearance).mode : "system";
 
   return (
-    <html lang={lang} className={fontVariables}>
+    <html lang={lang} className={fontVariables} data-theme={mode === "system" ? undefined : mode}>
       <body>
         <template dangerouslySetInnerHTML={{ __html: `<!--${DESIGN_CONTRACT}-->` }} />
-        <Ambient />
         <LiquidFilter />
         <Specular />
         {children}

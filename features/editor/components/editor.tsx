@@ -2,24 +2,26 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
+import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Field, Input, inputClass } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
+import { liveBlocks } from "@/lib/schedule";
 import { EDITABLE_BLOCK_TYPES, type EditableBlockType } from "@/lib/validation/blocks";
-import { addBlock, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setSocial, updateBlock, updateProfileBasics } from "../actions";
+import { addBlock, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setSocial, updateBlock, updateProfileBasics } from "../actions";
 import type { EditorBlock, EditorProfile, EditorSocials } from "../types";
 import { AvatarUploader } from "./avatar-uploader";
 import { PageHeader, Section } from "@/features/dashboard/components/page";
 import { useRegisterPreview } from "@/features/dashboard/components/preview-context";
 import { BLOCK_ICON, BlockRow } from "./block-row";
 import { SocialsEditor } from "./socials-editor";
-import { useAutosave, type SaveState } from "./use-autosave";
+import { SaveIndicator } from "./save-indicator";
+import { useAutosave } from "./use-autosave";
 
 type Props = { profile: EditorProfile; blocks: EditorBlock[]; socials: EditorSocials; userId: string; uploadsEnabled: boolean };
 
@@ -65,6 +67,11 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   function flagBlock(id: string, flags: { isVisible?: boolean; isHighlighted?: boolean }) {
     setBlocks((list) => list.map((b) => (b.id === id ? { ...b, ...flags } : b)));
     schedule(`flags:${id}`, async () => (await setBlockFlags(id, flags)).ok, true);
+  }
+
+  function scheduleBlock(id: string, sched: { startsAt: string | null; endsAt: string | null }) {
+    setBlocks((list) => list.map((b) => (b.id === id ? { ...b, ...sched } : b)));
+    schedule(`schedule:${id}`, async () => (await setBlockSchedule(id, sched)).ok, true);
   }
 
   async function persistOrder(next: EditorBlock[], previous: EditorBlock[]) {
@@ -140,10 +147,11 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     ...profile,
     displayName: profile.displayName || null,
     bio: profile.bio || null,
-    blocks: blocks.filter((b) => b.isVisible),
+    // Same rule as the public page: hidden and out-of-schedule blocks are not shown.
+        blocks: liveBlocks(blocks.filter((b) => b.isVisible)),
     socials: Object.entries(socials).map(([platform, handle]) => ({ platform: platform as SocialPlatform, handle: handle ?? "" })),
   };
-  const preview = <ProfileView profile={previewProfile} mode="preview" labels={{ madeWith: t("profile.madeWith") }} />;
+  const preview = <ProfileView profile={previewProfile} mode="preview" labels={profileLabels(t)} />;
   // The mobile tab bar's "Preview" shows this live (unsaved) preview while the editor is open.
   useRegisterPreview(preview);
 
@@ -221,6 +229,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                       onFlags={(flags) => flagBlock(block.id, flags)}
                       onMove={(direction) => move(block.id, direction)}
                       onDelete={() => remove(block.id)}
+                      onSchedule={(sched) => scheduleBlock(block.id, sched)}
                     />
                   ))}
                 </ul>
@@ -235,27 +244,11 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
         <div className="sticky top-6">
           <div className="glass rounded-[44px] p-2.5">
             <div className="relative h-[760px] overflow-y-auto overscroll-contain rounded-[36px] bg-bg [scrollbar-width:none]">
-              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[36px]" aria-hidden>
-                <div className="ambient !absolute" />
-              </div>
-              <div className="relative">{preview}</div>
+              <div className="relative h-full">{preview}</div>
             </div>
           </div>
         </div>
       </aside>
     </div>
-  );
-}
-
-function SaveIndicator({ state }: { state: SaveState }) {
-  const t = useTranslations("editor");
-  if (state === "idle") return null;
-  return (
-    <p role="status" className={cn("glass-flat flex h-9 items-center gap-2 rounded-full px-3.5 text-sm", state === "error" ? "text-negative" : "text-ink-2")}>
-      {state === "saving" && <span className="dots" aria-hidden />}
-      {state === "saved" && <span className="neon size-1.5 rounded-full bg-positive text-positive" aria-hidden />}
-      {state === "error" && <CircleAlert size={16} strokeWidth={1.75} aria-hidden />}
-      {state === "saving" ? t("saving") : state === "saved" ? t("saved") : t("saveError")}
-    </p>
   );
 }
