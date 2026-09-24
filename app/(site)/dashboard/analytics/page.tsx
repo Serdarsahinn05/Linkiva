@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { TrafficChart } from "@/features/analytics/components/traffic-chart";
+import { WorldMap } from "@/features/analytics/components/world-map";
 import { getAnalytics, isRange, RANGES, type Row } from "@/features/analytics/queries";
 import { PageHeader, Section } from "@/features/dashboard/components/page";
 import { getOwnProfile } from "@/features/profile/queries";
@@ -26,6 +27,14 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
   const tNav = await getTranslations("nav");
   const format = await getFormatter();
   const data = await getAnalytics(profile, range, locale);
+  const regionNames = new Intl.DisplayNames([locale], { type: "region" });
+  const regionName = (iso: string) => {
+    try {
+      return regionNames.of(iso) ?? iso;
+    } catch {
+      return iso;
+    }
+  };
   const pct = (n: number) => format.number(n, { style: "percent", maximumFractionDigits: 1 });
 
   const stats = [
@@ -114,12 +123,22 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
             )}
           </Section>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <Section title={t("countries")}>
+            <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+              {data.countries.length > 0 && (
+                <WorldMap
+                  views={data.countryViews}
+                  label={t("map")}
+                  describe={(iso, count) => `${regionName(iso)} · ${format.number(count)}`}
+                />
+              )}
+              <RowList rows={data.countries} pct={pct} empty={t("unknown")} />
+            </div>
+          </Section>
+
+          <div className="grid gap-6 lg:grid-cols-3">
             <Section title={t("sources")}>
               <RowList rows={data.sources.map((r) => (r.key === "direct" ? { ...r, label: t("direct") } : r))} pct={pct} />
-            </Section>
-            <Section title={t("countries")}>
-              <RowList rows={data.countries} pct={pct} empty={t("unknown")} />
             </Section>
             <Section title={t("devices")}>
               <RowList rows={data.devices.map((r) => ({ ...r, label: t(`deviceNames.${r.key as "MOBILE" | "DESKTOP" | "TABLET"}`) }))} pct={pct} />

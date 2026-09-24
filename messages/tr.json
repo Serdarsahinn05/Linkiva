@@ -458,7 +458,8 @@
     "noClicks": "Bu aralıkta tıklama yok.",
     "export": "CSV indir",
     "privacy": "Çerez kullanmıyoruz; botlar, önizlemeler ve senin kendi ziyaretlerin sayılmaz.",
-    "privacyLink": "Nasıl ölçüyoruz?"
+    "privacyLink": "Nasıl ölçüyoruz?",
+    "map": "Ziyaretçi haritası"
   },
   "account": {
     "email": "E-posta",

@@ -21,6 +21,8 @@ export type Analytics = {
   links: { id: string; title: string; clicks: number; ctr: number }[];
   sources: Row[];
   countries: Row[];
+  /** Views per ISO country code, every country (the map); `countries` is the top of this list. */
+  countryViews: Record<string, number>;
   devices: Row[];
   os: Row[];
   browsers: Row[];
@@ -129,6 +131,7 @@ export async function getAnalytics(profile: { id: string; timezone: string }, ra
         }
       },
     ),
+    countryViews: Object.fromEntries(countryGroups.flatMap((g) => (g.country ? [[g.country, g._count._all]] : []))),
     devices: toRows(deviceGroups.map((g) => ({ key: g.device, count: g._count._all })), views, (k) => k),
     os: toRows(osGroups.map((g) => ({ key: g.os, count: g._count._all })), views, (k) => k),
     browsers: toRows(browserGroups.map((g) => ({ key: g.browser, count: g._count._all })), views, (k) => k),
