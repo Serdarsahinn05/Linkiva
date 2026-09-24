@@ -14,7 +14,7 @@ const FREE_KEYS = ["analytics", "themes", "schedule", "highlight", "capture", "e
 function ClaimForm({ id, label, placeholder, cta }: { id: string; label: string; placeholder: string; cta: string }) {
   return (
     <form action="/register" method="get" className="glass-float liquid flex w-full max-w-xl items-center gap-1 rounded-full p-1.5 pl-5">
-      <label htmlFor={id} lang="en" translate="no" className="shrink-0 text-[0.9375rem] text-ink-3 sm:text-base">
+      <label htmlFor={id} lang="en" translate="no" className="min-w-0 truncate text-[0.9375rem] text-ink-3 sm:text-base">
         {site.host}/
       </label>
       <input
@@ -26,7 +26,7 @@ function ClaimForm({ id, label, placeholder, cta }: { id: string; label: string;
         autoComplete="off"
         spellCheck={false}
         maxLength={30}
-        className="h-12 min-w-0 flex-1 bg-transparent text-[0.9375rem] font-medium text-ink placeholder:text-ink-3 focus-visible:outline-none sm:text-base"
+        className="h-12 min-w-28 flex-1 bg-transparent text-[0.9375rem] font-medium text-ink placeholder:text-ink-3 focus-visible:outline-none sm:text-base"
       />
       <button type="submit" className={cn(buttonBase, buttonVariants.primary, buttonSizes.lg, "shrink-0 px-5")}>
         <span className="max-sm:sr-only">{cta}</span>
