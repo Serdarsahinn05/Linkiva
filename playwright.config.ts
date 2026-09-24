@@ -14,7 +14,8 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, channel } },
   ],
   webServer: {
-    command: "npm run dev",
+    // PW_PROD=1 runs against a production build (npm run build first): real caching/ISR behaviour.
+    command: process.env.PW_PROD ? "npm run start" : "npm run dev",
     env: { E2E: "1" },
     port,
     // Never reuse a manually started server: it would lack the E2E flag.

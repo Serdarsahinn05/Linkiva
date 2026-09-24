@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { site } from "@/lib/site";
 
@@ -12,9 +13,9 @@ export default async function HomePage() {
           <span className="tape tape-type text-sm" lang="en" translate="no">
             {t("common.appName")}
           </span>
-          <a href="/register" className="tape tape-type text-sm" data-tone="red">
+          <Link href="/register" className="tape tape-type text-sm" data-tone="red">
             {t("common.startFree")}
-          </a>
+          </Link>
         </header>
         <h1 className="max-w-3xl text-[length:var(--text-display)] leading-[0.95] font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88] text-balance">
           {t("landing.headline")}

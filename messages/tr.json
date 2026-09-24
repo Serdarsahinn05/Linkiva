@@ -127,5 +127,93 @@
       "body": "Linkiva hesabının e-posta adresini bu adresle değiştirmek istedin. Onaylamak için butona tıkla. Onaylayana kadar eski adresin geçerli kalır.",
       "cta": "Adresi onayla"
     }
+  },
+  "profile": {
+    "madeWith": "Linkiva ile yapıldı",
+    "notFoundTitle": "Bu adreste kimse yok.",
+    "claim": "Bu adresi al",
+    "home": "Ana sayfaya dön"
+  },
+  "nav": {
+    "links": "Linkler",
+    "appearance": "Görünüm",
+    "analytics": "İstatistik",
+    "settings": "Ayarlar",
+    "preview": "Önizle",
+    "main": "Panel menüsü"
+  },
+  "editor": {
+    "title": "Sayfan",
+    "profile": "Profil",
+    "displayName": "Görünen ad",
+    "bio": "Hakkında",
+    "bioHint": "En fazla 160 karakter.",
+    "socials": "Sosyal hesaplar",
+    "socialsHint": "Kullanıcı adını ya da profil linkini yapıştır.",
+    "socialInvalid": "Bu {platform} hesabını anlayamadık.",
+    "blocks": "Bloklar",
+    "add": "Ekle",
+    "addBlock": "{type} ekle",
+    "types": {
+      "LINK": "Link",
+      "HEADER": "Başlık",
+      "TEXT": "Metin",
+      "DIVIDER": "Ayraç",
+      "EMBED": "Embed",
+      "EMAIL_CAPTURE": "E-posta"
+    },
+    "fields": {
+      "title": "Başlık",
+      "url": "Adres",
+      "text": "Metin",
+      "headerText": "Başlık metni"
+    },
+    "placeholders": {
+      "title": "Örn. Portfolyom",
+      "url": "ornek.com/sayfa",
+      "headerText": "Örn. Projeler",
+      "text": "Kısa bir not yaz."
+    },
+    "urlInvalid": "Bu adresi açamayız. https:// ile başlayan bir link dene.",
+    "incomplete": "Tamamlanmadı, sayfanda görünmüyor.",
+    "visible": "Sayfada göster",
+    "highlight": "Öne çıkar",
+    "unhighlight": "Öne çıkarmayı kaldır",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı",
+    "delete": "Sil",
+    "deleted": "Blok silindi.",
+    "undo": "Geri al",
+    "drag": "Sırasını değiştirmek için sürükle",
+    "more": "Diğer işlemler",
+    "saving": "Kaydediliyor",
+    "saved": "Kaydedildi",
+    "saveError": "Kaydedilemedi. Bağlantını kontrol et.",
+    "empty": "Buraya ilk linkini yapıştır",
+    "emptyHint": "Yukarıdan bir blok ekle. Sağdaki önizleme sayfanın aynısı.",
+    "previewTitle": "Önizleme",
+    "closePreview": "Önizlemeyi kapat",
+    "avatar": {
+      "label": "Profil fotoğrafı",
+      "change": "Fotoğraf seç",
+      "remove": "Kaldır",
+      "uploading": "Yükleniyor",
+      "disabled": "Fotoğraf yükleme bu ortamda kapalı.",
+      "wrongType": "JPG, PNG ya da WebP bir görsel seç.",
+      "tooBig": "Görsel 5 MB'tan küçük olmalı.",
+      "failed": "Fotoğraf yüklenemedi. Tekrar dene."
+    }
+  },
+  "share": {
+    "address": "Adresin",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "open": "Sayfayı aç",
+    "qr": "QR kod",
+    "qrTitle": "QR kodun",
+    "qrBody": "Okutan herkes doğrudan sayfana gelir.",
+    "downloadPng": "PNG indir",
+    "downloadSvg": "SVG indir",
+    "close": "Kapat"
   }
 }

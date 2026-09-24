@@ -26,8 +26,10 @@ Next.js 16.3 (App Router, React 19.3) · TypeScript strict · Tailwind CSS v4 ·
 docker compose up -d   # yerel Postgres (localhost:54329)
 npm install
 npm run dev            # http://localhost:3000
-npm run check          # lint + typecheck + unit test: commit öncesi zorunlu
+npm run check          # lint + typecheck + unit + integration: commit öncesi zorunlu (docker DB açık olmalı)
+npm run test:integration   # gerçek yerel DB ile (sahiplik vb.)
 PW_CHANNEL=chrome npm run test:e2e   # Playwright (kurulu Chrome ile)
+PW_PROD=1 PW_CHANNEL=chrome npm run test:e2e   # production build üzerinde (önce npm run build)
 npm run db:migrate -- --name <ad>   # şema değişikliği (asla `db push` değil)
 npm run db:studio
 npm run build

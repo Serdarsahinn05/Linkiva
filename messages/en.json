@@ -127,5 +127,93 @@
       "body": "You asked to change your Linkiva email to this address. Click the button to confirm. Your old address stays active until you do.",
       "cta": "Confirm address"
     }
+  },
+  "profile": {
+    "madeWith": "Made with",
+    "notFoundTitle": "Nobody lives here yet.",
+    "claim": "Claim this address",
+    "home": "Back to home"
+  },
+  "nav": {
+    "links": "Links",
+    "appearance": "Appearance",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "preview": "Preview",
+    "main": "Dashboard menu"
+  },
+  "editor": {
+    "title": "Your page",
+    "profile": "Profile",
+    "displayName": "Display name",
+    "bio": "About",
+    "bioHint": "Up to 160 characters.",
+    "socials": "Social accounts",
+    "socialsHint": "Paste your username or profile link.",
+    "socialInvalid": "We could not read this {platform} account.",
+    "blocks": "Blocks",
+    "add": "Add",
+    "addBlock": "Add {type}",
+    "types": {
+      "LINK": "Link",
+      "HEADER": "Header",
+      "TEXT": "Text",
+      "DIVIDER": "Divider",
+      "EMBED": "Embed",
+      "EMAIL_CAPTURE": "Email"
+    },
+    "fields": {
+      "title": "Title",
+      "url": "Address",
+      "text": "Text",
+      "headerText": "Header text"
+    },
+    "placeholders": {
+      "title": "e.g. My portfolio",
+      "url": "example.com/page",
+      "headerText": "e.g. Projects",
+      "text": "Write a short note."
+    },
+    "urlInvalid": "We cannot open this address. Try a link starting with https://.",
+    "incomplete": "Unfinished, not shown on your page.",
+    "visible": "Show on page",
+    "highlight": "Highlight",
+    "unhighlight": "Remove highlight",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "delete": "Delete",
+    "deleted": "Block deleted.",
+    "undo": "Undo",
+    "drag": "Drag to reorder",
+    "more": "More actions",
+    "saving": "Saving",
+    "saved": "Saved",
+    "saveError": "Could not save. Check your connection.",
+    "empty": "Paste your first link here",
+    "emptyHint": "Add a block above. The preview on the right is your real page.",
+    "previewTitle": "Preview",
+    "closePreview": "Close preview",
+    "avatar": {
+      "label": "Profile photo",
+      "change": "Choose photo",
+      "remove": "Remove",
+      "uploading": "Uploading",
+      "disabled": "Photo uploads are turned off in this environment.",
+      "wrongType": "Choose a JPG, PNG or WebP image.",
+      "tooBig": "The image must be under 5 MB.",
+      "failed": "Could not upload the photo. Try again."
+    }
+  },
+  "share": {
+    "address": "Your address",
+    "copy": "Copy",
+    "copied": "Copied",
+    "open": "Open page",
+    "qr": "QR code",
+    "qrTitle": "Your QR code",
+    "qrBody": "Anyone who scans it lands on your page.",
+    "downloadPng": "Download PNG",
+    "downloadSvg": "Download SVG",
+    "close": "Close"
   }
 }

@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { localeFromRequest } from "@/i18n/detect";
 import { db } from "@/lib/db";
-import { env } from "@/lib/env";
+import { env, isE2E } from "@/lib/env";
 import { sendMail } from "@/lib/mail/send";
 import { site } from "@/lib/site";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/validation/auth";
@@ -71,8 +71,8 @@ export const auth = betterAuth({
   },
 
   rateLimit: {
-    // Off for the e2e server so repeated runs from one IP are not throttled; never off in production.
-    enabled: env.NODE_ENV === "production" || !env.E2E,
+    // Off only for the local e2e server, so repeated runs from one IP are not throttled.
+    enabled: !isE2E,
     storage: "database",
     modelName: "rateLimit",
     window: 60,

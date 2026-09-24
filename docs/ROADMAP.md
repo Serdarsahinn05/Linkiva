@@ -53,16 +53,23 @@
 
 ## Faz 2: Editör ve public profil (çekirdek)
 
-- [ ] `components/ui`: Tape, Button, Input, Field, Switch, Menu, Dialog, Sheet, Toast, Tabs (erişilebilir: odak, Esc, aria).
-- [ ] `components/blocks`: LINK, HEADER, TEXT, DIVIDER render'cıları. Önizleme ile profil aynı bileşeni kullanır.
-- [ ] Editör: blok ekle (tip seçici), satır içi düzenleme, görünürlük, öne çıkar, sil + "Geri al" toast'ı, dnd sıralama + klavye alternatifi, sosyal linkler (handle tabanlı, URL platform şablonundan).
-- [ ] Server action deseni: `requireSession` → zod → sahiplik filtresi → yazma → `updateTag("profile:"+username)`. Sonuç tipi `{ ok } | { ok:false, error }`.
-- [ ] Canlı önizleme (masaüstünde yapışkan telefon, mobilde sheet), optimistic güncelleme (`useOptimistic`).
-- [ ] Public profil: önbellekli, `notFound()` 404, Etiket teması, `opengraph-image.tsx`, `sitemap.ts` (yayındaki profiller), `robots.ts`.
-- [ ] Görsel yükleme: Blob client upload, oturum kontrollü token, tür/boyut sınırı, canvas ile küçültme, eski blob'u silme.
-- [ ] QR (SVG + PNG indirme, `lib/site.ts` URL'i), "adresi kopyala".
+- [x] `components/ui`: Tape, Button, Field/Input, PasswordInput, Notice, Switch, Menu (ok tuşları, Esc), Dialog (native `<dialog>`, mobilde sheet, içerik yalnızca açıkken), Toast (geri al). *Tabs ihtiyaç doğunca (Faz 4).*
+- [x] `components/blocks/profile-view.tsx`: LINK, HEADER, TEXT, DIVIDER. Önizleme ile public profil **aynı** bileşeni kullanır.
+- [x] Editör: blok ekle, satır içi düzenleme + otomatik kayıt, görünürlük, öne çıkar, yukarı/aşağı taşı, sil + "Geri al", dnd-kit sıralama (klavye dahil), sosyal hesaplar (yapıştırılan URL handle'a çevrilir), profil adı/bio.
+- [x] Server action deseni: `withProfile` → zod → sahiplik filtresi → yazma → `updateTag`. Sonuç tipi `{ ok, data } | { ok:false, error }`.
+- [x] Canlı önizleme (masaüstünde yapışkan telefon, mobilde sheet). Yerel iyimser durum + hata olursa geri alma. `useOptimistic` yerine düz state kullanıldı, çünkü otomatik kayıt debounce'lu.
+- [x] Public profil: ISR (`generateStaticParams` boş + etiketli veri önbelleği), `notFound()` gerçek 404, Etiket teması, `opengraph-image.tsx`, `sitemap.ts`, `robots.ts`, `/l/[blockId]` yönlendirmesi (tıklama sayımı Faz 4).
+- [x] Görsel yükleme: Blob client upload, oturum kontrollü token, kullanıcı klasörüne sabit yol, tür/boyut sınırı, canvas ile 512px WebP, eski blob'u silme. ⚠️ *Yerelde Blob anahtarı kapalı (v1 production deposu). Uçtan uca yükleme testi yeni bir Blob deposuyla Faz 5'te yapılacak.*
+- [x] QR (SVG + 1024px PNG indirme, `lib/site.ts` URL'i), adresi kopyala, sayfayı aç.
 
 **Kabul:** Yeni kullanıcı 60 saniyede 3 linkli yayında bir sayfa kuruyor (Playwright senaryosu). Başka kullanıcının bloğuna yazma denemesi başarısız oluyor (test). Profil Lighthouse mobil performansı ≥ 95, erişilebilirlik 100.
+
+**Faz 2 notları (2026-09-24):**
+- ✅ `tests/e2e/editor.spec.ts`: kayıttan yayına tam akış, `/l/` 302, gizle/taşı/sil/geri al, 404. Hem dev hem **production build** (`PW_PROD=1`) üzerinde geçiyor. Production'da ISR önbelleği düzenlemeyle anında yenileniyor.
+- ✅ `tests/integration/ownership.test.ts`: B kullanıcısı A'nın bloğunu değiştiremiyor, gizleyemiyor, silemiyor, sıralamasına yabancı ID sokamıyor (S1 kapandı). S3 (upload) ve S7 (rezerve adlar) de kapandı.
+- ⏳ Lighthouse ölçümü yapılmadı. Faz 5 denetimine taşındı.
+- `E2E` bayrağı artık yalnızca `NEXT_PUBLIC_APP_URL` localhost iken geçerli (`isE2E`).
+- zod 4 tuzağı: `z.record(z.enum(...))` tüm anahtarları zorunlu kılar, kısmi kayıt için `z.partialRecord` kullanılmalı.
 
 ## Faz 3: Görünüm ve ek bloklar
 

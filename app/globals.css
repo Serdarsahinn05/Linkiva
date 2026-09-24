@@ -160,6 +160,15 @@
   @keyframes print-dots {
     to { mask-size: 100% 100%; }
   }
+
+  /* A toast leaves the label maker: it slides up out of the edge, unrolling left to right. */
+  .toast-in {
+    animation: toast-in 220ms var(--ease-out) both;
+  }
+  @keyframes toast-in {
+    from { translate: 0 120%; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+    to { translate: 0 0; clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

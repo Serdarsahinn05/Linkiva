@@ -16,7 +16,7 @@ const schema = z.object({
   UPSTASH_REDIS_REST_TOKEN: optional,
   BLOB_READ_WRITE_TOKEN: optional,
   TRACKING_SALT_SECRET: z.string().min(16).default("dev-only-tracking-salt-secret"),
-  /** Set by the Playwright web server only; lifts auth rate limits. Ignored in production. */
+  /** Set by the Playwright web server only. See isE2E below. */
   E2E: z.enum(["1"]).optional(),
 });
 
@@ -32,3 +32,9 @@ if (parsed.data.NODE_ENV === "production" && parsed.data.TRACKING_SALT_SECRET ==
 }
 
 export const env = parsed.data;
+
+/**
+ * E2E test mode: dev mailbox instead of Resend, auth rate limits off. Honoured only when the app itself
+ * runs on localhost, so setting E2E on a deployed environment has no effect.
+ */
+export const isE2E = env.E2E === "1" && new URL(env.NEXT_PUBLIC_APP_URL).hostname === "localhost";
