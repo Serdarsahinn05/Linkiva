@@ -129,7 +129,9 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - Playwright: production modunda 3 çalışan, test süresi 60 sn. Dev modunda Faz 3 testi ara sıra ilk derleme yükünde düşebiliyor; production ve tekrar çalıştırmalarda geçiyor.
 - [x] Tasarım denetimi: impeccable detector (kod) → `ponytail-review`, bu sırayla. Sonuçlar DESIGN.md §11'de. Kontrast düzeltmeleri testle korunuyor. URL taraması `puppeteer` gerektirdiği için yapılmadı.
 - [x] Güvenlik incelemesi (`/security-review`): yüksek güvenilirlikte açık yok. İki sağlamlaştırma uygulandı (doğrulama kaydı temizliği tam eşitlik, Blob URL'si kendi depomuzla sınırlı). `npm audit`: `overrides` ile 0 açık (`mysql2`, `deepmerge-ts`).
-- [ ] **Yayın (kullanıcı girdisi gerekli):** yeni Supabase projesi (ya da mevcut DB'nin temizlenmesi) + `prisma migrate deploy`, Vercel env'leri, yeni Blob deposu, Resend alan adı doğrulaması, Google OAuth redirect URI'si, `hello@linkiva.space` posta kutusu. Önce preview, sonra production. Lighthouse ölçümü preview'da.
+- [x] İşlem mailleri (TR/EN, cam tasarım, düz metin ikizi): doğrulama, sıfırlama, e-posta değişikliği **önce eski adrese onay** sonra yeni adrese doğrulama, hoş geldin, şifre değişti, hesap silindi. Önizleme: `/api/dev/mail` (yalnızca geliştirmede). `tests/unit/mail.test.ts`, account e2e iki adımlı akışı doğruluyor.
+- [x] `docs/DEPLOY.md`: Supabase, Vercel env, Blob, Resend alan adı, Google Branding/redirect, `hello@` yönlendirme, preview → birleştirme sırası.
+- [ ] **Yayın (kullanıcı adımları, `docs/DEPLOY.md`):** kullanıcı önce preview'da deneyecek, sonra `master`'a birleştirilecek. Eski DB geçişten sonra silinecek. Lighthouse ölçümü preview'da.
 - [x] `DESIGN.md` build'den yeniden kaydedildi (gerçek token değerleri, köşeler, hareket, denetim kaydı).
 
 **Kabul:** Tüm Playwright senaryoları production URL'inde geçiyor. Lighthouse (landing, profil, panel) ≥ 90/100/100. Açık kritik bulgu yok.

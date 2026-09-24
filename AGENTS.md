@@ -12,9 +12,10 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 | [DESIGN.md](DESIGN.md) | Görsel sistem: token'lar, tipografi, bileşen dili, temalar (**tasarım otoritesi**) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Stack, klasör yapısı, veri modeli, auth, takip hattı, i18n |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Fazlar, kabul kriterleri, backlog |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
 | [docs/AUDIT.md](docs/AUDIT.md) | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
 
-> **Durum (2026-09-24):** v2 yeniden kurulumu onaylandı ve `rebuild/v2` dalında sürüyor. v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
+> **Durum (2026-09-24):** v2 yeniden kurulumu onaylandı ve `rebuild/v2` dalında sürüyor. v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Kod tarafı bitti (Faz 0–5, işlem mailleri dahil). Sırada kullanıcının preview denemesi ve `docs/DEPLOY.md` adımları var; `master`'a birleştirme kullanıcı onayıyla. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
 
 ## Stack
 

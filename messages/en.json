@@ -157,24 +157,60 @@
     "comingSoon": "The editor arrives in the next step."
   },
   "mail": {
-    "footer": "If you didn't ask for this, you can ignore this email.",
+    "footer": "You received this because something happened on your linkiva.space account.",
+    "footerIgnore": "If this wasn't you, you can ignore this email.",
+    "fallback": "If the button does not work, paste this link into your browser:",
     "verify": {
       "subject": "Linkiva: verify your email",
+      "preheader": "One step left to open your account.",
       "heading": "Verify your email",
       "body": "Click the button below to open your Linkiva account. The link is valid for 24 hours.",
       "cta": "Verify my email"
     },
     "reset": {
       "subject": "Linkiva: reset your password",
+      "preheader": "Here is your password reset link.",
       "heading": "Reset your password",
       "body": "We received a request to reset your password. If it was you, click the button below. The link is valid for 1 hour.",
       "cta": "Set a new password"
     },
     "changeEmail": {
       "subject": "Linkiva: confirm your new email",
+      "preheader": "Confirm your new address.",
       "heading": "Confirm your new address",
       "body": "You asked to change your Linkiva email to this address. Click the button to confirm. Your old address stays active until you do.",
       "cta": "Confirm address"
+    },
+    "changeEmailConfirm": {
+      "subject": "Linkiva: email change request",
+      "preheader": "Your approval is needed to change your account email.",
+      "heading": "Approve the address change",
+      "body": "We received a request to change your account email to {newEmail}. If it was you, approve it; a verification link will then go to the new address.",
+      "cta": "Approve the change",
+      "security": "If you did not request this, do not click the button and change your password."
+    },
+    "welcome": {
+      "subject": "Linkiva: your page is live",
+      "preheader": "Your address is ready to share.",
+      "heading": "Welcome, your page is live",
+      "body": "Your address is now {url}. Add links, pick a theme and paste it into your bio. Follow your stats from the dashboard.",
+      "cta": "See my page"
+    },
+    "passwordChanged": {
+      "subject": "Linkiva: your password changed",
+      "preheader": "Your account password was just changed.",
+      "heading": "Your password changed",
+      "body": "The password of your Linkiva account was just changed and sessions on other devices were signed out.",
+      "cta": "It wasn't me, reset my password",
+      "security": "If you made this change, there is nothing else to do."
+    },
+    "accountDeleted": {
+      "subject": "Linkiva: your account was deleted",
+      "preheader": "Your account and all data were deleted.",
+      "heading": "Your account was deleted",
+      "body": "As requested, your Linkiva account, page, stats and subscriber list were permanently deleted. Your address is now free for others.",
+      "cta": "",
+      "security": "If this wasn't you, write to us right away: hello@linkiva.space"
     }
   },
   "profile": {
@@ -429,7 +465,7 @@
     "currentEmail": "Your current address",
     "newEmail": "New email",
     "changeEmail": "Send confirmation link",
-    "changeEmailSent": "We sent a confirmation link to {email}. Your old address stays active until you confirm.",
+    "changeEmailSent": "We first sent an approval link to your current address ({email}). Once you approve, the new address gets a verification link; your old address stays active until then.",
     "password": "Password",
     "currentPassword": "Current password",
     "newPassword": "New password",

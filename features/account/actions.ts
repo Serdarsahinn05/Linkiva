@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { LOCALE_COOKIE, locales } from "@/i18n/config";
 import { db } from "@/lib/db";
+import { sendMailQuietly } from "@/lib/mail/send";
 import { env } from "@/lib/env";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { THEME_COOKIE } from "@/lib/theme-preference";
@@ -54,6 +55,8 @@ export async function deleteAccount(confirmation: string): Promise<DeleteAccount
 
     await db.$transaction([db.verification.deleteMany({ where: { identifier: user.email } }), db.user.delete({ where: { id: user.id } })]);
     if (profile) updateTag(profileTag(profile.username));
+    const locale = (await cookies()).get(LOCALE_COOKIE)?.value === "en" ? "en" : "tr";
+    await sendMailQuietly({ to: user.email, kind: "accountDeleted", locale });
     return { ok: true };
   } catch (error) {
     if (error instanceof UnauthorizedError) return { ok: false, error: "unauthorized" };

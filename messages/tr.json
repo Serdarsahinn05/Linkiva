@@ -157,24 +157,60 @@
     "comingSoon": "Editör bir sonraki adımda geliyor."
   },
   "mail": {
-    "footer": "Bu maili sen istemediysen görmezden gelebilirsin.",
+    "footer": "Bu maili, linkiva.space hesabınla ilgili bir işlem yapıldığı için aldın.",
+    "footerIgnore": "Bu işlemi sen yapmadıysan bu maili görmezden gelebilirsin.",
+    "fallback": "Buton çalışmazsa bu linki tarayıcına yapıştır:",
     "verify": {
       "subject": "Linkiva: e-postanı doğrula",
+      "preheader": "Hesabını açmak için bir adım kaldı.",
       "heading": "E-postanı doğrula",
       "body": "Linkiva hesabını açmak için aşağıdaki butona tıkla. Link 24 saat geçerli.",
       "cta": "E-postamı doğrula"
     },
     "reset": {
       "subject": "Linkiva: şifre sıfırlama",
+      "preheader": "Şifreni sıfırlama linkin burada.",
       "heading": "Şifreni sıfırla",
       "body": "Şifreni sıfırlamak için bir istek aldık. Sen istediysen aşağıdaki butona tıkla. Link 1 saat geçerli.",
       "cta": "Yeni şifre belirle"
     },
     "changeEmail": {
       "subject": "Linkiva: yeni e-posta adresini doğrula",
+      "preheader": "Yeni adresini onayla.",
       "heading": "Yeni adresini doğrula",
       "body": "Linkiva hesabının e-posta adresini bu adresle değiştirmek istedin. Onaylamak için butona tıkla. Onaylayana kadar eski adresin geçerli kalır.",
       "cta": "Adresi onayla"
+    },
+    "changeEmailConfirm": {
+      "subject": "Linkiva: e-posta değişikliği isteği",
+      "preheader": "Hesabının adresini değiştirmek için onayın gerekiyor.",
+      "heading": "Adres değişikliğini onayla",
+      "body": "Hesabının e-posta adresini {newEmail} olarak değiştirmek için bir istek aldık. Sen istediysen onayla; ardından yeni adrese bir doğrulama linki gidecek.",
+      "cta": "Değişikliği onayla",
+      "security": "Bu isteği sen yapmadıysan butona tıklama ve şifreni değiştir."
+    },
+    "welcome": {
+      "subject": "Linkiva: sayfan yayında",
+      "preheader": "Adresin hazır, paylaşmaya başlayabilirsin.",
+      "heading": "Hoş geldin, sayfan yayında",
+      "body": "Adresin artık {url}. Link ekle, temanı seç ve biyografine yapıştır. İstatistiklerini panelden takip edebilirsin.",
+      "cta": "Sayfamı gör"
+    },
+    "passwordChanged": {
+      "subject": "Linkiva: şifren değişti",
+      "preheader": "Hesabının şifresi az önce değiştirildi.",
+      "heading": "Şifren değişti",
+      "body": "Linkiva hesabının şifresi az önce değiştirildi ve diğer cihazlardaki oturumlar kapatıldı.",
+      "cta": "Ben değiştirmedim, şifremi sıfırla",
+      "security": "Bu değişikliği sen yaptıysan başka bir şey yapmana gerek yok."
+    },
+    "accountDeleted": {
+      "subject": "Linkiva: hesabın silindi",
+      "preheader": "Hesabın ve tüm verilerin silindi.",
+      "heading": "Hesabın silindi",
+      "body": "İsteğin üzerine Linkiva hesabın, sayfan, istatistiklerin ve abone listen kalıcı olarak silindi. Adresin artık başkaları tarafından alınabilir.",
+      "cta": "",
+      "security": "Bunu sen yapmadıysan hemen bize yaz: hello@linkiva.space"
     }
   },
   "profile": {
@@ -429,7 +465,7 @@
     "currentEmail": "Şu anki adresin",
     "newEmail": "Yeni e-posta",
     "changeEmail": "Doğrulama linki gönder",
-    "changeEmailSent": "{email} adresine bir onay linki gönderdik. Onaylayana kadar eski adresin geçerli.",
+    "changeEmailSent": "Önce şu anki adresine ({email}) bir onay linki gönderdik. Onayladığında yeni adrese bir doğrulama linki gelecek; o da onaylanana kadar eski adresin geçerli.",
     "password": "Şifre",
     "currentPassword": "Mevcut şifre",
     "newPassword": "Yeni şifre",

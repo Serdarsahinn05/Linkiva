@@ -1,9 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { Prisma } from "@/prisma/generated/client";
 import { db } from "@/lib/db";
+import { sendMailQuietly } from "@/lib/mail/send";
+import { profileUrl } from "@/lib/site";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { usernameProblem, usernameSchema, type UsernameProblem } from "@/lib/validation/username";
 
@@ -44,8 +47,11 @@ export type CreateProfileResult = { ok: false; error: "unauthorized" | "invalid"
 
 export async function createProfile(_prev: CreateProfileResult | null, formData: FormData): Promise<CreateProfileResult> {
   let userId: string;
+  let email: string;
   try {
-    userId = (await requireUser()).id;
+    const user = await requireUser();
+    userId = user.id;
+    email = user.email;
   } catch (error) {
     if (error instanceof UnauthorizedError) return { ok: false, error: "unauthorized" };
     throw error;
@@ -70,5 +76,7 @@ export async function createProfile(_prev: CreateProfileResult | null, formData:
     return { ok: false, error: "unknown" };
   }
 
+  // Welcome mail for every new page (email and Google sign-ups alike).
+  await sendMailQuietly({ to: email, kind: "welcome", locale: (await getLocale()) === "en" ? "en" : "tr", url: profileUrl(username) });
   redirect("/dashboard");
 }

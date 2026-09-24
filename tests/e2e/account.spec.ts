@@ -17,19 +17,22 @@ test("email change, password change, data export and account deletion", async ({
   const { email } = await createUser(page, username);
   const newEmail = `new-${username}@example.com`;
 
-  // Email change: confirmation goes to the new address; the old one keeps working until then (v1 bug S4).
+  // Email change: the current address approves first, then the new one verifies (v1 bug S4).
   await page.goto("/dashboard/settings");
   const requested = Date.now();
   await page.getByLabel("Yeni e-posta").fill(newEmail);
   await page.getByRole("button", { name: "Doğrulama linki gönder" }).click();
-  await expect(page.getByText(`${newEmail} adresine bir onay linki gönderdik`)).toBeVisible();
-  const confirmUrl = await lastMail(newEmail, "changeEmail", requested);
+  await expect(page.getByText("Önce şu anki adresine")).toBeVisible();
+  const approveUrl = await lastMail(email, "changeEmailConfirm", requested);
 
+  // Until the change completes, the old address still signs in.
   await page.context().clearCookies();
   await login(page, email, "correct-horse-1");
   await expect(page).toHaveURL(/\/dashboard$/);
 
-  await page.goto(confirmUrl);
+  const approved = Date.now();
+  await page.goto(approveUrl);
+  await page.goto(await lastMail(newEmail, "changeEmail", approved));
   await page.goto("/dashboard/settings");
   await expect(page.getByText(newEmail).first()).toBeVisible();
 

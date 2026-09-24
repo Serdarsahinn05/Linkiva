@@ -124,7 +124,7 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
           {t("account.currentEmail")}: <span className="font-medium text-ink">{email}</span>
         </p>
         {emailState === "sent" ? (
-          <Notice tone="success">{t("account.changeEmailSent", { email: newEmail })}</Notice>
+          <Notice tone="success">{t("account.changeEmailSent", { email })}</Notice>
         ) : (
           <form onSubmit={changeEmail} className="flex flex-col gap-3 sm:flex-row sm:items-end" noValidate>
             <Field label={t("account.newEmail")} error={emailState === "invalid" ? t("auth.errors.email") : undefined} className="flex-1">

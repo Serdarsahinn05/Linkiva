@@ -1,10 +1,11 @@
 import { betterAuth } from "better-auth";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { localeFromRequest } from "@/i18n/detect";
 import { db } from "@/lib/db";
 import { env, isE2E } from "@/lib/env";
-import { sendMail } from "@/lib/mail/send";
+import { sendMail, sendMailQuietly } from "@/lib/mail/send";
 import { site } from "@/lib/site";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/validation/auth";
 
@@ -26,6 +27,9 @@ export const auth = betterAuth({
     minPasswordLength: PASSWORD_MIN,
     maxPasswordLength: PASSWORD_MAX,
     revokeSessionsOnPasswordReset: true,
+    onPasswordReset: async ({ user }, request) => {
+      await sendMailQuietly({ to: user.email, kind: "passwordChanged", locale: localeFromRequest(request), url: `${site.url}/forgot-password` });
+    },
     sendResetPassword: async ({ user, url }, request) => {
       await sendMail({ to: user.email, kind: "reset", locale: localeFromRequest(request), url });
     },
@@ -60,7 +64,14 @@ export const auth = betterAuth({
 
   user: {
     // The stored address only changes after the new one is verified (docs/AUDIT.md S4).
-    changeEmail: { enabled: true },
+    changeEmail: {
+      enabled: true,
+      // A verified account must approve the change from its current address first; only then does the
+      // new address get its verification link. A stolen session alone cannot move the account away.
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }, request) => {
+        await sendMail({ to: user.email, kind: "changeEmailConfirm", locale: localeFromRequest(request), url, newEmail });
+      },
+    },
     deleteUser: { enabled: true },
   },
 
@@ -89,6 +100,15 @@ export const auth = betterAuth({
   advanced: {
     // Vercel sets x-forwarded-for; rate limits key on its first (client) address.
     ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
+  },
+
+  hooks: {
+    // Security notice after an in-app password change (resets are covered by onPasswordReset).
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/change-password" || ctx.context.returned instanceof APIError) return;
+      const email = ctx.context.session?.user.email;
+      if (email) await sendMailQuietly({ to: email, kind: "passwordChanged", locale: localeFromRequest(ctx.request), url: `${site.url}/forgot-password` });
+    }),
   },
 
   telemetry: { enabled: false },

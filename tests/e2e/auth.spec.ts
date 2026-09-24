@@ -72,7 +72,7 @@ test("register → verify → onboarding → dashboard, then log out and back in
   await page.getByLabel("Görünen ad").fill("E2E Test");
   await page.getByRole("button", { name: "Sayfamı yayınla" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByText(`localhost:3000/${username}`)).toBeVisible();
+  await expect(page.getByText(`${new URL(page.url()).host}/${username}`)).toBeVisible();
 
   // Onboarding is done: visiting it again goes to the dashboard.
   await page.goto("/onboarding");
