@@ -1,117 +1,201 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
-enum Role {
-  USER
-  ADMIN
-}
+// ─── Auth (Better Auth core schema) ──────────────────────────────────────────
 
 model User {
-  id              String    @id @default(cuid())
-  username        String?   @unique
-  email           String    @unique
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  profile       Profile?
 
-  instagram String?
-  x   String?
-  github    String?
-  linkedin  String?
-  youtube   String?
-
-
-  password        String?
-  fullName        String?
-  bio             String?
-  avatarUrl       String?
-  themeColor      String?   @default("#ffffff")
-  backgroundImage String?
-  role            Role      @default(USER)
-  name            String?
-  image           String?
-  emailVerified   DateTime?
-  verificationToken String?   @unique // Maile göndereceğimiz benzersiz kod
-  tokenExpires    DateTime?         // Tokenın son kullanma tarihi
-  accounts        Account[]
-  links           Link[]
-
-  // YENİ: Profil görüntülenme kayıtları
-  visits          Visit[]
-
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  @@map("user")
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-}
-
-model Link {
-  id         String   @id @default(cuid())
-  title      String
-  url        String
-  isActive   Boolean  @default(true)
-  order      Int      @default(0)
-  thumbnail  String?
-  clickCount Int      @default(0)
-  clickEvents ClickEvent[]
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model ClickEvent {
-  id        String   @id @default(cuid())
-  linkId    String
-  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
-
-  // -- Cihaz ve Konum Verileri --
-  country   String?
-  city      String?
-  userAgent String?  // YENİ: Cihaz (iPhone, Mac, Windows vs.)
-  referer   String?  // YENİ: Geliş kaynağı (Instagram, Twitter vs.)
-
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
   createdAt DateTime @default(now())
-}
-
-// Profil ziyaret tablosu
-model Visit {
-  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  country   String?
-  city      String?
-  userAgent String?
-  referer   String?
-
-  createdAt DateTime @default(now())
+  @@index([userId])
+  @@map("session")
 }
 
-model PasswordResetToken {
-  id      String   @id @default(cuid())
-  email   String
-  token   String   @unique
-  expires DateTime
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  @@unique([email, token])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ─── Linkiva ─────────────────────────────────────────────────────────────────
+
+model Profile {
+  id             String       @id @default(cuid())
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username       String       @unique
+  displayName    String?
+  bio            String?
+  avatarUrl      String?
+  theme          String       @default("etiket")
+  appearance     Json         @default("{}")
+  seoTitle       String?
+  seoDescription String?
+  showBranding   Boolean      @default(true)
+  isPublished    Boolean      @default(true)
+  locale         String       @default("tr")
+  timezone       String       @default("Europe/Istanbul")
+  blocks         Block[]
+  socials        SocialLink[]
+  events         Event[]
+  subscribers    Subscriber[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("profile")
+}
+
+enum BlockType {
+  LINK
+  HEADER
+  TEXT
+  EMBED
+  EMAIL_CAPTURE
+  DIVIDER
+}
+
+model Block {
+  id            String    @id @default(cuid())
+  profileId     String
+  profile       Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type          BlockType
+  position      Int
+  isVisible     Boolean   @default(true)
+  isHighlighted Boolean   @default(false)
+  /// Shape depends on `type`; always parsed through lib/validation/blocks.ts
+  data          Json
+  startsAt      DateTime?
+  endsAt        DateTime?
+  events        Event[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([profileId, position])
+  @@map("block")
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  X
+  TIKTOK
+  YOUTUBE
+  GITHUB
+  LINKEDIN
+  TWITCH
+  SPOTIFY
+  DISCORD
+  BEHANCE
+  DRIBBBLE
+  EMAIL
+  WEBSITE
+}
+
+model SocialLink {
+  id        String         @id @default(cuid())
+  profileId String
+  profile   Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  platform  SocialPlatform
+  handle    String
+  position  Int
+
+  @@unique([profileId, platform])
+  @@map("social_link")
+}
+
+enum EventType {
+  VIEW
+  CLICK
+}
+
+enum Device {
+  MOBILE
+  DESKTOP
+  TABLET
+}
+
+model Event {
+  id           BigInt    @id @default(autoincrement())
+  profileId    String
+  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  blockId      String?
+  block        Block?    @relation(fields: [blockId], references: [id], onDelete: SetNull)
+  type         EventType
+  visitorHash  String
+  country      String?   @db.Char(2)
+  city         String?
+  device       Device?
+  os           String?
+  browser      String?
+  referrerHost String?
+  utmSource    String?
+  createdAt    DateTime  @default(now())
+
+  @@index([profileId, createdAt])
+  @@index([blockId, createdAt])
+  @@map("event")
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  email     String
+  createdAt DateTime @default(now())
+
+  @@unique([profileId, email])
+  @@map("subscriber")
 }

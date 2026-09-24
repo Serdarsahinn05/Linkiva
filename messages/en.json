@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "title": "Linkiva: Everything you are, at one address",
+    "description": "Gather your links, social accounts and content on one page. What others charge for is free here."
+  },
+  "common": {
+    "appName": "Linkiva",
+    "login": "Log in",
+    "startFree": "Start free",
+    "skipToContent": "Skip to content"
+  },
+  "landing": {
+    "headline": "Everything you are, at one address.",
+    "lede": "Gather your links, socials and content on one page. Build it, share it, see who clicks.",
+    "usernamePlaceholder": "your-name",
+    "usernameLabel": "Your username",
+    "claim": "Create my page"
+  }
+}

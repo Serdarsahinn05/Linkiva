@@ -1,39 +1,26 @@
-# Dependency directories
 node_modules/
-jspm_packages/
-
-# Next.js build output
 .next/
 out/
+build/
+next-env.d.ts
+*.tsbuildinfo
 
-# IDEs and Editors
+# Prisma generated client
+prisma/generated/
+
+# Tests
+playwright-report/
+test-results/
+coverage/
+
+# Env (secrets never committed; .env.example is)
+.env
+.env.*
+!.env.example
+
+# IDE / OS
 .idea/
 .vscode/
-*.swp
-*.swo
-.project
-.classpath
-.settings/
-
-# Environment variables (KRİTİK: Şifrelerin gitmemeli!)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.sample
-
-# OS metadata
 .DS_Store
 Thumbs.db
-
-# Prisma logs and sqlite db (eğer kullanıyorsan)
-prisma/*.db
-prisma/*.db-journal
-
-# Logs
-logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*

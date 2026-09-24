@@ -1,17 +1,13 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
-    typescript: {
-        // !! DİKKAT !!
-        // Projende tip hatası olsa bile build almasını sağlar.
-        // Özellikle react-simple-maps gibi kütüphanelerin tip sorunlarını aşmak için kullanılır.
-        ignoreBuildErrors: true,
-    },
-    eslint: {
-        // ESLint hatalarını da build sırasında görmezden gelir (opsiyonel ama hayat kurtarır)
-        ignoreDuringBuilds: true,
-    },
-    /* Diğer config ayarların varsa buraya ekleyebilirsin */
+  typedRoutes: true,
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
+  },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

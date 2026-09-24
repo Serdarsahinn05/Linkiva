@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "title": "Linkiva: Her şeyin, tek bir adreste",
+    "description": "Linklerini, sosyal hesaplarını ve içeriklerini tek bir sayfada topla. Başka yerde ücretli olan her şey burada ücretsiz."
+  },
+  "common": {
+    "appName": "Linkiva",
+    "login": "Giriş yap",
+    "startFree": "Ücretsiz başla",
+    "skipToContent": "İçeriğe geç"
+  },
+  "landing": {
+    "headline": "Her şeyin, tek bir adreste.",
+    "lede": "Linklerini, sosyal hesaplarını ve içeriklerini tek sayfada topla. Kur, paylaş, kimin tıkladığını gör.",
+    "usernamePlaceholder": "senin-adin",
+    "usernameLabel": "Kullanıcı adın",
+    "claim": "Sayfamı oluştur"
+  }
+}
