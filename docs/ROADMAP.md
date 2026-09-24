@@ -119,9 +119,14 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## Faz 5: Hesap, sağlamlaştırma, yayın
 
-- [ ] Ayarlar: e-posta değiştir, şifre değiştir, Google bağla/ayır, oturumlar, dil, tema (açık/koyu/sistem), **veri dışa aktarma (JSON)**, hesap silme (blob'lar dahil).
-- [ ] Landing (Persuade): basım etkileşimli hero, örnek profil, "Ücretsiz" bölümü, kapanış eylemi. Gerçek olmayan iddia yok.
-- [ ] 404, hata sınırları (`error.tsx`), yükleniyor durumları, boş durumlar. Tüm metinler i18n.
+- [x] Ayarlar: e-posta değiştir (yeni adres onaylanınca), şifre değiştir (diğer oturumlar kapanır), Google bağla/ayır (tek giriş yöntemi korunur), oturumlar (ilk 5 + tümü), dil, tema, **veri dışa aktarma (JSON, sır içermez)**, hesap silme (kullanıcı adıyla onay, blob'lar dahil).
+- [x] Landing: cam adres çubuğu (JS'siz form), sentetik "Örnek profil" cam telefonda, "ücretsiz" satır listesi (rakip adı/fiyat yok), kapanış çağrısı, alt bilgi.
+- [x] 404'ler (`(site)/not-found`, profil 404, `global-not-found` ile eşleşmeyen tüm adresler), hata sınırları (`(site)/error.tsx`, profil `error.tsx`). Tüm metinler i18n (profil hatası iki dilli).
+
+**Faz 5 ara notları (2026-09-24):**
+- 🐞 Production e2e yarış durumu yakaladı: eşzamanlı iki tıklama tekrar kilidini birlikte geçip ikisi de kaydediliyordu. `event.dedupeKey` (ziyaretçi + hedef + zaman kovası) üzerinde tekil indeks eklendi, migration `event_dedupe_key`. `tests/integration/record.test.ts` 5 eşzamanlı tıklamada tam 1 kayıt doğruluyor.
+- 🐞 Landing hero'su mobilde yatay taşıyordu (grid sütunu içerik genişliğine uzuyordu). `tests/e2e/layout.spec.ts` beş sayfada taşmayı koruyor.
+- Playwright: production modunda 3 çalışan, test süresi 60 sn. Dev modunda Faz 3 testi ara sıra ilk derleme yükünde düşebiliyor; production ve tekrar çalıştırmalarda geçiyor.
 - [ ] Tasarım denetimi: `impeccable audit` → `critique`, ardından `ponytail-review` (bu sırayla). Detector taraması.
 - [ ] Güvenlik incelemesi (`/security-review`), bağımlılık denetimi.
 - [ ] Vercel env'leri, yeni DB migration, Google OAuth redirect URI'leri, Resend domain. Önce preview, sonra production.

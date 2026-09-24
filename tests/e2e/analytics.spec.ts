@@ -50,12 +50,13 @@ test("views and clicks are counted honestly: no bots, no owner, no repeats", asy
   const botBeacon = await request.post("/api/e", { data: JSON.stringify({ p: "x" }), headers: { "user-agent": "facebookexternalhit/1.1" } });
   expect(botBeacon.status()).toBe(204);
 
-  // Writes happen after the response; give them a moment.
-  await page.waitForTimeout(1500);
-
-  await page.goto("/dashboard/analytics?range=7d");
+  // Writes happen after the response (next/server after()), so poll the page until they land.
   const strip = page.locator("section").filter({ hasText: "Görüntülenme" }).first();
-  await expect(strip.getByText("Görüntülenme").locator("xpath=following-sibling::span[1]")).toHaveText("1");
+  await expect(async () => {
+    await page.goto("/dashboard/analytics?range=7d");
+    await expect(strip.getByText("Görüntülenme").locator("xpath=following-sibling::span[1]")).toHaveText("1", { timeout: 1000 });
+    await expect(strip.getByText("Tıklama", { exact: true }).locator("xpath=following-sibling::span[1]")).toHaveText("1", { timeout: 1000 });
+  }).toPass({ timeout: 20_000 });
   await expect(strip.getByText("Tekil ziyaretçi").locator("xpath=following-sibling::span[1]")).toHaveText("1");
   await expect(strip.getByText("Tıklama", { exact: true }).locator("xpath=following-sibling::span[1]")).toHaveText("1");
 

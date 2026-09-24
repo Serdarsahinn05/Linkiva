@@ -192,6 +192,8 @@ model Event {
   browser      String?
   referrerHost String?
   utmSource    String?
+  /// Atomic de-duplication: visitor + target + time bucket. A concurrent repeat violates the unique index.
+  dedupeKey    String?   @unique
   createdAt    DateTime  @default(now())
 
   @@index([profileId, createdAt])

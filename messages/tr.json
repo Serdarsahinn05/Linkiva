@@ -19,7 +19,56 @@
     "lede": "Linklerini, sosyal hesaplarını ve içeriklerini tek sayfada topla. Kur, paylaş, kimin tıkladığını gör.",
     "usernamePlaceholder": "senin-adin",
     "usernameLabel": "Kullanıcı adın",
-    "claim": "Sayfamı oluştur"
+    "claim": "Sayfamı oluştur",
+    "sample": "Örnek profil",
+    "freeTitle": "Başka yerde ücretli olanlar, burada ücretsiz.",
+    "freeLede": "Kilitli özellik yok, deneme süresi yok.",
+    "free": {
+      "analytics": [
+        "Detaylı istatistik",
+        "Görüntülenme, tekil ziyaretçi, tıklama oranı, kaynak, ülke ve cihaz. Çerezsiz."
+      ],
+      "themes": [
+        "Temalar ve özelleştirme",
+        "Altı tema, beş yazı tipi, üç buton stili, kendi rengin ve arka plan görselin."
+      ],
+      "schedule": [
+        "Planlı linkler",
+        "Bir linki belirli bir tarihte açılacak ya da kapanacak şekilde ayarla."
+      ],
+      "highlight": [
+        "Öne çıkan link",
+        "En önemli linkini diğerlerinden ayır."
+      ],
+      "capture": [
+        "E-posta toplama",
+        "Sayfana abone formu ekle, listeni CSV olarak indir."
+      ],
+      "embed": [
+        "Video ve müzik",
+        "YouTube, Spotify ve SoundCloud, sayfayı yavaşlatmadan."
+      ],
+      "branding": [
+        "Rozetsiz sayfa",
+        "Linkiva yazısını tek dokunuşla kaldır."
+      ],
+      "qr": [
+        "QR kod",
+        "Adresinin QR kodunu SVG ya da PNG olarak indir."
+      ]
+    },
+    "closeTitle": "Adresin boşta mı?",
+    "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
+    "privacy": "Gizlilik",
+    "sampleName": "Deniz Aydın",
+    "sampleBio": "İllüstratör · İstanbul",
+    "sampleHeader": "İşler",
+    "sampleLinks": [
+      "Portfolyo",
+      "Baskı dükkânı",
+      "Atölye takvimi"
+    ],
+    "sampleCapture": "Yeni işlerden haberdar ol"
   },
   "auth": {
     "fields": {
@@ -250,8 +299,7 @@
       "en": "English"
     },
     "account": "Hesap",
-    "signedInAs": "{email} olarak giriş yaptın.",
-    "more": "E-posta, şifre, oturumlar ve hesap silme yakında burada."
+    "signedInAs": "{email} olarak giriş yaptın."
   },
   "soon": {
     "appearance": "Tema ve özelleştirme bir sonraki adımda geliyor.",
@@ -375,5 +423,52 @@
     "export": "CSV indir",
     "privacy": "Çerez kullanmıyoruz; botlar, önizlemeler ve senin kendi ziyaretlerin sayılmaz.",
     "privacyLink": "Nasıl ölçüyoruz?"
+  },
+  "account": {
+    "email": "E-posta",
+    "currentEmail": "Şu anki adresin",
+    "newEmail": "Yeni e-posta",
+    "changeEmail": "Doğrulama linki gönder",
+    "changeEmailSent": "{email} adresine bir onay linki gönderdik. Onaylayana kadar eski adresin geçerli.",
+    "password": "Şifre",
+    "currentPassword": "Mevcut şifre",
+    "newPassword": "Yeni şifre",
+    "changePassword": "Şifreyi değiştir",
+    "passwordChanged": "Şifren değişti. Diğer cihazlardaki oturumlar kapatıldı.",
+    "wrongPassword": "Mevcut şifre hatalı.",
+    "noPassword": "Google ile giriş yapıyorsun. Şifre belirlemek istersen çıkış yapıp \"Şifremi unuttum\" adımını kullanabilirsin.",
+    "connections": "Bağlı hesaplar",
+    "google": "Google",
+    "connect": "Bağla",
+    "disconnect": "Bağlantıyı kaldır",
+    "connected": "Bağlı",
+    "lastMethod": "Tek giriş yöntemin bu olduğu için kaldırılamaz.",
+    "sessions": "Oturumlar",
+    "thisDevice": "Bu cihaz",
+    "since": "{date} tarihinden beri",
+    "signOutOthers": "Diğer oturumları kapat",
+    "signedOutOthers": "Diğer oturumlar kapatıldı.",
+    "revoke": "Kapat",
+    "data": "Verilerin",
+    "dataHint": "Hesabın, sayfan, abonelerin ve istatistiklerin tek bir JSON dosyasında.",
+    "download": "Verilerimi indir",
+    "danger": "Hesabı sil",
+    "dangerHint": "Sayfan, blokların, abonelerin, istatistiklerin ve yüklediğin görseller kalıcı olarak silinir. Geri alınamaz.",
+    "deleteOpen": "Hesabımı sil",
+    "deleteTitle": "Hesabı kalıcı olarak sil",
+    "deleteConfirmLabel": "Onaylamak için kullanıcı adını yaz: {username}",
+    "deleteConfirm": "Hesabı kalıcı olarak sil",
+    "deleting": "Siliniyor",
+    "deleteMismatch": "Kullanıcı adı eşleşmiyor.",
+    "cancel": "Vazgeç",
+    "showAllSessions": "Tümünü göster ({count})"
+  },
+  "errors": {
+    "notFoundTitle": "Bu sayfa yok.",
+    "notFoundBody": "Adres yanlış yazılmış ya da sayfa kaldırılmış olabilir.",
+    "home": "Ana sayfaya dön",
+    "errorTitle": "Bir şeyler ters gitti.",
+    "errorBody": "Sorun bizde. Tekrar dene; devam ederse biraz sonra yeniden gel.",
+    "retry": "Tekrar dene"
   }
 }

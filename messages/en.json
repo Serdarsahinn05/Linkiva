@@ -19,7 +19,56 @@
     "lede": "Gather your links, socials and content on one page. Build it, share it, see who clicks.",
     "usernamePlaceholder": "your-name",
     "usernameLabel": "Your username",
-    "claim": "Create my page"
+    "claim": "Create my page",
+    "sample": "Sample profile",
+    "freeTitle": "What others charge for is free here.",
+    "freeLede": "No locked features, no trial period.",
+    "free": {
+      "analytics": [
+        "Detailed analytics",
+        "Views, unique visitors, click-through rate, sources, countries and devices. No cookies."
+      ],
+      "themes": [
+        "Themes and customisation",
+        "Six themes, five typefaces, three button styles, your own colour and background image."
+      ],
+      "schedule": [
+        "Scheduled links",
+        "Make a link go live or disappear at a given time."
+      ],
+      "highlight": [
+        "Highlighted link",
+        "Make your most important link stand out."
+      ],
+      "capture": [
+        "Email collection",
+        "Add a subscribe form and download your list as CSV."
+      ],
+      "embed": [
+        "Video and music",
+        "YouTube, Spotify and SoundCloud, without slowing the page."
+      ],
+      "branding": [
+        "No badge",
+        "Remove the Linkiva badge with one tap."
+      ],
+      "qr": [
+        "QR code",
+        "Download your address as an SVG or PNG QR code."
+      ]
+    },
+    "closeTitle": "Is your address still free?",
+    "closeLede": "Claim your username and go live in a minute.",
+    "privacy": "Privacy",
+    "sampleName": "Deniz Aydın",
+    "sampleBio": "Illustrator · Istanbul",
+    "sampleHeader": "Work",
+    "sampleLinks": [
+      "Portfolio",
+      "Print shop",
+      "Workshop dates"
+    ],
+    "sampleCapture": "Hear about new work"
   },
   "auth": {
     "fields": {
@@ -250,8 +299,7 @@
       "en": "English"
     },
     "account": "Account",
-    "signedInAs": "Signed in as {email}.",
-    "more": "Email, password, sessions and account deletion arrive here soon."
+    "signedInAs": "Signed in as {email}."
   },
   "soon": {
     "appearance": "Themes and customisation arrive in the next step.",
@@ -375,5 +423,52 @@
     "export": "Download CSV",
     "privacy": "No cookies; bots, previews and your own visits are not counted.",
     "privacyLink": "How we measure"
+  },
+  "account": {
+    "email": "Email",
+    "currentEmail": "Your current address",
+    "newEmail": "New email",
+    "changeEmail": "Send confirmation link",
+    "changeEmailSent": "We sent a confirmation link to {email}. Your old address stays active until you confirm.",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "changePassword": "Change password",
+    "passwordChanged": "Password changed. Sessions on other devices were signed out.",
+    "wrongPassword": "The current password is wrong.",
+    "noPassword": "You sign in with Google. To set a password, log out and use \"Forgot password\".",
+    "connections": "Connected accounts",
+    "google": "Google",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connected": "Connected",
+    "lastMethod": "This is your only way to sign in, so it cannot be removed.",
+    "sessions": "Sessions",
+    "thisDevice": "This device",
+    "since": "Since {date}",
+    "signOutOthers": "Sign out other sessions",
+    "signedOutOthers": "Other sessions were signed out.",
+    "revoke": "Sign out",
+    "data": "Your data",
+    "dataHint": "Your account, page, subscribers and stats in one JSON file.",
+    "download": "Download my data",
+    "danger": "Delete account",
+    "dangerHint": "Your page, blocks, subscribers, stats and uploaded images are deleted permanently. This cannot be undone.",
+    "deleteOpen": "Delete my account",
+    "deleteTitle": "Delete account permanently",
+    "deleteConfirmLabel": "Type your username to confirm: {username}",
+    "deleteConfirm": "Delete account permanently",
+    "deleting": "Deleting",
+    "deleteMismatch": "The username does not match.",
+    "cancel": "Cancel",
+    "showAllSessions": "Show all ({count})"
+  },
+  "errors": {
+    "notFoundTitle": "This page does not exist.",
+    "notFoundBody": "The address may be mistyped, or the page was removed.",
+    "home": "Back to home",
+    "errorTitle": "Something went wrong.",
+    "errorBody": "The problem is on our side. Try again; if it persists, come back a little later.",
+    "retry": "Try again"
   }
 }

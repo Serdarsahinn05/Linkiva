@@ -8,7 +8,9 @@ export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
   // The dev server compiles routes on first hit; parallel workers make that contend. Production runs in parallel.
-  workers: process.env.PW_PROD ? undefined : 1,
+  // Each worker registers users and renders heavy glass; more than a few overload a dev machine.
+  workers: process.env.PW_PROD ? 3 : 1,
+  timeout: 60_000,
   // Dev mode compiles routes on first hit; parallel workers can push a navigation past 5s.
   expect: { timeout: 15_000 },
   retries: process.env.CI ? 2 : 0,

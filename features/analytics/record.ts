@@ -1,3 +1,4 @@
+import { Prisma } from "@/prisma/generated/client";
 import type { EventType } from "@/prisma/generated/enums";
 import { auth } from "@/lib/auth";
 import { isBot, isPrefetch } from "@/lib/bots";
@@ -50,22 +51,33 @@ export async function recordEvent({ type, profile, blockId, headers, referrer, u
   });
   if (recent) return "duplicate";
 
+  // The sliding-window check above handles the common case; this bucketed key makes concurrent
+  // repeats (two requests racing past that check) collide on a unique index instead of both landing.
+  const windowMs = type === "VIEW" ? VIEW_DEDUPE_MS : CLICK_DEDUPE_MS;
+  const dedupeKey = `${type}:${hash}:${blockId ?? "-"}:${Math.floor(Date.now() / windowMs)}`;
+
   const ua = parseUserAgent(userAgent);
   const geo = geoFromHeaders(headers);
-  await db.event.create({
-    data: {
-      profileId: profile.id,
-      blockId: blockId ?? null,
-      type,
-      visitorHash: hash,
-      country: geo.country,
-      city: geo.city,
-      device: ua.device,
-      os: ua.os,
-      browser: ua.browser,
-      referrerHost: referrerHost(referrer, site.host),
-      utmSource: utmSource(utm),
-    },
-  });
+  try {
+    await db.event.create({
+      data: {
+        profileId: profile.id,
+        blockId: blockId ?? null,
+        type,
+        visitorHash: hash,
+        country: geo.country,
+        city: geo.city,
+        device: ua.device,
+        os: ua.os,
+        browser: ua.browser,
+        referrerHost: referrerHost(referrer, site.host),
+        utmSource: utmSource(utm),
+        dedupeKey,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") return "duplicate";
+    throw error;
+  }
   return "recorded";
 }
