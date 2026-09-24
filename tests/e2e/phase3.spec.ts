@@ -11,7 +11,10 @@ async function addBlock(page: Page, type: string) {
   await expect(rows).toHaveCount(before + 1);
 }
 
-const saved = (page: Page) => expect(page.getByRole("status").filter({ hasText: "Kaydedildi" })).toBeVisible();
+// First use of a server action compiles it in dev mode; allow for that.
+const saved = (page: Page) => expect(page.getByRole("status").filter({ hasText: "Kaydedildi" })).toBeVisible({ timeout: 30_000 });
+
+test.describe.configure({ timeout: 90_000 });
 
 test("themes, embeds, email capture, scheduling and publishing", async ({ page, request }) => {
   const username = `p3-${uid()}`;

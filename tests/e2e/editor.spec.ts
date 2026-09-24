@@ -16,6 +16,8 @@ async function waitSaved(page: Page) {
   await expect(page.getByRole("status").filter({ hasText: "Kaydedildi" })).toBeVisible();
 }
 
+test.describe.configure({ timeout: 90_000 });
+
 test("build a page in the editor and see it live", async ({ page, request }) => {
   const username = `ed-${uid()}`;
   await createUser(page, username);

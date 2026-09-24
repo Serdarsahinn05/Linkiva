@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
+import { ViewBeacon } from "@/components/blocks/view-beacon";
 import { getPublicProfile, liveBlocks } from "@/features/profile/public";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { profileUrl, site } from "@/lib/site";
@@ -46,6 +47,7 @@ export default async function ProfilePage({ params }: PageProps<"/[username]">) 
 
   return (
     <main className="min-h-dvh">
+      <ViewBeacon profileId={profile.id} />
       <ProfileView profile={{ ...profile, blocks: liveBlocks(profile.blocks) }} labels={profileLabels(t)} />
     </main>
   );

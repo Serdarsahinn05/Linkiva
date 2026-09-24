@@ -340,5 +340,40 @@
     "seoTitleHint": "Leave empty to use your name and username. Up to 70 characters.",
     "seoDescription": "Search description",
     "seoDescriptionHint": "Leave empty to use your bio. Up to 160 characters."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "ranges": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "all": "All time"
+    },
+    "views": "Views",
+    "visitors": "Unique visitors",
+    "clicks": "Clicks",
+    "ctr": "Click-through rate",
+    "vsPrevious": "vs previous period",
+    "noCompare": "No comparison",
+    "chartTitle": "Daily traffic",
+    "links": "Links",
+    "link": "Link",
+    "sources": "Sources",
+    "direct": "Direct",
+    "countries": "Countries",
+    "unknown": "Unknown",
+    "devices": "Devices",
+    "deviceNames": {
+      "MOBILE": "Mobile",
+      "DESKTOP": "Desktop",
+      "TABLET": "Tablet"
+    },
+    "os": "Operating system",
+    "browsers": "Browser / app",
+    "empty": "No visits yet. Share your page and the numbers show up here.",
+    "noClicks": "No clicks in this range.",
+    "export": "Download CSV",
+    "privacy": "No cookies; bots, previews and your own visits are not counted.",
+    "privacyLink": "How we measure"
   }
 }

@@ -103,12 +103,19 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## Faz 4: Analitik
 
-- [ ] `/api/e` beacon'ı + `/l/[blockId]` yönlendirme. Bot, prefetch ve sahip filtresi, 30 dakikalık tekil ziyaret kilidi, günlük tuzlu `visitorHash`, geo başlıkları (uydurma yok), UA'dan cihaz/OS/tarayıcı (`lib/ua.ts`, paketsiz regex), `referrerHost` + UTM.
-- [ ] Analitik sayfası: aralık sekmeleri, veri şeridi, zaman grafiği (recharts), link tablosu + CTR, kaynaklar, ülkeler, cihazlar. Sorgular SQL `GROUP BY` ile ve saat dilimi doğru.
-- [ ] Sunucu tarafında CSV dışa aktarma.
-- [ ] Gizlilik politikası sayfası (çerezsiz takip açıklaması, KVKK).
+- [x] `/api/e` beacon'ı (`ViewBeacon`, sendBeacon) + `/l/[blockId]` tıklama kaydı. Tek yazma noktası `features/analytics/record.ts`: bot/prefetch/sahip filtresi, görüntülenmede 30 dk, tıklamada 5 sn tekrar kilidi, günlük HMAC tuzlu `visitorHash` (IP saklanmaz), Vercel geo başlıkları (yoksa null), `lib/ua.ts` (uygulama içi tarayıcılar dahil), `referrerHost` + UTM. Yazmalar `after()` ile yanıttan sonra.
+- [x] Analitik sayfası: aralık sekmeleri (link, paylaşılabilir), cam veri şeridi + semantik trend rozetleri, recharts grafiği (görüntülenme mavi alan, tıklama yeşil çizgi, koyu temada neon), link tablosu + CTR, kaynaklar, ülkeler (`Intl.DisplayNames`), cihaz/OS, tarayıcı. SQL toplama, profilin saat diliminde gün kovaları.
+- [x] CSV dışa aktarma (günlük seri + link tıklamaları, sahibe özel).
+- [x] Gizlilik sayfası (`/privacy`, TR/EN; kodun gerçekten yaptığını anlatır).
 
 **Kabul:** Bot UA'sı, prefetch ve sahip ziyareti sayılmıyor (birim + e2e test). 7g ve 30g seçimi sayıları gerçekten değiştiriyor. 100k olaylı seed'de analitik sayfası < 500ms.
+
+**Faz 4 notları (2026-09-24):**
+- ✅ `tests/unit/tracking.test.ts` (bot, prefetch, UA, hash, referrer, geo) · `tests/integration/analytics.test.ts` (aralıklar gerçekten filtreliyor, trend, kaynak önceliği, gün ekseni) · `tests/e2e/analytics.spec.ts` (sahip, tekrar, çift tıklama, WhatsApp önizleyicisi ve bot beacon'ı sayılmıyor; kaynak, cihaz, CSV). Dev + production'da geçiyor.
+- ✅ Performans: 100k olayda `getAnalytics(30d)` **48 ms** (yerel Postgres). `DailyStat` özet tablosuna henüz gerek yok.
+- ⚠️ Gizlilik sayfası iki şey vaat ediyor: hesap silmenin ayarlardan yapılabilmesi (Faz 5'te geliyor) ve `hello@linkiva.space` adresinin gerçek bir posta kutusu olması (kullanıcı doğrulamalı).
+- Kitle, mobilde İstatistik sayfasının başlığından erişilebilir.
+- E2E: Playwright'ın headless UA'sı bot filtresine takıldığı için testler gerçek bir iPhone/Instagram UA'sı kullanıyor. Uzun senaryolar 90 sn zaman aşımıyla çalışıyor, dev modunda ilk server action derlemesi için kayıt beklemesi 30 sn.
 
 ## Faz 5: Hesap, sağlamlaştırma, yayın
 

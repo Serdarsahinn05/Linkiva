@@ -340,5 +340,40 @@
     "seoTitleHint": "Boş bırakırsan adın ve kullanıcı adın kullanılır. En fazla 70 karakter.",
     "seoDescription": "Arama motoru açıklaması",
     "seoDescriptionHint": "Boş bırakırsan bio kullanılır. En fazla 160 karakter."
+  },
+  "analytics": {
+    "title": "İstatistik",
+    "ranges": {
+      "7d": "7 gün",
+      "30d": "30 gün",
+      "90d": "90 gün",
+      "all": "Tümü"
+    },
+    "views": "Görüntülenme",
+    "visitors": "Tekil ziyaretçi",
+    "clicks": "Tıklama",
+    "ctr": "Tıklama oranı",
+    "vsPrevious": "önceki döneme göre",
+    "noCompare": "Karşılaştırma yok",
+    "chartTitle": "Günlük trafik",
+    "links": "Linkler",
+    "link": "Link",
+    "sources": "Kaynaklar",
+    "direct": "Doğrudan",
+    "countries": "Ülkeler",
+    "unknown": "Bilinmiyor",
+    "devices": "Cihazlar",
+    "deviceNames": {
+      "MOBILE": "Mobil",
+      "DESKTOP": "Masaüstü",
+      "TABLET": "Tablet"
+    },
+    "os": "İşletim sistemi",
+    "browsers": "Tarayıcı / uygulama",
+    "empty": "Henüz ziyaret yok. Profilini paylaştığında sayılar burada görünecek.",
+    "noClicks": "Bu aralıkta tıklama yok.",
+    "export": "CSV indir",
+    "privacy": "Çerez kullanmıyoruz; botlar, önizlemeler ve senin kendi ziyaretlerin sayılmaz.",
+    "privacyLink": "Nasıl ölçüyoruz?"
   }
 }
