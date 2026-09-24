@@ -107,7 +107,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
           {activeIndex >= 0 && (
             <span
               aria-hidden
-              className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/5)] rounded-full bg-glass-strong shadow-[inset_0_1px_0_var(--c-glass-shine),0_4px_14px_-6px_rgb(0_0_0/0.35)] transition-transform duration-500 ease-[var(--ease-spring)]"
+              className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/5)] rounded-full bg-glass-strong shadow-[inset_0_1px_0_var(--c-glass-shine),0_4px_14px_-6px_rgb(0_0_0/0.35)] transition-transform duration-500 ease-[var(--ease-sheet)]"
               style={{ transform: `translateX(${(activeIndex >= 2 ? activeIndex + 1 : activeIndex) * 100}%)` }}
             />
           )}

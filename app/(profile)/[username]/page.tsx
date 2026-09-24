@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { ViewBeacon } from "@/components/blocks/view-beacon";
-import { getPublicProfile, liveBlocks } from "@/features/profile/public";
+import { getPublicProfile } from "@/features/profile/public";
+import { liveBlocks } from "@/lib/schedule";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { profileUrl, site } from "@/lib/site";
 

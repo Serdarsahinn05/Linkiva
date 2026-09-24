@@ -8,7 +8,7 @@ import { renderMail, type MailKind } from "./templates";
 const resend = env.RESEND_API_KEY ? new Resend(env.RESEND_API_KEY) : null;
 
 /** Local development / e2e: without a mail provider, the last mail per recipient lands in tmp/mailbox. */
-export const DEV_MAILBOX = join(process.cwd(), "tmp", "mailbox");
+const DEV_MAILBOX = join(process.cwd(), "tmp", "mailbox");
 
 export async function sendMail({ to, kind, locale, url }: { to: string; kind: MailKind; locale: Locale; url: string }) {
   const { subject, html, text } = renderMail(kind, locale, url);

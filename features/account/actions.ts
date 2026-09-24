@@ -52,7 +52,7 @@ export async function deleteAccount(confirmation: string): Promise<DeleteAccount
       } while (cursor);
     }
 
-    await db.$transaction([db.verification.deleteMany({ where: { identifier: { contains: user.email } } }), db.user.delete({ where: { id: user.id } })]);
+    await db.$transaction([db.verification.deleteMany({ where: { identifier: user.email } }), db.user.delete({ where: { id: user.id } })]);
     if (profile) updateTag(profileTag(profile.username));
     return { ok: true };
   } catch (error) {

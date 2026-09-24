@@ -113,8 +113,8 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
       return setDeleteError(result.error === "confirm" ? t("account.deleteMismatch") : t("common.genericError"));
     }
     await authClient.signOut().catch(() => {});
+    // No refresh(): it would re-render the settings route for a user that no longer exists.
     router.replace("/");
-    router.refresh();
   }
 
   return (

@@ -25,21 +25,6 @@ export const RESERVED_USERNAMES = new Set([
 
 const TURKISH_MAP: Record<string, string> = { ı: "i", İ: "i", ş: "s", Ş: "s", ğ: "g", Ğ: "g", ü: "u", Ü: "u", ö: "o", Ö: "o", ç: "c", Ç: "c" };
 
-/** Best-effort conversion of free text ("Serdar Şahin") into a username candidate ("serdar.sahin"). */
-export function toUsernameCandidate(input: string): string {
-  return input
-    .replace(/[ıİşŞğĞüÜöÖçÇ]/g, (ch) => TURKISH_MAP[ch] ?? ch)
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, ".")
-    .replace(/[^a-z0-9._-]/g, "")
-    .replace(/[._-]{2,}/g, (m) => m[0] ?? "")
-    .replace(/^[._-]+|[._-]+$/g, "")
-    .slice(0, USERNAME_MAX);
-}
-
 /**
  * Per-keystroke filter for the username field: transliterates and drops invalid characters but,
  * unlike toUsernameCandidate, keeps separators at the edges so "serdar." can become "serdar.dev".
@@ -47,10 +32,19 @@ export function toUsernameCandidate(input: string): string {
 export function sanitizeUsernameInput(input: string): string {
   return input
     .replace(/[ıİşŞğĞüÜöÖçÇ]/g, (ch) => TURKISH_MAP[ch] ?? ch)
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/\s+/g, ".")
     .replace(/[^a-z0-9._-]/g, "")
     .slice(0, USERNAME_MAX);
+}
+
+/** Best-effort conversion of free text ("Serdar Şahin") into a username candidate ("serdar.sahin"). */
+export function toUsernameCandidate(input: string): string {
+  return sanitizeUsernameInput(input.trim())
+    .replace(/[._-]{2,}/g, (m) => m[0] ?? "")
+    .replace(/^[._-]+|[._-]+$/g, "");
 }
 
 export type UsernameProblem = "tooShort" | "tooLong" | "invalid" | "reserved";

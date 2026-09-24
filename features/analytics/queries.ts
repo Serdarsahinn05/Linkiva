@@ -139,7 +139,7 @@ export async function getAnalytics(profile: { id: string; timezone: string }, ra
 const dayIn = (date: Date, timeZone: string) => new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
 
 /** Continuous day axis in the owner's time zone: days without events are zeros, not gaps. */
-export function fillDays(points: DayPoint[], range: Range, timeZone: string, now = new Date()): DayPoint[] {
+function fillDays(points: DayPoint[], range: Range, timeZone: string, now = new Date()): DayPoint[] {
   if (points.length === 0 && range === "all") return [];
   const byDay = new Map(points.map((p) => [p.day, p]));
   const today = dayIn(now, timeZone);

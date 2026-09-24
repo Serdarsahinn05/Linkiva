@@ -70,12 +70,8 @@ export function resolveAppearance(theme: string, raw: unknown): ResolvedAppearan
   };
 }
 
-export function themePreset(theme: ThemeKey) {
-  return PRESETS[theme];
-}
-
 /** WCAG relative luminance of a #rrggbb colour. */
-export function luminance(hexColor: string): number {
+function luminance(hexColor: string): number {
   const channel = (i: number) => {
     const v = parseInt(hexColor.slice(i, i + 2), 16) / 255;
     return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;

@@ -1,6 +1,6 @@
 # Linkiva: Tasarım Sistemi — "Cam"
 
-> **Durum:** Yön kullanıcı tarafından belirlendi (2026-09-24) ve "Etiket" yönünün yerine geçti. Bu belge build öncesi sözleşmedir; build bittikten sonra koddaki gerçek duruma göre yeniden kaydedilir.
+> **Durum:** Yön kullanıcı tarafından belirlendi (2026-09-24) ve "Etiket" yönünün yerine geçti. **Build'den yeniden kaydedildi (Faz 5):** değerler `app/globals.css` ve `themes/index.ts` ile eşleşir; çelişki olursa kod esastır ve bu belge düzeltilir.
 > Tasarım otoritesi bu belgedir. `ui-ux-pro-max` ve benzeri skill önerileri bu belgeye uyar, onu ezmez.
 > Ürün gerçeği ve bağlayıcı görsel taahhütler: [PRODUCT.md](PRODUCT.md) → Brand Commitments.
 
@@ -58,21 +58,25 @@ Cam, arkasında bir şey olduğunda cam gibi görünür. Her yüzeyin arkasında
 --bg:          oklch(97% 0.006 270);       /* #F4F4F8 inci */
 --ink:         oklch(20% 0.012 265);
 --ink-2:       oklch(44% 0.012 265);
---ink-3:       oklch(58% 0.01 265);
+--ink-3:       oklch(52% 0.01 265);        /* denetimde 56%→52%: 4.27→5.05:1 */
 --glass:       oklch(100% 0 0 / 0.55);
---glass-strong:oklch(100% 0 0 / 0.75);
---glass-edge:  oklch(100% 0 0 / 0.70);     /* açık temada kenar beyaz + dış gölge ile ayrışır */
+--glass-strong:oklch(100% 0 0 / 0.78);
+--glass-edge:  oklch(100% 0 0 / 0.75);     /* açık temada kenar beyaz + dış gölge ile ayrışır */
 --glass-shine: oklch(100% 0 0 / 0.95);
 --accent:      oklch(20% 0.012 265);       /* monokrom: birincil buton mürekkep */
 --accent-ink:  oklch(98% 0 0);
 
-/* SEMANTİK NEON: iki temada da aynı ton ailesi; koyu temada hafif parlama */
---positive: oklch(78% 0.17 155);  /* yeşil: artış, başarı, açık */
---negative: oklch(68% 0.20 22);   /* kırmızı: düşüş, hata, yıkıcı */
---info:     oklch(72% 0.14 245);  /* mavi: bilgi, nötr veri serisi */
---warning:  oklch(82% 0.15 80);   /* sarı: uyarı */
+/* SEMANTİK NEON, KOYU: parlak tonlar + hafif parlama */
+--positive: oklch(80% 0.17 155);  /* yeşil: artış, başarı, açık */
+--negative: oklch(70% 0.19 22);   /* kırmızı: düşüş, hata, yıkıcı */
+--info:     oklch(74% 0.14 245);  /* mavi: bilgi, nötr veri serisi */
+--warning:  oklch(84% 0.15 80);   /* sarı: uyarı */
+
+/* SEMANTİK, AÇIK: metin olarak okunacak kadar koyu, parlama yok */
+--positive: oklch(50% 0.14 155);  --negative: oklch(55% 0.20 22);
+--info:     oklch(52% 0.15 250);  --warning:  oklch(62% 0.14 70);
 ```
-Açık temada semantik renklerin metin versiyonları ~%15 koyulaştırılır, böylece açık zeminde 4.5:1 kontrast sağlanır.
+Her iki temada her metin token'ı zemine karşı ≥ 4.5:1 sağlar; `tests/unit/contrast.test.ts` değerleri CSS'ten okuyup doğrular.
 
 **Neon kuralı:** Parlama (`box-shadow: 0 0 0 1px color, 0 0 16px -4px color`) **yalnızca** semantik renklerde ve yalnızca koyu temada kullanılır: analitik trend rozetleri, grafik çizgileri, canlı/başarılı durum noktası, hata kenarı. Marka öğelerinde neon yok.
 
@@ -92,7 +96,7 @@ Tek bir malzeme, üç yoğunluk:
 
 **Specular highlight:** Etkileşimli camlarda (`.glass-interactive`) pointer konumu CSS değişkenine (`--mx`, `--my`) yazılır. Radyal bir beyaz ışık (%8 opaklık) parmağı izler. JS yalnızca `pointermove` → CSS var olarak çalışır, re-render yapmaz.
 
-**Köşe:** kart/panel 20px · input/küçük buton 12px · birincil buton, sekme çubuğu, rozet, avatar tam hap (999px). Başka değer yok.
+**Köşe:** kart/panel 20px · input/küçük buton 12px · birincil buton, sekme çubuğu, rozet, avatar tam hap (999px) · tek başına duran büyük yüzey (auth paneli, 404/hata, landing listesi, gizlilik) 28px · cihaz çerçevesi (önizleme telefonu) dış 44px / iç 36px. Başka değer yok.
 
 **Çizgi:** 1px `--glass-edge`.
 
@@ -177,7 +181,7 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
 ## 8. Hareket
 
-- Yay eğrisi: `cubic-bezier(0.32, 0.72, 0, 1)` 280ms (iOS sheet eğrisi). Mikro etkileşimler 160ms.
+- Sheet eğrisi `--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1)` 280–500ms (iOS sheet eğrisi; hızlı üstel yavaşlama, hedefi aşmaz). Mikro etkileşimler `--ease-out` 160ms.
 - İmza hareketler: sıvı sekme göstergesi, specular highlight, sheet açılışı. Scroll'da "fade-up" girişleri yok.
 - `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı.
 - Kütüphane eklenmez (CSS + WAAPI).
@@ -202,3 +206,13 @@ FIRST VIEWPORT: Display headline over ambient light, glass address bar with live
 FORM: user-pinned direction "Cam" (glass), replacing seed 2967658e.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 ```
+
+---
+
+## 11. Denetim kaydı (Faz 5, 2026-09-24)
+
+- **impeccable detector (kod):** 3 bulgu → 2'si yanlış alarm (`--ease-spring` adı; eğri hedefi aşmıyor, `--ease-sheet` olarak yeniden adlandırıldı). Kalan 1: **"Geist aşırı kullanılan bir yazı tipi"**. *Bilinçli istisna:* ürün ağırlıklı olarak Operate yüzeyi (panel, editör, analitik) ve kullanıcı premium, sessiz, Apple benzeri bir his istedi; kişilik yazı tipinden değil ışık/cam malzemesinden geliyor. Profil sahipleri 4 farklı karakterde yazı tipi seçebiliyor (§7).
+- **impeccable detector (URL taraması):** çalıştırılamadı, `puppeteer` gerektiriyor ve onaylı bağımlılık değil.
+- **Kontrast:** açık temada `ink-3`, `positive`, `info` 4.5:1 altındaydı, koyulaştırıldı. Artık testle korunuyor.
+- **Mobil taşma:** landing hero'su 390px'te yatay taşıyordu, düzeltildi. `tests/e2e/layout.spec.ts` beş sayfayı koruyor.
+- **Açık kalan:** Lighthouse ölçümü (yerelde Lighthouse yok; ilk preview dağıtımında ölçülecek). `ponytail-review` (fazlalık denetimi) henüz çalıştırılmadı.

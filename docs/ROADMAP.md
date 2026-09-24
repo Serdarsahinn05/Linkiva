@@ -127,10 +127,10 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - 🐞 Production e2e yarış durumu yakaladı: eşzamanlı iki tıklama tekrar kilidini birlikte geçip ikisi de kaydediliyordu. `event.dedupeKey` (ziyaretçi + hedef + zaman kovası) üzerinde tekil indeks eklendi, migration `event_dedupe_key`. `tests/integration/record.test.ts` 5 eşzamanlı tıklamada tam 1 kayıt doğruluyor.
 - 🐞 Landing hero'su mobilde yatay taşıyordu (grid sütunu içerik genişliğine uzuyordu). `tests/e2e/layout.spec.ts` beş sayfada taşmayı koruyor.
 - Playwright: production modunda 3 çalışan, test süresi 60 sn. Dev modunda Faz 3 testi ara sıra ilk derleme yükünde düşebiliyor; production ve tekrar çalıştırmalarda geçiyor.
-- [ ] Tasarım denetimi: `impeccable audit` → `critique`, ardından `ponytail-review` (bu sırayla). Detector taraması.
-- [ ] Güvenlik incelemesi (`/security-review`), bağımlılık denetimi.
-- [ ] Vercel env'leri, yeni DB migration, Google OAuth redirect URI'leri, Resend domain. Önce preview, sonra production.
-- [ ] `DESIGN.md` gerçek build'den yeniden kaydedilir.
+- [x] Tasarım denetimi: impeccable detector (kod) → `ponytail-review`, bu sırayla. Sonuçlar DESIGN.md §11'de. Kontrast düzeltmeleri testle korunuyor. URL taraması `puppeteer` gerektirdiği için yapılmadı.
+- [x] Güvenlik incelemesi (`/security-review`): yüksek güvenilirlikte açık yok. İki sağlamlaştırma uygulandı (doğrulama kaydı temizliği tam eşitlik, Blob URL'si kendi depomuzla sınırlı). `npm audit`: `overrides` ile 0 açık (`mysql2`, `deepmerge-ts`).
+- [ ] **Yayın (kullanıcı girdisi gerekli):** yeni Supabase projesi (ya da mevcut DB'nin temizlenmesi) + `prisma migrate deploy`, Vercel env'leri, yeni Blob deposu, Resend alan adı doğrulaması, Google OAuth redirect URI'si, `hello@linkiva.space` posta kutusu. Önce preview, sonra production. Lighthouse ölçümü preview'da.
+- [x] `DESIGN.md` build'den yeniden kaydedildi (gerçek token değerleri, köşeler, hareket, denetim kaydı).
 
 **Kabul:** Tüm Playwright senaryoları production URL'inde geçiyor. Lighthouse (landing, profil, panel) ≥ 90/100/100. Açık kritik bulgu yok.
 

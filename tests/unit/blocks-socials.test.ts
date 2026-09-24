@@ -102,3 +102,12 @@ describe("csvCell", () => {
     expect(csvCell("+1")).toBe(`"'+1"`);
   });
 });
+
+describe("isOwnBlobUrl with a known store", () => {
+  it("rejects files on other Blob stores even inside the user's folder path", async () => {
+    const { blobStoreId, isOwnBlobUrl } = await import("@/lib/uploads");
+    expect(blobStoreId("vercel_blob_rw_AbC123_secretpart")).toBe("abc123");
+    expect(isOwnBlobUrl("https://abc123.public.blob.vercel-storage.com/u/user1/a.webp", "user1", "abc123")).toBe(true);
+    expect(isOwnBlobUrl("https://evilstore.public.blob.vercel-storage.com/u/user1/a.webp", "user1", "abc123")).toBe(false);
+  });
+});

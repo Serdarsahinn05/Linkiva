@@ -76,5 +76,3 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
 export const getPublicProfile = cache((username: string) =>
   unstable_cache(() => loadProfile(username), ["public-profile", username], { tags: [profileTag(username)] })(),
 );
-
-export { isLive, liveBlocks } from "@/lib/schedule";

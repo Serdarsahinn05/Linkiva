@@ -11,7 +11,8 @@
   --radius-card: 20px;
   --radius-control: 12px;
 
-  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  /* iOS sheet curve: a fast exponential ease-out, no overshoot. */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --text-display: clamp(2.5rem, 6vw, 4.5rem);
@@ -39,7 +40,7 @@
   --c-bg: oklch(97% 0.006 270);
   --c-ink: oklch(20% 0.012 265);
   --c-ink-2: oklch(44% 0.012 265);
-  --c-ink-3: oklch(56% 0.01 265);
+  --c-ink-3: oklch(52% 0.01 265); /* ≥ 4.5:1 on the light ground and glass */
   --c-glass: oklch(100% 0 0 / 0.55);
   --c-glass-strong: oklch(100% 0 0 / 0.78);
   --c-glass-edge: oklch(100% 0 0 / 0.75);
@@ -49,9 +50,9 @@
   --c-accent: oklch(20% 0.012 265);
   --c-accent-ink: oklch(98% 0 0);
   /* Semantic colours, darkened for text contrast on light glass. */
-  --c-positive: oklch(55% 0.15 155);
+  --c-positive: oklch(50% 0.14 155);
   --c-negative: oklch(55% 0.2 22);
-  --c-info: oklch(55% 0.15 250);
+  --c-info: oklch(52% 0.15 250);
   --c-warning: oklch(62% 0.14 70);
   --c-glow: 0;
   --c-ambient-1: oklch(88% 0.04 285);
@@ -252,11 +253,11 @@
     to { mask-size: 100% 100%; }
   }
 
-  .sheet-in { animation: sheet-in 320ms var(--ease-spring) both; }
+  .sheet-in { animation: sheet-in 320ms var(--ease-sheet) both; }
   @keyframes sheet-in {
     from { translate: 0 16px; opacity: 0; scale: 0.98; }
   }
-  .toast-in { animation: toast-in 320ms var(--ease-spring) both; }
+  .toast-in { animation: toast-in 320ms var(--ease-sheet) both; }
   @keyframes toast-in {
     from { translate: 0 24px; opacity: 0; scale: 0.96; }
   }

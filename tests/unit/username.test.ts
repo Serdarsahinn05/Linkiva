@@ -60,3 +60,9 @@ describe("sanitizeUsernameInput", () => {
     expect(sanitizeUsernameInput("a@b#c")).toBe("abc");
   });
 });
+
+describe("accents", () => {
+  it("folds non-Turkish accents instead of dropping the letter", () => {
+    expect(toUsernameCandidate("José Müller")).toBe("jose.muller");
+  });
+});

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
-import { getPublicProfile, liveBlocks } from "@/features/profile/public";
+import { getPublicProfile } from "@/features/profile/public";
+import { liveBlocks } from "@/lib/schedule";
 import { profileDisplayUrl } from "@/lib/site";
 import { parseBlock } from "@/lib/validation/blocks";
 

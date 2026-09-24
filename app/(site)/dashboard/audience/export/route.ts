@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { csvCell, getSubscribers } from "@/features/audience/queries";
+import { getSubscribers } from "@/features/audience/queries";
+import { csvCell } from "@/lib/csv";
 
 /** CSV of the caller's own subscribers. */
 export async function GET(request: Request) {

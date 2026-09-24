@@ -23,7 +23,7 @@ export function Switch({ checked, onChange, label, disabled }: { checked: boolea
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 size-[18px] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.3)] transition-transform duration-300 ease-[var(--ease-spring)]",
+            "absolute top-0.5 left-0.5 size-[18px] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.3)] transition-transform duration-300 ease-[var(--ease-sheet)]",
             checked && "translate-x-4",
           )}
         />
