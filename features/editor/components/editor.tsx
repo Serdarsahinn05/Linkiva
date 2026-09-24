@@ -2,7 +2,7 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
 import { profileLabels } from "@/components/blocks/labels";
@@ -32,6 +32,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   const [profile, setProfile] = useState(initialProfile);
   const [blocks, setBlocks] = useState(initialBlocks);
   const [socials, setSocials] = useState(initialSocials);
+  // dnd-kit numbers its a11y ids with a module counter that differs between server and client; pin it.
+  const dndId = useId();
   const [focusId, setFocusId] = useState<string | null>(null);
   const [adding, setAdding] = useState<EditableBlockType | null>(null);
 
@@ -215,7 +217,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
               <p className="max-w-[40ch] text-sm text-ink-2">{t("editor.emptyHint")}</p>
             </div>
           ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
               <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
                 <ul className="flex flex-col gap-2.5">
                   {blocks.map((block, index) => (

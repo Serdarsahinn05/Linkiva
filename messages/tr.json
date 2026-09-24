@@ -459,7 +459,9 @@
     "export": "CSV indir",
     "privacy": "Çerez kullanmıyoruz; botlar, önizlemeler ve senin kendi ziyaretlerin sayılmaz.",
     "privacyLink": "Nasıl ölçüyoruz?",
-    "map": "Ziyaretçi haritası"
+    "map": "Ziyaretçi haritası",
+    "mapViews": "görüntülenme",
+    "mapNone": "Henüz ziyaret yok"
   },
   "account": {
     "email": "E-posta",

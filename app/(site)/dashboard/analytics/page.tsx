@@ -128,8 +128,10 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
               {data.countries.length > 0 && (
                 <WorldMap
                   views={data.countryViews}
-                  label={t("map")}
-                  describe={(iso, count) => `${regionName(iso)} · ${format.number(count)}`}
+                  name={regionName}
+                  formatCount={(n) => format.number(n)}
+                  formatShare={pct}
+                  labels={{ map: t("map"), views: t("mapViews"), none: t("mapNone") }}
                 />
               )}
               <RowList rows={data.countries} pct={pct} empty={t("unknown")} />

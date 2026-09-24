@@ -459,7 +459,9 @@
     "export": "Download CSV",
     "privacy": "No cookies; bots, previews and your own visits are not counted.",
     "privacyLink": "How we measure",
-    "map": "Visitor map"
+    "map": "Visitor map",
+    "mapViews": "views",
+    "mapNone": "No visits yet"
   },
   "account": {
     "email": "Email",
