@@ -6,8 +6,13 @@
   "common": {
     "appName": "Linkiva",
     "login": "Giriş yap",
+    "logout": "Çıkış yap",
     "startFree": "Ücretsiz başla",
-    "skipToContent": "İçeriğe geç"
+    "skipToContent": "İçeriğe geç",
+    "continue": "Devam et",
+    "back": "Geri dön",
+    "or": "veya",
+    "genericError": "Bir şeyler ters gitti. Birazdan tekrar dene."
   },
   "landing": {
     "headline": "Her şeyin, tek bir adreste.",
@@ -15,5 +20,112 @@
     "usernamePlaceholder": "senin-adin",
     "usernameLabel": "Kullanıcı adın",
     "claim": "Sayfamı oluştur"
+  },
+  "auth": {
+    "fields": {
+      "email": "E-posta",
+      "password": "Şifre",
+      "newPassword": "Yeni şifre",
+      "passwordHint": "En az {min} karakter.",
+      "showPassword": "Şifreyi göster",
+      "hidePassword": "Şifreyi gizle"
+    },
+    "google": "Google ile devam et",
+    "login": {
+      "title": "Tekrar hoş geldin.",
+      "submit": "Giriş yap",
+      "pending": "Giriş yapılıyor",
+      "forgot": "Şifreni mi unuttun?",
+      "noAccount": "Hesabın yok mu?",
+      "toRegister": "Ücretsiz kaydol",
+      "invalid": "E-posta veya şifre hatalı.",
+      "unverified": "Önce e-postanı doğrulaman gerekiyor. Gelen kutuna yeni bir doğrulama linki gönderdik.",
+      "tooMany": "Çok fazla deneme yaptın. Bir dakika sonra tekrar dene.",
+      "verified": "E-postan doğrulandı. Şimdi giriş yapabilirsin.",
+      "passwordReset": "Şifren güncellendi. Yeni şifrenle giriş yap."
+    },
+    "register": {
+      "title": "Sayfanı kur.",
+      "lede": "Kullanıcı adını bir sonraki adımda seçeceksin.",
+      "submit": "Hesap oluştur",
+      "pending": "Hesap oluşturuluyor",
+      "hasAccount": "Zaten hesabın var mı?",
+      "toLogin": "Giriş yap",
+      "terms": "Devam ederek Kullanım Koşulları'nı ve Gizlilik Politikası'nı kabul etmiş olursun.",
+      "tooMany": "Çok fazla kayıt denemesi. Birkaç dakika sonra tekrar dene."
+    },
+    "checkEmail": {
+      "title": "Gelen kutuna bak.",
+      "body": "<strong>{email}</strong> adresine bir doğrulama linki gönderdik. Linke tıkladığında hesabın açılacak.",
+      "bodyNoEmail": "Sana bir doğrulama linki gönderdik. Linke tıkladığında hesabın açılacak.",
+      "spam": "Mail gelmediyse spam klasörüne bak ya da tekrar gönder.",
+      "resend": "Linki tekrar gönder",
+      "resent": "Yeni link gönderildi."
+    },
+    "forgot": {
+      "title": "Şifreni sıfırla.",
+      "lede": "E-posta adresini yaz, sıfırlama linki gönderelim.",
+      "submit": "Link gönder",
+      "pending": "Gönderiliyor",
+      "sent": "Bu adrese kayıtlı bir hesap varsa sıfırlama linki yolda. Link 1 saat geçerli.",
+      "backToLogin": "Girişe dön"
+    },
+    "reset": {
+      "title": "Yeni şifreni belirle.",
+      "submit": "Şifreyi güncelle",
+      "pending": "Güncelleniyor",
+      "invalidToken": "Bu sıfırlama linki geçersiz ya da süresi dolmuş. Yeni bir link iste.",
+      "requestNew": "Yeni link iste"
+    },
+    "errors": {
+      "email": "Geçerli bir e-posta adresi yaz.",
+      "passwordShort": "Şifre en az {min} karakter olmalı.",
+      "passwordLong": "Şifre en fazla {max} karakter olabilir."
+    }
+  },
+  "onboarding": {
+    "title": "Adresini seç.",
+    "lede": "Profilin bu adreste yayınlanacak. Sonradan değiştirebilirsin.",
+    "usernameLabel": "Kullanıcı adı",
+    "displayNameLabel": "Görünen ad",
+    "displayNameHint": "Profilinde en üstte görünür. Boş bırakabilirsin.",
+    "submit": "Sayfamı yayınla",
+    "pending": "Yayınlanıyor",
+    "checking": "Kontrol ediliyor",
+    "available": "{username} boşta.",
+    "taken": "{username} alınmış.",
+    "trySuggestion": "Şunu deneyebilirsin:",
+    "problems": {
+      "tooShort": "En az 3 karakter olmalı.",
+      "tooLong": "En fazla 30 karakter olabilir.",
+      "invalid": "Küçük harf, rakam ve . _ - kullanabilirsin. Harf ya da rakamla başlayıp bitmeli.",
+      "reserved": "Bu ad ayrılmış, başka bir ad seç."
+    }
+  },
+  "dashboard": {
+    "welcome": "Sayfan yayında.",
+    "liveAt": "Adresin",
+    "comingSoon": "Editör bir sonraki adımda geliyor."
+  },
+  "mail": {
+    "footer": "Bu maili sen istemediysen görmezden gelebilirsin.",
+    "verify": {
+      "subject": "Linkiva: e-postanı doğrula",
+      "heading": "E-postanı doğrula",
+      "body": "Linkiva hesabını açmak için aşağıdaki butona tıkla. Link 24 saat geçerli.",
+      "cta": "E-postamı doğrula"
+    },
+    "reset": {
+      "subject": "Linkiva: şifre sıfırlama",
+      "heading": "Şifreni sıfırla",
+      "body": "Şifreni sıfırlamak için bir istek aldık. Sen istediysen aşağıdaki butona tıkla. Link 1 saat geçerli.",
+      "cta": "Yeni şifre belirle"
+    },
+    "changeEmail": {
+      "subject": "Linkiva: yeni e-posta adresini doğrula",
+      "heading": "Yeni adresini doğrula",
+      "body": "Linkiva hesabının e-posta adresini bu adresle değiştirmek istedin. Onaylamak için butona tıkla. Onaylayana kadar eski adresin geçerli kalır.",
+      "cta": "Adresi onayla"
+    }
   }
 }

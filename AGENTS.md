@@ -23,6 +23,7 @@ Next.js 16.3 (App Router, React 19.3) · TypeScript strict · Tailwind CSS v4 ·
 ## Komutlar
 
 ```bash
+docker compose up -d   # yerel Postgres (localhost:54329)
 npm install
 npm run dev            # http://localhost:3000
 npm run check          # lint + typecheck + unit test: commit öncesi zorunlu

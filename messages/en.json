@@ -6,8 +6,13 @@
   "common": {
     "appName": "Linkiva",
     "login": "Log in",
+    "logout": "Log out",
     "startFree": "Start free",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "continue": "Continue",
+    "back": "Go back",
+    "or": "or",
+    "genericError": "Something went wrong. Try again in a moment."
   },
   "landing": {
     "headline": "Everything you are, at one address.",
@@ -15,5 +20,112 @@
     "usernamePlaceholder": "your-name",
     "usernameLabel": "Your username",
     "claim": "Create my page"
+  },
+  "auth": {
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password",
+      "passwordHint": "At least {min} characters.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "google": "Continue with Google",
+    "login": {
+      "title": "Welcome back.",
+      "submit": "Log in",
+      "pending": "Logging in",
+      "forgot": "Forgot your password?",
+      "noAccount": "No account yet?",
+      "toRegister": "Sign up free",
+      "invalid": "Wrong email or password.",
+      "unverified": "Verify your email first. We just sent a fresh verification link to your inbox.",
+      "tooMany": "Too many attempts. Try again in a minute.",
+      "verified": "Your email is verified. You can log in now.",
+      "passwordReset": "Your password is updated. Log in with the new one."
+    },
+    "register": {
+      "title": "Build your page.",
+      "lede": "You'll pick your username in the next step.",
+      "submit": "Create account",
+      "pending": "Creating account",
+      "hasAccount": "Already have an account?",
+      "toLogin": "Log in",
+      "terms": "By continuing you accept the Terms of Use and Privacy Policy.",
+      "tooMany": "Too many sign-up attempts. Try again in a few minutes."
+    },
+    "checkEmail": {
+      "title": "Check your inbox.",
+      "body": "We sent a verification link to <strong>{email}</strong>. Your account opens when you click it.",
+      "bodyNoEmail": "We sent you a verification link. Your account opens when you click it.",
+      "spam": "No mail? Check your spam folder or send it again.",
+      "resend": "Send the link again",
+      "resent": "A new link is on its way."
+    },
+    "forgot": {
+      "title": "Reset your password.",
+      "lede": "Enter your email and we'll send a reset link.",
+      "submit": "Send link",
+      "pending": "Sending",
+      "sent": "If an account exists for this address, a reset link is on its way. It's valid for 1 hour.",
+      "backToLogin": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password.",
+      "submit": "Update password",
+      "pending": "Updating",
+      "invalidToken": "This reset link is invalid or expired. Request a new one.",
+      "requestNew": "Request a new link"
+    },
+    "errors": {
+      "email": "Enter a valid email address.",
+      "passwordShort": "Password must be at least {min} characters.",
+      "passwordLong": "Password can be at most {max} characters."
+    }
+  },
+  "onboarding": {
+    "title": "Pick your address.",
+    "lede": "Your profile goes live at this address. You can change it later.",
+    "usernameLabel": "Username",
+    "displayNameLabel": "Display name",
+    "displayNameHint": "Shown at the top of your profile. Optional.",
+    "submit": "Publish my page",
+    "pending": "Publishing",
+    "checking": "Checking",
+    "available": "{username} is available.",
+    "taken": "{username} is taken.",
+    "trySuggestion": "You could try:",
+    "problems": {
+      "tooShort": "Use at least 3 characters.",
+      "tooLong": "Use at most 30 characters.",
+      "invalid": "Use lowercase letters, digits and . _ -, starting and ending with a letter or digit.",
+      "reserved": "This name is reserved, pick another one."
+    }
+  },
+  "dashboard": {
+    "welcome": "Your page is live.",
+    "liveAt": "Your address",
+    "comingSoon": "The editor arrives in the next step."
+  },
+  "mail": {
+    "footer": "If you didn't ask for this, you can ignore this email.",
+    "verify": {
+      "subject": "Linkiva: verify your email",
+      "heading": "Verify your email",
+      "body": "Click the button below to open your Linkiva account. The link is valid for 24 hours.",
+      "cta": "Verify my email"
+    },
+    "reset": {
+      "subject": "Linkiva: reset your password",
+      "heading": "Reset your password",
+      "body": "We received a request to reset your password. If it was you, click the button below. The link is valid for 1 hour.",
+      "cta": "Set a new password"
+    },
+    "changeEmail": {
+      "subject": "Linkiva: confirm your new email",
+      "heading": "Confirm your new address",
+      "body": "You asked to change your Linkiva email to this address. Click the button to confirm. Your old address stays active until you do.",
+      "cta": "Confirm address"
+    }
   }
 }

@@ -15,8 +15,10 @@ export default defineConfig({
   ],
   webServer: {
     command: "npm run dev",
+    env: { E2E: "1" },
     port,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a manually started server: it would lack the E2E flag.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

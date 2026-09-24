@@ -2,7 +2,8 @@ import { existsSync } from "node:fs";
 import { defineConfig } from "prisma/config";
 
 // Prisma 7 no longer loads .env on its own. Node 22 can, without a dotenv dependency.
-if (existsSync(".env")) process.loadEnvFile(".env");
+// .env.local first so local overrides win (loadEnvFile does not overwrite existing keys).
+for (const file of [".env.local", ".env"]) if (existsSync(file)) process.loadEnvFile(file);
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

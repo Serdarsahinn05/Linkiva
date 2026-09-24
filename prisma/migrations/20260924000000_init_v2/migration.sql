@@ -72,6 +72,16 @@ CREATE TABLE "verification" (
 );
 
 -- CreateTable
+CREATE TABLE "rate_limit" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "count" INTEGER NOT NULL,
+    "lastRequest" BIGINT NOT NULL,
+
+    CONSTRAINT "rate_limit_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "profile" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -164,6 +174,9 @@ CREATE INDEX "account_userId_idx" ON "account"("userId");
 
 -- CreateIndex
 CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "rate_limit_key_key" ON "rate_limit"("key");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "profile_userId_key" ON "profile"("userId");

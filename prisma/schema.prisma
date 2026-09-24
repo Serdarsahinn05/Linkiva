@@ -71,6 +71,16 @@ model Verification {
   @@map("verification")
 }
 
+/// Better Auth rate-limit counters (storage: "database"), shared across serverless instances.
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rate_limit")
+}
+
 // ─── Linkiva ─────────────────────────────────────────────────────────────────
 
 model Profile {

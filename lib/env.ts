@@ -16,6 +16,8 @@ const schema = z.object({
   UPSTASH_REDIS_REST_TOKEN: optional,
   BLOB_READ_WRITE_TOKEN: optional,
   TRACKING_SALT_SECRET: z.string().min(16).default("dev-only-tracking-salt-secret"),
+  /** Set by the Playwright web server only; lifts auth rate limits. Ignored in production. */
+  E2E: z.enum(["1"]).optional(),
 });
 
 const parsed = schema.safeParse(process.env);

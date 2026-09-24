@@ -1,0 +1,19 @@
+# Local development database only. Production uses Supabase (see docs/ARCHITECTURE.md §10).
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: linkiva-db
+    environment:
+      POSTGRES_USER: linkiva
+      POSTGRES_PASSWORD: linkiva
+      POSTGRES_DB: linkiva
+    ports:
+      - "54329:5432"
+    volumes:
+      - linkiva-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linkiva"]
+      interval: 2s
+      retries: 20
+volumes:
+  linkiva-db:

@@ -36,14 +36,20 @@
 
 ## Faz 1: Kimlik ve onboarding
 
-- [ ] Auth kurulumu (onaylanan kütüphane): e-posta+şifre (doğrulama zorunlu), Google, şifre sıfırlama, e-posta değiştirme (yeni adres doğrulanınca geçer), oturum listesi. Güvenli hesap bağlama (S2 kapanır).
-- [ ] Resend şablonları (TR/EN), Etiket dünyasında sade HTML mail.
-- [ ] Upstash rate limit: auth uçları, ilk IP (`x-forwarded-for` ilk değer / `request.ip`). Env yoksa no-op.
-- [ ] `proxy.ts` iyimser yönlendirme + `(app)/dashboard/layout.tsx` içinde gerçek `requireSession()`.
-- [ ] Onboarding: kullanıcı adı seç (anlık müsaitlik, rezerve liste, öneriler), görünen isim, avatar (opsiyonel). "İlk 60 saniye" hedefi.
-- [ ] Auth ve onboarding ekranları Etiket dünyasında (formlar sade, tek kırmızı bant eylem).
+- [x] Auth kurulumu (Better Auth 1.7): e-posta+şifre (doğrulama zorunlu), Google (env varsa), şifre sıfırlama, e-posta değiştirme (yeni adres doğrulanınca geçer). Güvenli hesap bağlama (`requireLocalEmailVerified`, S2 kapandı). *Oturum listesi ve e-posta değiştirme arayüzü Faz 5'teki Ayarlar sayfasında.*
+- [x] Mail şablonları (TR/EN, next-intl `createTranslator`), Etiket dünyasında tablo tabanlı HTML. Resend anahtarı yoksa geliştirmede `tmp/mailbox/` klasörüne yazılır.
+- [x] Rate limit: **Upstash yerine Better Auth'un DB depolaması** (`rate_limit` tablosu, serverless örnekler arası paylaşılır). Kurallar: giriş 5/dk, kayıt 5/10dk, sıfırlama 3/10dk, doğrulama maili 3/10dk. Upstash, Faz 4'te beacon için kalıyor.
+- [x] `proxy.ts` iyimser yönlendirme + `dashboard/layout.tsx` içinde gerçek `requireSession()` ve profil kontrolü.
+- [x] Onboarding: kullanıcı adı (anlık müsaitlik, rezerve liste, öneri, Türkçe harf çevirisi, landing'den taşınan ad), görünen ad. *Avatar Faz 2'de görsel yükleme ile birlikte.*
+- [x] Auth ve onboarding ekranları Etiket dünyasında.
 
 **Kabul:** Kayıt → mail → doğrulama → onboarding → panel akışı Playwright ile geçiyor. Kullanıcı keşfi mümkün değil. S1–S9 maddelerinden auth ile ilgili olanlar kapalı.
+
+**Faz 1 notları (2026-09-24):**
+- ✅ Kabul: `tests/e2e/auth.spec.ts` 3 senaryo geçiyor (tam akış, çift kayıt aynı ekran, şifre sıfırlama bilinmeyen e-postada aynı cevap). Rate limit gerçek denemede tetiklendi (`/sign-up/email` 5. istekte), e2e sunucusunda `E2E=1` bayrağıyla kapatılıyor (production'da yok sayılır).
+- Kapanan v1 bulguları: S2, S4, S5, S6, S8, S9 (S1, S3, S7 editör ve yükleme ile Faz 2'de).
+- Prisma 7'de `migrate dev` client'ı otomatik üretmiyor. `npm run db:migrate` artık `prisma generate` de çalıştırıyor.
+- Yerel geliştirme: Docker `linkiva-db` (port 54329), DB `linkiva_dev`. Eski yerel `linkiva` DB'si (yalnızca ilk e2e verisi) silinmedi; Prisma yapay zekânın DB sıfırlamasını onaysız engelliyor.
 
 ## Faz 2: Editör ve public profil (çekirdek)
 
