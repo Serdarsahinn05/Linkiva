@@ -2,21 +2,22 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Check, CircleAlert, Eye, Plus } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
 import { ProfileView } from "@/components/blocks/profile-view";
-import { Dialog } from "@/components/ui/dialog";
+import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Field, Input, inputClass } from "@/components/ui/field";
-import { Tape } from "@/components/ui/tape";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { EDITABLE_BLOCK_TYPES, type EditableBlockType } from "@/lib/validation/blocks";
 import { addBlock, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setSocial, updateBlock, updateProfileBasics } from "../actions";
 import type { EditorBlock, EditorProfile, EditorSocials } from "../types";
 import { AvatarUploader } from "./avatar-uploader";
-import { BLOCK_TONE, BlockRow } from "./block-row";
+import { PageHeader, Section } from "@/features/dashboard/components/page";
+import { useRegisterPreview } from "@/features/dashboard/components/preview-context";
+import { BLOCK_ICON, BlockRow } from "./block-row";
 import { SocialsEditor } from "./socials-editor";
 import { useAutosave, type SaveState } from "./use-autosave";
 
@@ -31,7 +32,6 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   const [socials, setSocials] = useState(initialSocials);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [adding, setAdding] = useState<EditableBlockType | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -144,20 +144,18 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     socials: Object.entries(socials).map(([platform, handle]) => ({ platform: platform as SocialPlatform, handle: handle ?? "" })),
   };
   const preview = <ProfileView profile={previewProfile} mode="preview" labels={{ madeWith: t("profile.madeWith") }} />;
+  // The mobile tab bar's "Preview" shows this live (unsaved) preview while the editor is open.
+  useRegisterPreview(preview);
 
   return (
-    <div className="mx-auto grid max-w-[1180px] gap-10 px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:py-10">
-      <div className="flex min-w-0 flex-col gap-8">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-[2.441rem] leading-none font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("editor.title")}</h1>
+    <div className="mx-auto grid max-w-[1180px] gap-8 px-4 py-4 sm:px-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:py-10">
+      <div className="flex min-w-0 flex-col gap-6">
+        <PageHeader title={t("editor.title")}>
           <SaveIndicator state={saveState} />
-        </div>
+        </PageHeader>
 
         {/* Profile header */}
-        <section aria-labelledby="profile-heading" className="flex flex-col gap-4 rounded-[var(--radius-panel)] border border-hairline bg-panel p-4">
-          <h2 id="profile-heading" className="font-semibold">
-            {t("editor.profile")}
-          </h2>
+        <Section title={t("editor.profile")}>
           <AvatarUploader userId={userId} url={profile.avatarUrl} enabled={uploadsEnabled} onChange={(avatarUrl) => setProfile((p) => ({ ...p, avatarUrl }))} />
           <Field label={t("editor.displayName")}>
             {({ id }) => <Input id={id} value={profile.displayName} maxLength={60} onChange={(e) => changeBasics({ displayName: e.target.value })} />}
@@ -171,47 +169,47 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                 maxLength={160}
                 rows={2}
                 onChange={(e) => changeBasics({ bio: e.target.value })}
-                className={cn(inputClass, "resize-y py-2 leading-normal")}
+                className={cn(inputClass, "h-auto resize-y py-3 leading-normal")}
               />
             )}
           </Field>
-        </section>
+        </Section>
 
         <SocialsEditor socials={socials} onSave={saveSocial} />
 
         {/* Blocks */}
-        <section aria-labelledby="blocks-heading" className="flex flex-col gap-4">
-          <h2 id="blocks-heading" className="font-semibold">
+        <section aria-labelledby="blocks-heading" className="flex flex-col gap-3">
+          <h2 id="blocks-heading" className="px-1 text-[0.9375rem] font-semibold text-ink-2">
             {t("editor.blocks")}
           </h2>
-          <div className="flex flex-wrap gap-2">
-            {EDITABLE_BLOCK_TYPES.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => add(type)}
-                disabled={adding !== null}
-                aria-label={t("editor.addBlock", { type: t(`editor.types.${type}`) })}
-                className="tape tape-type min-h-11 gap-1.5 pr-5 text-xs"
-                data-tone={BLOCK_TONE[type] === "black" ? undefined : BLOCK_TONE[type]}
-              >
-                {adding === type ? <span className="print-dots" aria-hidden /> : <Plus size={14} aria-hidden />}
-                {t(`editor.types.${type}`)}
-              </button>
-            ))}
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            {EDITABLE_BLOCK_TYPES.map((type) => {
+              const Icon = BLOCK_ICON[type];
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => add(type)}
+                  disabled={adding !== null}
+                  aria-label={t("editor.addBlock", { type: t(`editor.types.${type}`) })}
+                  className={cn(buttonBase, buttonVariants[type === "LINK" ? "primary" : "secondary"], buttonSizes.md, "shrink-0 px-4")}
+                >
+                  {adding === type ? <span className="dots" aria-hidden /> : <Icon size={16} strokeWidth={1.75} aria-hidden />}
+                  {t(`editor.types.${type}`)}
+                </button>
+              );
+            })}
           </div>
 
           {blocks.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-[var(--radius-panel)] border border-dashed border-hairline px-4 py-12 text-center">
-              <Tape tone="grey" size="md" className="opacity-70">
-                {t("editor.empty")}
-              </Tape>
+            <div className="glass-flat flex flex-col items-center gap-2 rounded-[var(--radius-card)] px-6 py-14 text-center">
+              <p className="font-medium">{t("editor.empty")}</p>
               <p className="max-w-[40ch] text-sm text-ink-2">{t("editor.emptyHint")}</p>
             </div>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
               <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-2.5">
                   {blocks.map((block, index) => (
                     <BlockRow
                       key={block.id}
@@ -232,27 +230,19 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
         </section>
       </div>
 
-      {/* Live preview: sticky phone on desktop, full-screen sheet on mobile. */}
+      {/* Desktop live preview: a glass phone. On mobile the tab bar's Preview opens it. */}
       <aside aria-label={t("editor.previewTitle")} className="hidden lg:block">
-        <div className="sticky top-8">
-          <div className="h-[760px] overflow-y-auto overscroll-contain rounded-[var(--radius-panel)] border border-ink/80 bg-ground shadow-[var(--shadow-pop)]">
-            {preview}
+        <div className="sticky top-6">
+          <div className="glass rounded-[44px] p-2.5">
+            <div className="relative h-[760px] overflow-y-auto overscroll-contain rounded-[36px] bg-bg [scrollbar-width:none]">
+              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[36px]" aria-hidden>
+                <div className="ambient !absolute" />
+              </div>
+              <div className="relative">{preview}</div>
+            </div>
           </div>
         </div>
       </aside>
-
-      <button
-        type="button"
-        onClick={() => setPreviewOpen(true)}
-        className="tape tape-type fixed right-4 bottom-4 z-20 min-h-12 gap-2 shadow-[var(--shadow-pop)] lg:hidden"
-        data-tone="red"
-      >
-        <Eye size={16} aria-hidden />
-        {t("nav.preview")}
-      </button>
-      <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} title={t("editor.previewTitle")} closeLabel={t("editor.closePreview")} variant="sheet">
-        <div className="h-[80dvh] overflow-y-auto">{preview}</div>
-      </Dialog>
     </div>
   );
 }
@@ -261,9 +251,9 @@ function SaveIndicator({ state }: { state: SaveState }) {
   const t = useTranslations("editor");
   if (state === "idle") return null;
   return (
-    <p role="status" className={cn("flex items-center gap-1.5 text-sm", state === "error" ? "text-danger" : "text-ink-2")}>
-      {state === "saving" && <span className="print-dots" aria-hidden />}
-      {state === "saved" && <Check size={16} strokeWidth={1.75} className="text-tape-green" aria-hidden />}
+    <p role="status" className={cn("glass-flat flex h-9 items-center gap-2 rounded-full px-3.5 text-sm", state === "error" ? "text-negative" : "text-ink-2")}>
+      {state === "saving" && <span className="dots" aria-hidden />}
+      {state === "saved" && <span className="neon size-1.5 rounded-full bg-positive text-positive" aria-hidden />}
       {state === "error" && <CircleAlert size={16} strokeWidth={1.75} aria-hidden />}
       {state === "saving" ? t("saving") : state === "saved" ? t("saved") : t("saveError")}
     </p>

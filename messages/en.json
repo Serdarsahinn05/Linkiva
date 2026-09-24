@@ -214,6 +214,30 @@
     "qrBody": "Anyone who scans it lands on your page.",
     "downloadPng": "Download PNG",
     "downloadSvg": "Download SVG",
-    "close": "Close"
+    "close": "Close",
+    "share": "Share"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themes": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": "Language",
+    "languages": {
+      "tr": "Türkçe",
+      "en": "English"
+    },
+    "account": "Account",
+    "signedInAs": "Signed in as {email}.",
+    "more": "Email, password, sessions and account deletion arrive here soon."
+  },
+  "soon": {
+    "appearance": "Themes and customisation arrive in the next step.",
+    "analytics": "Your stats appear here once your page gets visits.",
+    "back": "Back to links"
   }
 }

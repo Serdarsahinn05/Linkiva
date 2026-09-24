@@ -91,7 +91,7 @@ model Profile {
   displayName    String?
   bio            String?
   avatarUrl      String?
-  theme          String       @default("etiket")
+  theme          String       @default("cam")
   appearance     Json         @default("{}")
   seoTitle       String?
   seoDescription String?

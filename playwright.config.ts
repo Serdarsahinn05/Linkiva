@@ -7,6 +7,10 @@ const channel = process.env.PW_CHANNEL;
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
+  // The dev server compiles routes on first hit; parallel workers make that contend. Production runs in parallel.
+  workers: process.env.PW_PROD ? undefined : 1,
+  // Dev mode compiles routes on first hit; parallel workers can push a navigation past 5s.
+  expect: { timeout: 15_000 },
   retries: process.env.CI ? 2 : 0,
   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },
   projects: [

@@ -1,32 +1,55 @@
 "use client";
 
-import { Link2 } from "lucide-react";
+import { BarChart3, Eye, Link2, Palette, Settings, Share2, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { Dialog } from "@/components/ui/dialog";
+import { Wordmark } from "@/components/ui/surface";
 import { ToastProvider } from "@/components/ui/toast";
-import { Wordmark } from "@/components/ui/tape";
-import { LogoutButton } from "@/features/account/components/logout-button";
 import { cn } from "@/lib/cn";
+import { LogoutButton } from "@/features/account/components/logout-button";
+import { PreviewProvider, usePreview } from "./preview-context";
 import { SharePanel } from "./share-panel";
 
-// Sections appear here as their phases land (appearance: 3, analytics: 4, settings: 5).
-const NAV = [{ href: "/dashboard", key: "links", icon: Link2 }] as const;
+type NavKey = "links" | "appearance" | "analytics" | "settings";
+type NavItem = { href: "/dashboard" | "/dashboard/appearance" | "/dashboard/analytics" | "/dashboard/settings"; key: NavKey; icon: LucideIcon };
+
+const NAV: NavItem[] = [
+  { href: "/dashboard", key: "links", icon: Link2 },
+  { href: "/dashboard/appearance", key: "appearance", icon: Palette },
+  { href: "/dashboard/analytics", key: "analytics", icon: BarChart3 },
+  { href: "/dashboard/settings", key: "settings", icon: Settings },
+];
 
 export function DashboardShell({ username, children }: { username: string; children: ReactNode }) {
-  const t = useTranslations("nav");
-  const pathname = usePathname();
-
   return (
     <ToastProvider>
-      <div className="min-h-dvh lg:grid lg:grid-cols-[232px_1fr]">
-        {/* Desktop rail */}
-        <aside className="sticky top-0 hidden h-dvh flex-col gap-8 border-r border-hairline bg-panel px-4 py-5 lg:flex">
+      <PreviewProvider>
+        <ShellFrame username={username}>{children}</ShellFrame>
+      </PreviewProvider>
+    </ToastProvider>
+  );
+}
+
+function ShellFrame({ username, children }: { username: string; children: ReactNode }) {
+  const t = useTranslations();
+  const pathname = usePathname();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const livePreview = usePreview();
+  const activeIndex = NAV.findIndex((item) => item.href === pathname);
+
+  return (
+    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
+      {/* Desktop: glass sidebar */}
+      <aside className="sticky top-0 hidden h-dvh p-3 lg:block">
+        <div className="glass flex h-full flex-col gap-8 rounded-[var(--radius-card)] p-4">
           <Link href="/dashboard" className="self-start">
             <Wordmark />
           </Link>
-          <nav aria-label={t("main")}>
+          <nav aria-label={t("nav.main")}>
             <ul className="flex flex-col gap-1">
               {NAV.map(({ href, key, icon: Icon }) => {
                 const active = pathname === href;
@@ -36,36 +59,101 @@ export function DashboardShell({ username, children }: { username: string; child
                       href={href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "relative flex min-h-11 items-center gap-3 rounded-[var(--radius-panel)] px-3 font-medium hover:bg-ground",
-                        active ? "text-ink" : "text-ink-2",
+                        "flex h-11 items-center gap-3 rounded-full px-4 font-medium transition-colors duration-150",
+                        active ? "bg-glass-strong text-ink shadow-[inset_0_1px_0_var(--c-glass-shine)]" : "text-ink-2 hover:bg-glass hover:text-ink",
                       )}
                     >
-                      {/* Active marker: a small red tape stub (DESIGN.md §6). */}
-                      {active && <span aria-hidden className="tape absolute top-1/2 -left-4 h-4 min-h-0 w-2.5 -translate-y-1/2 p-0" data-tone="red" />}
-                      <Icon size={20} strokeWidth={1.75} aria-hidden />
-                      {t(key)}
+                      <Icon size={19} strokeWidth={1.75} aria-hidden />
+                      {t(`nav.${key}`)}
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
-          <div className="mt-auto flex flex-col gap-4">
+          <div className="mt-auto flex flex-col gap-2">
             <SharePanel username={username} />
             <LogoutButton />
           </div>
-        </aside>
+        </div>
+      </aside>
 
-        {/* Mobile top bar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-hairline bg-panel/95 px-4 py-2 backdrop-blur-sm lg:hidden">
-          <Link href="/dashboard">
-            <Wordmark />
-          </Link>
-          <LogoutButton />
-        </header>
+      {/* Mobile: top bar */}
+      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 lg:hidden">
+        <Link href="/dashboard">
+          <Wordmark />
+        </Link>
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          aria-label={t("share.share")}
+          className="glass flex size-11 items-center justify-center rounded-full text-ink"
+        >
+          <Share2 size={18} strokeWidth={1.75} aria-hidden />
+        </button>
+      </header>
 
-        <div className="min-w-0 pb-20 lg:pb-0">{children}</div>
-      </div>
-    </ToastProvider>
+      <div className="min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</div>
+
+      {/* Mobile: Instagram-style floating glass tab bar with a liquid active indicator. */}
+      <nav
+        aria-label={t("nav.main")}
+        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 lg:hidden"
+      >
+        <div className="glass-float liquid relative grid h-16 grid-cols-5 items-center rounded-full px-1.5">
+          {activeIndex >= 0 && (
+            <span
+              aria-hidden
+              className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/5)] rounded-full bg-glass-strong shadow-[inset_0_1px_0_var(--c-glass-shine),0_4px_14px_-6px_rgb(0_0_0/0.35)] transition-transform duration-500 ease-[var(--ease-spring)]"
+              style={{ transform: `translateX(${(activeIndex >= 2 ? activeIndex + 1 : activeIndex) * 100}%)` }}
+            />
+          )}
+          {NAV.slice(0, 2).map((item) => (
+            <TabLink key={item.href} item={item} active={pathname === item.href} label={t(`nav.${item.key}`)} />
+          ))}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              aria-label={t("nav.preview")}
+              className="relative flex size-12 items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_6px_20px_-6px_rgb(0_0_0/0.5)] transition-transform duration-150 active:scale-95"
+            >
+              <Eye size={22} strokeWidth={1.75} aria-hidden />
+            </button>
+          </div>
+          {NAV.slice(2).map((item) => (
+            <TabLink key={item.href} item={item} active={pathname === item.href} label={t(`nav.${item.key}`)} />
+          ))}
+        </div>
+      </nav>
+
+      <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} title={t("editor.previewTitle")} closeLabel={t("editor.closePreview")} variant="sheet">
+        <div className="h-[80dvh] overflow-y-auto">
+          {livePreview ?? <iframe src={`/${username}`} title={t("editor.previewTitle")} className="size-full border-0" />}
+        </div>
+      </Dialog>
+      <Dialog open={shareOpen} onClose={() => setShareOpen(false)} title={t("share.share")} closeLabel={t("share.close")} variant="sheet">
+        <div className="p-5">
+          <SharePanel username={username} />
+        </div>
+      </Dialog>
+    </div>
+  );
+}
+
+function TabLink({ item, active, label }: { item: NavItem; active: boolean; label: string }) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative z-10 flex h-full flex-col items-center justify-center gap-0.5 rounded-full text-[0.6875rem] font-medium transition-colors duration-200",
+        active ? "text-ink" : "text-ink-3",
+      )}
+    >
+      <Icon size={22} strokeWidth={active ? 2 : 1.75} aria-hidden />
+      {label}
+    </Link>
   );
 }

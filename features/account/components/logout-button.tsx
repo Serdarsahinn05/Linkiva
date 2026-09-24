@@ -14,6 +14,7 @@ export function LogoutButton() {
   return (
     <Button
       variant="ghost"
+      size="md"
       pending={pending}
       onClick={async () => {
         setPending(true);

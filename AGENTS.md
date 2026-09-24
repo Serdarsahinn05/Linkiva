@@ -46,6 +46,7 @@ npm run build
 
 **Veri**
 - Şema değişikliği her zaman migration ile yapılır (`migrate dev`). `db push` kullanma, v1'de şema ile migration bu yüzden ayrıştı (AUDIT B2).
+- **Ajanlar için:** `migrate dev` etkileşimli onay bekleyip takılabilir. SQL'i elle (`prisma/migrations/<zaman>_<ad>/migration.sql`) ya da `prisma migrate diff` ile yaz, ardından `prisma migrate deploy` + `prisma generate` çalıştır.
 - Tıklama ve görüntülenme sayıları `Event` tablosundan hesaplanır. Sayaç kolonu ekleme.
 - Public profil render'ında DB'ye yazma. Takip sadece `/api/e` ve `/l/[blockId]` üzerinden yapılır.
 
@@ -61,7 +62,7 @@ npm run build
 
 **Tasarım**
 - DESIGN.md'deki token'lar dışında renk, radius veya gölge değeri yazma. Tailwind'de keyfi değer (`bg-[#0A0A0A]`, `rounded-[2.5rem]`) yasak, token sınıfı kullan.
-- v1'in görsel dili (siyah + glass + neon + italik uppercase) geri getirilmez.
+- Reddedilen diller geri getirilmez: v1 (bağıran italik uppercase, şişkin kartlar, dağınık neon) ve Etiket (renkli Dymo bantları). Renk yalnızca anlam taşıdığında (analitik, durum) kullanılır; marka vurgusu monokromdur.
 - Her etkileşimli bileşende hover, focus-visible, disabled, loading, error ve empty durumları bulunur.
 
 ## Git

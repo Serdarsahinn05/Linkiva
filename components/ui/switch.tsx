@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/cn";
 
-/** A small tape slider: green tape when on, grey when off (DESIGN.md §5). */
+/** iOS-style switch. "On" is a meaningful state (live on the page), so it uses the positive colour. */
 export function Switch({ checked, onChange, label, disabled }: { checked: boolean; onChange: (next: boolean) => void; label: string; disabled?: boolean }) {
   return (
     <button
@@ -13,17 +13,17 @@ export function Switch({ checked, onChange, label, disabled }: { checked: boolea
       title={label}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="group inline-flex size-11 shrink-0 items-center justify-center disabled:opacity-50"
+      className="inline-flex size-11 shrink-0 items-center justify-center rounded-full disabled:opacity-50"
     >
       <span
         className={cn(
-          "relative h-5 w-9 rounded-[var(--radius-tape)] shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)] transition-colors duration-150",
-          checked ? "bg-tape-green" : "bg-tape-grey",
+          "relative h-6 w-10 rounded-full border transition-colors duration-200 ease-[var(--ease-out)]",
+          checked ? "border-positive/40 bg-positive" : "border-glass-edge bg-glass-strong",
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 size-4 rounded-[1px] bg-emboss shadow-[0_1px_2px_rgb(0_0_0/0.3)] transition-transform duration-150 ease-[var(--ease-out)]",
+            "absolute top-0.5 left-0.5 size-[18px] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.3)] transition-transform duration-300 ease-[var(--ease-spring)]",
             checked && "translate-x-4",
           )}
         />

@@ -53,7 +53,7 @@ export function LoginForm({ googleEnabled, notice }: { googleEnabled: boolean; n
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("auth.login.title")}</h1>
+      <h1 className="text-[1.75rem] leading-tight font-semibold tracking-[-0.03em]">{t("auth.login.title")}</h1>
 
       {notice === "passwordReset" && <Notice tone="success">{t("auth.login.passwordReset")}</Notice>}
       {status !== "idle" && <Notice tone={status === "unverified" ? "info" : "error"}>{messages[status]}</Notice>}

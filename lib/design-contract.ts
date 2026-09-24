@@ -1,9 +1,9 @@
 // Direction contract (DESIGN.md §10), emitted as an HTML comment in every root layout.
 export const DESIGN_CONTRACT = `
-THESIS: Linkiva is labelling what you own; every block is a printed, embossed Dymo tape. Refuses the pastel pill list and the black-neon "premium" look.
-OWN-WORLD: Cool steel pegboard (24px hole grid), Dymo tape colours (red primary; black/blue/green/yellow/grey block types), white embossed letters, Archivo only (condensed caps tape + normal body), 2/4px corners, 1px lines.
-STORY: The visitor types a username, watches the tape print, is live in 60 seconds; adds blocks in the panel, sees the live preview, watches real data.
-FIRST VIEWPORT: Viewport-wide red display tape "LINKIVA.SPACE/_" that prints as you type; headline above, red "Start free" top right.
-FORM: own list candidate 7 (Dymo label-maker tape), seed 2967658e.
+THESIS: Linkiva is a single pane of glass onto a person's world; the UI speaks in light and depth, never in colour. Refuses v1's shouting neon-glass and the category's pastel pill list.
+OWN-WORLD: One slow monochrome ambient light behind frosted glass (one material, three densities, liquid edge on floating glass); pill primary in ink/white; Geist + Geist Mono for data; 20/12/999 radii; semantic neon (green/red/blue) only where colour means something.
+STORY: The visitor claims an address in a glass bar, lands in a calm editor with a live glass-phone preview, and manages everything from an Instagram-style glass tab bar on mobile.
+FIRST VIEWPORT: Display headline over ambient light, glass address bar with live availability and a single white/ink pill; a sample profile in a glass phone beside it.
+FORM: user-pinned direction "Cam" (glass), replacing seed 2967658e.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 `;

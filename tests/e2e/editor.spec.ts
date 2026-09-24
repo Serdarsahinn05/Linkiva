@@ -60,7 +60,7 @@ test("build a page in the editor and see it live", async ({ page, request }) => 
   await page.goto(`/${username}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Editör Testi");
   await expect(page.getByRole("link", { name: "Instagram" })).toHaveAttribute("href", "https://instagram.com/linkiva");
-  const links = page.locator("main li a.tape");
+  const links = page.locator("main li a[href^=\"/l/\"]");
   await expect(links).toHaveText(["GitHub", "Blog"]);
   await expect(page.getByText("Kötü")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 2 })).toHaveText("Projeler");
@@ -87,7 +87,7 @@ test("build a page in the editor and see it live", async ({ page, request }) => 
   await waitSaved(page);
 
   await page.goto(`/${username}`);
-  await expect(page.locator("main li a.tape")).toHaveText(["Blog"]);
+  await expect(page.locator("main li a[href^=\"/l/\"]")).toHaveText(["Blog"]);
   await expect(page.getByText("GitHub", { exact: true })).toHaveCount(0);
 
   // Unknown profiles are a real 404.

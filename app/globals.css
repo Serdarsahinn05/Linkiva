@@ -1,76 +1,121 @@
 @import "tailwindcss";
 
-/* Theme is driven by tokens; `dark:` is rarely needed because tokens flip. */
+/* Tokens flip per theme, so `dark:` is rarely needed. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* ─── Theme-independent tokens ─────────────────────────────────────────────── */
 @theme {
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Ground: galvanised pegboard. Cool steel grey, not cream. */
-  --color-ground: oklch(93.5% 0.003 160);
-  --color-panel: oklch(97.3% 0.002 160);
-  --color-ink: oklch(19% 0.005 160);
-  --color-ink-2: oklch(42% 0.008 160);
-  --color-ink-3: oklch(55% 0.008 160);
-  --color-hairline: oklch(83% 0.005 160);
-  --color-peg: oklch(19% 0.005 160 / 0.07);
-  --color-focus: oklch(19% 0.005 160);
+  --radius-card: 20px;
+  --radius-control: 12px;
 
-  /* Dymo tapes: physical material, identical in light and dark. */
-  --color-tape-red: oklch(52% 0.19 25);
-  --color-tape-black: oklch(22% 0.004 260);
-  --color-tape-blue: oklch(44% 0.14 260);
-  --color-tape-green: oklch(50% 0.11 155);
-  --color-tape-yellow: oklch(83% 0.15 88);
-  --color-tape-grey: oklch(62% 0.01 160);
-  --color-emboss: oklch(98% 0 0);
-  --color-danger: oklch(52% 0.19 25);
-
-  --radius-tape: 2px;
-  --radius-panel: 4px;
-
-  --shadow-tape: 0 1px 0 rgb(0 0 0 / 0.22), 0 2px 4px -1px rgb(0 0 0 / 0.22);
-  --shadow-tape-lift: 0 1px 0 rgb(0 0 0 / 0.18), 0 3px 8px -2px rgb(0 0 0 / 0.28);
-  --shadow-pop: 0 8px 24px -8px rgb(20 22 21 / 0.25);
-
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* 1.25 modular scale */
-  --text-2xs: 0.8125rem;
-  --text-display: clamp(2.441rem, 5vw + 1rem, 6rem);
+  --text-display: clamp(2.5rem, 6vw, 4.5rem);
+
+  /* Colours are defined per theme below; these make them Tailwind utilities (bg-glass, text-ink-2…). */
+  --color-bg: var(--c-bg);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-glass: var(--c-glass);
+  --color-glass-strong: var(--c-glass-strong);
+  --color-glass-edge: var(--c-glass-edge);
+  --color-accent: var(--c-accent);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-positive: var(--c-positive);
+  --color-negative: var(--c-negative);
+  --color-info: var(--c-info);
+  --color-warning: var(--c-warning);
+}
+
+/* ─── Light (default) ──────────────────────────────────────────────────────── */
+:root {
+  --c-bg: oklch(97% 0.006 270);
+  --c-ink: oklch(20% 0.012 265);
+  --c-ink-2: oklch(44% 0.012 265);
+  --c-ink-3: oklch(56% 0.01 265);
+  --c-glass: oklch(100% 0 0 / 0.55);
+  --c-glass-strong: oklch(100% 0 0 / 0.78);
+  --c-glass-edge: oklch(100% 0 0 / 0.75);
+  --c-glass-shine: oklch(100% 0 0 / 0.95);
+  --c-glass-shadow: 0 1px 2px rgb(30 32 50 / 0.06), 0 8px 32px -12px rgb(30 32 50 / 0.18);
+  --c-hairline: oklch(20% 0.012 265 / 0.08);
+  --c-accent: oklch(20% 0.012 265);
+  --c-accent-ink: oklch(98% 0 0);
+  /* Semantic colours, darkened for text contrast on light glass. */
+  --c-positive: oklch(55% 0.15 155);
+  --c-negative: oklch(55% 0.2 22);
+  --c-info: oklch(55% 0.15 250);
+  --c-warning: oklch(62% 0.14 70);
+  --c-glow: 0;
+  --c-ambient-1: oklch(88% 0.04 285);
+  --c-ambient-2: oklch(92% 0.03 230);
+  --c-ambient-3: oklch(94% 0.03 20);
+  --c-focus: oklch(20% 0.012 265 / 0.22);
+  color-scheme: light;
+}
+
+/* ─── Dark ─────────────────────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --c-bg: oklch(14% 0.01 260);
+  --c-ink: oklch(97% 0.003 260);
+  --c-ink-2: oklch(76% 0.01 260);
+  --c-ink-3: oklch(62% 0.012 260);
+  --c-glass: oklch(100% 0 0 / 0.06);
+  --c-glass-strong: oklch(100% 0 0 / 0.11);
+  --c-glass-edge: oklch(100% 0 0 / 0.13);
+  --c-glass-shine: oklch(100% 0 0 / 0.2);
+  --c-glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 40px -12px rgb(0 0 0 / 0.6);
+  --c-hairline: oklch(100% 0 0 / 0.08);
+  --c-accent: oklch(97% 0.003 260);
+  --c-accent-ink: oklch(16% 0.01 260);
+  --c-positive: oklch(80% 0.17 155);
+  --c-negative: oklch(70% 0.19 22);
+  --c-info: oklch(74% 0.14 245);
+  --c-warning: oklch(84% 0.15 80);
+  --c-glow: 1;
+  --c-ambient-1: oklch(42% 0.05 270);
+  --c-ambient-2: oklch(36% 0.04 230);
+  --c-ambient-3: oklch(32% 0.03 300);
+  --c-focus: oklch(97% 0.003 260 / 0.28);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-bg: oklch(14% 0.01 260);
+    --c-ink: oklch(97% 0.003 260);
+    --c-ink-2: oklch(76% 0.01 260);
+    --c-ink-3: oklch(62% 0.012 260);
+    --c-glass: oklch(100% 0 0 / 0.06);
+    --c-glass-strong: oklch(100% 0 0 / 0.11);
+    --c-glass-edge: oklch(100% 0 0 / 0.13);
+    --c-glass-shine: oklch(100% 0 0 / 0.2);
+    --c-glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 40px -12px rgb(0 0 0 / 0.6);
+    --c-hairline: oklch(100% 0 0 / 0.08);
+    --c-accent: oklch(97% 0.003 260);
+    --c-accent-ink: oklch(16% 0.01 260);
+    --c-positive: oklch(80% 0.17 155);
+    --c-negative: oklch(70% 0.19 22);
+    --c-info: oklch(74% 0.14 245);
+    --c-warning: oklch(84% 0.15 80);
+    --c-glow: 1;
+    --c-ambient-1: oklch(42% 0.05 270);
+    --c-ambient-2: oklch(36% 0.04 230);
+    --c-ambient-3: oklch(32% 0.03 300);
+    --c-focus: oklch(97% 0.003 260 / 0.28);
+    color-scheme: dark;
+  }
 }
 
 @layer base {
-  :root[data-theme="dark"] {
-    --color-ground: oklch(17% 0.004 160);
-    --color-panel: oklch(21% 0.005 160);
-    --color-ink: oklch(93% 0.003 160);
-    --color-ink-2: oklch(74% 0.006 160);
-    --color-ink-3: oklch(62% 0.006 160);
-    --color-hairline: oklch(31% 0.006 160);
-    --color-peg: oklch(93% 0.003 160 / 0.06);
-    --color-focus: oklch(93% 0.003 160);
-    color-scheme: dark;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --color-ground: oklch(17% 0.004 160);
-      --color-panel: oklch(21% 0.005 160);
-      --color-ink: oklch(93% 0.003 160);
-      --color-ink-2: oklch(74% 0.006 160);
-      --color-ink-3: oklch(62% 0.006 160);
-      --color-hairline: oklch(31% 0.006 160);
-      --color-peg: oklch(93% 0.003 160 / 0.06);
-      --color-focus: oklch(93% 0.003 160);
-      color-scheme: dark;
-    }
-  }
-
   html {
-    background: var(--color-ground);
-    color: var(--color-ink);
+    background: var(--c-bg);
+    color: var(--c-ink);
     font-family: var(--font-sans);
-    font-variation-settings: "wdth" 100;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -79,102 +124,154 @@
     line-height: 1.55;
   }
   :focus-visible {
-    outline: 2px solid var(--color-focus);
+    outline: 2px solid var(--c-ink);
     outline-offset: 2px;
+    border-radius: inherit;
   }
   ::selection {
-    background: var(--color-tape-yellow);
-    color: var(--color-tape-black);
+    background: var(--c-ink);
+    color: var(--c-bg);
   }
 }
 
 @layer components {
-  /* Pegboard: 24px hole grid, which is also the layout grid. */
-  .pegboard {
-    background-color: var(--color-ground);
-    background-image: radial-gradient(circle at 12px 12px, var(--color-peg) 1px, transparent 1.5px);
-    background-size: 24px 24px;
+  /* One ambient light per page, behind everything (DESIGN.md §2). Monochrome, slow. */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--c-bg);
+  }
+  .ambient::before,
+  .ambient::after {
+    content: "";
+    position: absolute;
+    width: 80vmax;
+    height: 80vmax;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.9;
+    animation: ambient-drift 40s ease-in-out infinite alternate;
+  }
+  .ambient::before {
+    top: -45vmax;
+    left: -20vmax;
+    background: radial-gradient(circle, var(--c-ambient-1), transparent 65%);
+  }
+  .ambient::after {
+    top: -35vmax;
+    right: -30vmax;
+    background: radial-gradient(circle, var(--c-ambient-2), transparent 65%);
+    animation-delay: -20s;
+  }
+  @keyframes ambient-drift {
+    to { translate: 6vmax 4vmax; scale: 1.08; }
   }
 
-  /* Embossed label-maker lettering. */
-  .tape-type {
-    font-variation-settings: "wdth" 72;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-feature-settings: "tnum";
+  /* ─── Glass: one material, three densities (DESIGN.md §4) ─── */
+  .glass {
+    background: var(--c-glass);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--c-glass-edge);
+    box-shadow: inset 0 1px 0 var(--c-glass-shine), var(--c-glass-shadow);
+  }
+  /* Same look without the (expensive) blur: for long scrolling lists. */
+  .glass-flat {
+    background: var(--c-glass);
+    border: 1px solid var(--c-glass-edge);
+    box-shadow: inset 0 1px 0 var(--c-glass-shine), var(--c-glass-shadow);
+  }
+  .glass-float {
+    position: relative;
+    background: var(--c-glass-strong);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--c-glass-edge);
+    box-shadow: inset 0 1px 0 var(--c-glass-shine), 0 24px 60px -20px rgb(0 0 0 / 0.45);
+  }
+  /* Liquid edge: refraction where the browser supports SVG backdrop filters (Chromium). */
+  @supports (backdrop-filter: url(#liquid)) {
+    .glass-float.liquid {
+      backdrop-filter: blur(22px) saturate(180%) url(#liquid);
+    }
+  }
+  /* Thin refracted light running around floating glass. */
+  .glass-float::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from 210deg, transparent 0 20%, var(--c-glass-shine) 30%, transparent 45% 70%, var(--c-glass-shine) 82%, transparent 92%);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+    opacity: 0.8;
   }
 
-  /* Dymo tape strip. Set --tape (colour) and optionally --tilt. */
-  .tape {
-    --tape: var(--color-tape-black);
-    --tape-ink: var(--color-emboss);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    min-height: 36px;
-    padding-inline: 0.85em 1.35em;
-    border-radius: var(--radius-tape);
-    background: linear-gradient(to bottom, color-mix(in oklch, var(--tape) 90%, white), var(--tape));
-    color: var(--tape-ink);
-    text-shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 -1px 0 rgb(255 255 255 / 0.22);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), var(--shadow-tape);
-    clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
-    rotate: var(--tilt, 0deg);
-    transition:
-      translate 140ms var(--ease-out),
-      rotate 140ms var(--ease-out),
-      box-shadow 140ms var(--ease-out);
+  /* Pointer-following specular highlight; --mx/--my are set by <Specular />. */
+  .glass-interactive {
+    position: relative;
+    isolation: isolate;
+    transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
   }
-  .tape[data-tone="red"] { --tape: var(--color-tape-red); }
-  .tape[data-tone="blue"] { --tape: var(--color-tape-blue); }
-  .tape[data-tone="green"] { --tape: var(--color-tape-green); }
-  .tape[data-tone="grey"] { --tape: var(--color-tape-grey); }
-  .tape[data-tone="yellow"] {
-    --tape: var(--color-tape-yellow);
-    --tape-ink: var(--color-tape-black);
-    text-shadow: 0 1px 0 rgb(255 255 255 / 0.4);
+  .glass-interactive::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(180px circle at var(--mx, 50%) var(--my, -40%), oklch(100% 0 0 / 0.14), transparent 60%);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .glass-interactive:hover::before { opacity: 1; }
+  .glass-interactive:hover { background: var(--c-glass-strong); }
+  .glass-interactive:active { transform: scale(0.985); }
+
+  /* Semantic neon: glow only in dark theme (DESIGN.md §3). */
+  .neon {
+    box-shadow: 0 0 0 1px color-mix(in oklch, currentColor 45%, transparent), 0 0 calc(18px * var(--c-glow)) -4px currentColor;
   }
 
-  :is(a, button).tape:hover:not(:disabled) {
-    translate: 0 -1px;
-    rotate: calc(var(--tilt, 0deg) * 0.3);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), var(--shadow-tape-lift);
-  }
-  :is(a, button).tape:active:not(:disabled) {
-    translate: 0 0;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 1px 0 rgb(0 0 0 / 0.2);
-  }
-  .tape:disabled { opacity: 0.55; cursor: not-allowed; }
-  .tape[aria-busy="true"]:disabled { opacity: 0.85; cursor: progress; }
-
-  /* Pending indicator: three embossed dots "printed" one after another. */
-  .print-dots {
+  /* Pending indicator: three dots filling in sequence. */
+  .dots {
     display: inline-block;
     width: 1.1em;
     height: 0.3em;
     background: radial-gradient(circle, currentColor 45%, transparent 50%) 0 50% / 0.37em 100% repeat-x;
     mask: linear-gradient(to right, #000 0 0) 0 0 / 0% 100% no-repeat;
-    animation: print-dots 900ms steps(3, jump-none) infinite;
+    animation: dots 900ms steps(3, jump-none) infinite;
   }
-  @keyframes print-dots {
+  @keyframes dots {
     to { mask-size: 100% 100%; }
   }
 
-  /* A toast leaves the label maker: it slides up out of the edge, unrolling left to right. */
-  .toast-in {
-    animation: toast-in 220ms var(--ease-out) both;
+  .sheet-in { animation: sheet-in 320ms var(--ease-spring) both; }
+  @keyframes sheet-in {
+    from { translate: 0 16px; opacity: 0; scale: 0.98; }
   }
+  .toast-in { animation: toast-in 320ms var(--ease-spring) both; }
   @keyframes toast-in {
-    from { translate: 0 120%; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
-    to { translate: 0 0; clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+    from { translate: 0 24px; opacity: 0; scale: 0.96; }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .glass-float, .glass-flat {
+    background: color-mix(in oklch, var(--c-bg) 92%, var(--c-ink));
+    backdrop-filter: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
-  .tape { translate: none !important; }
+  .glass-interactive::before { display: none; }
 }

@@ -11,7 +11,7 @@ const ToastContext = createContext<(toast: ToastInput) => void>(() => {});
 export const useToast = () => useContext(ToastContext);
 
 /**
- * Toasts slide out of the bottom edge like a strip leaving the label maker (DESIGN.md §5).
+ * Glass pill above the mobile tab bar (DESIGN.md §6); the dot carries the semantic colour.
  * One at a time; a new toast replaces the current one.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -32,14 +32,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={show}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 lg:bottom-6">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-6">
         {toast && (
-          <div
-            key={toast.id}
-            data-tone={toast.tone === "success" ? "green" : "red"}
-            className="tape toast-in pointer-events-auto min-h-12 max-w-full gap-4 pr-6 text-[0.9375rem] font-medium [text-shadow:none]"
-          >
-            <span>{toast.message}</span>
+          <div key={toast.id} className="glass-float toast-in pointer-events-auto flex min-h-12 max-w-full items-center gap-3 rounded-full py-1.5 pr-1.5 pl-4 text-[0.9375rem]">
+            <span aria-hidden className={cn("neon size-2 shrink-0 rounded-full", toast.tone === "success" ? "bg-positive text-positive" : "bg-negative text-negative")} />
+            <span className={cn(!toast.action && "pr-3")}>{toast.message}</span>
             {toast.action && (
               <button
                 type="button"
@@ -47,7 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   toast.action?.onClick();
                   setToast(null);
                 }}
-                className={cn("tape-type min-h-9 rounded-[var(--radius-tape)] bg-black/25 px-3 text-xs hover:bg-black/35")}
+                className="h-9 rounded-full bg-accent px-4 text-sm font-medium text-accent-ink hover:opacity-90"
               >
                 {toast.action.label}
               </button>

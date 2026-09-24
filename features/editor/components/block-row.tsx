@@ -2,26 +2,25 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowDown, ArrowUp, CircleAlert, GripVertical, Star, StarOff, Trash2 } from "lucide-react";
+import { AlignLeft, ArrowDown, ArrowUp, CircleAlert, GripVertical, Heading, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Input, inputClass } from "@/components/ui/field";
 import { Menu } from "@/components/ui/menu";
 import { Switch } from "@/components/ui/switch";
-import { Tape, type TapeTone } from "@/components/ui/tape";
 import { cn } from "@/lib/cn";
 import { parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
 import { normalizeUrl } from "@/lib/validation/url";
 import type { EditorBlock } from "../types";
 
-/** Block type ↔ tape colour: the same mapping everywhere (DESIGN.md §2). */
-export const BLOCK_TONE: Record<EditorBlock["type"], TapeTone> = {
-  LINK: "black",
-  HEADER: "red",
-  TEXT: "blue",
-  EMBED: "yellow",
-  EMAIL_CAPTURE: "green",
-  DIVIDER: "grey",
+/** Block types are told apart by icon, never by colour (DESIGN.md §6). */
+export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
+  LINK: Link2,
+  HEADER: Heading,
+  TEXT: AlignLeft,
+  EMBED: PlayCircle,
+  EMAIL_CAPTURE: Mail,
+  DIVIDER: Minus,
 };
 
 type RowProps = {
@@ -43,6 +42,7 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
 
   const complete = parseBlock(block.type, block.data) !== null;
   const urlInvalid = block.type === "LINK" && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
+  const TypeIcon = BLOCK_ICON[block.type];
   const field = (key: string) => block.data[key] ?? "";
   const set = (key: string, value: string) => onChange({ ...block.data, [key]: value });
 
@@ -51,9 +51,9 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
-        "relative rounded-[var(--radius-panel)] border border-hairline bg-panel",
-        isDragging && "z-10 rotate-[-1deg] shadow-[var(--shadow-pop)]",
-        !block.isVisible && "bg-panel/60",
+        "glass-flat relative rounded-[var(--radius-card)]",
+        isDragging && "glass z-10 scale-[1.02] shadow-[0_24px_60px_-20px_rgb(0_0_0/0.5)]",
+        !block.isVisible && "opacity-70",
       )}
     >
       <div className="flex items-start gap-1 p-2">
@@ -64,17 +64,18 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
           {...listeners}
           aria-label={t("drag")}
           title={t("drag")}
-          className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-[var(--radius-panel)] text-ink-3 hover:text-ink active:cursor-grabbing"
+          className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-full text-ink-3 hover:bg-glass hover:text-ink active:cursor-grabbing"
         >
           <GripVertical size={20} strokeWidth={1.75} aria-hidden />
         </button>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2 py-1.5">
           <div className="flex items-center gap-2">
-            <Tape tone={BLOCK_TONE[block.type]} size="sm" className={cn("!min-h-6 text-[0.6875rem]", !block.isVisible && "opacity-50")}>
+            <span className="flex items-center gap-1.5 text-sm font-medium text-ink-2">
+              <TypeIcon size={16} strokeWidth={1.75} aria-hidden />
               {t(`types.${block.type}`)}
-            </Tape>
-            {block.isHighlighted && <Star size={14} className="fill-tape-yellow text-tape-yellow" aria-label={t("highlight")} />}
+            </span>
+            {block.isHighlighted && <Star size={14} className="fill-ink text-ink" aria-label={t("highlight")} />}
             <div className="-my-2 ml-auto flex shrink-0 items-center">
               <Switch checked={block.isVisible} onChange={(isVisible) => onFlags({ isVisible })} label={t("visible")} />
               <Menu
@@ -121,7 +122,7 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
                 onBlur={() => setUrlTouched(true)}
                 className="text-[0.9375rem] text-ink-2"
               />
-              {urlInvalid && <p className="text-sm text-danger">{t("urlInvalid")}</p>}
+              {urlInvalid && <p className="text-sm text-negative">{t("urlInvalid")}</p>}
             </>
           )}
           {block.type === "HEADER" && (
@@ -147,7 +148,7 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
               className={cn(inputClass, "resize-y py-2 leading-normal")}
             />
           )}
-          {block.type === "DIVIDER" && <hr className="my-3 border-hairline" aria-hidden />}
+          {block.type === "DIVIDER" && <hr className="my-3 border-glass-edge" aria-hidden />}
 
           {!complete && block.type !== "DIVIDER" && !urlInvalid && (
             <p className="flex items-center gap-1.5 text-sm text-ink-2">

@@ -23,15 +23,15 @@ export function SocialsEditor({ socials, onSave }: Props) {
   const count = Object.keys(socials).length;
 
   return (
-    <details className="group rounded-[var(--radius-panel)] border border-hairline bg-panel">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-semibold [&::-webkit-details-marker]:hidden">
+    <details className="glass group rounded-[var(--radius-card)]">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 text-[0.9375rem] font-semibold text-ink-2 [&::-webkit-details-marker]:hidden">
         <span>
           {t("socials")}
           {count > 0 && <span className="ml-2 font-normal text-ink-2">({count})</span>}
         </span>
         <ChevronDown size={18} strokeWidth={1.75} className="transition-transform group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="flex flex-col gap-3 border-t border-hairline p-4">
+      <div className="flex flex-col gap-3 border-t border-glass-edge p-5">
         <p className="text-sm text-ink-2">{t("socialsHint")}</p>
         <ul className="grid gap-2 sm:grid-cols-2">
           {SOCIAL_ORDER.map((platform) => {
@@ -60,7 +60,7 @@ export function SocialsEditor({ socials, onSave }: Props) {
                     }}
                   />
                 </div>
-                {invalid[platform] && <p className="pl-7 text-sm text-danger">{t("socialInvalid", { platform: label })}</p>}
+                {invalid[platform] && <p className="pl-7 text-sm text-negative">{t("socialInvalid", { platform: label })}</p>}
               </li>
             );
           })}

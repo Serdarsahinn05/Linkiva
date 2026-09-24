@@ -31,9 +31,9 @@ export function GoogleButton({ callbackURL = "/dashboard" }: { callbackURL?: str
 export function OrDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3 text-sm text-ink-2" role="separator">
-      <span className="h-px flex-1 bg-hairline" />
+      <span className="h-px flex-1 bg-glass-edge" />
       {label}
-      <span className="h-px flex-1 bg-hairline" />
+      <span className="h-px flex-1 bg-glass-edge" />
     </div>
   );
 }

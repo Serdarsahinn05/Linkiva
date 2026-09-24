@@ -214,6 +214,30 @@
     "qrBody": "Okutan herkes doğrudan sayfana gelir.",
     "downloadPng": "PNG indir",
     "downloadSvg": "SVG indir",
-    "close": "Kapat"
+    "close": "Kapat",
+    "share": "Paylaş"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "appearance": "Görünüm",
+    "theme": "Tema",
+    "themes": {
+      "system": "Sistem",
+      "light": "Açık",
+      "dark": "Koyu"
+    },
+    "language": "Dil",
+    "languages": {
+      "tr": "Türkçe",
+      "en": "English"
+    },
+    "account": "Hesap",
+    "signedInAs": "{email} olarak giriş yaptın.",
+    "more": "E-posta, şifre, oturumlar ve hesap silme yakında burada."
+  },
+  "soon": {
+    "appearance": "Tema ve özelleştirme bir sonraki adımda geliyor.",
+    "analytics": "İstatistikler, sayfan ziyaret almaya başladığında burada görünecek.",
+    "back": "Linklere dön"
   }
 }

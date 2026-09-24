@@ -1,23 +1,22 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Tape } from "@/components/ui/tape";
+import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { defaultLocale } from "@/i18n/config";
+import { cn } from "@/lib/cn";
 
 // A free username is an invitation, not an error.
 export default async function ProfileNotFound() {
   const t = await getTranslations({ locale: defaultLocale, namespace: "profile" });
   return (
-    <main className="pegboard flex min-h-dvh items-center justify-center px-4">
-      <div className="flex max-w-md flex-col items-start gap-5">
-        <Tape tone="grey" size="lg" lang="en" translate="no" tiltSeed="404">
-          404
-        </Tape>
-        <h1 className="text-4xl font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("notFoundTitle")}</h1>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/register" className="tape tape-type min-h-11 px-5" data-tone="red">
+    <main className="flex min-h-dvh items-center justify-center px-4">
+      <div className="glass flex max-w-md flex-col items-center gap-5 rounded-[28px] px-8 py-12 text-center">
+        <span className="font-mono text-sm text-ink-3">404</span>
+        <h1 className="text-3xl font-semibold tracking-[-0.03em]">{t("notFoundTitle")}</h1>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link href="/register" className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}>
             {t("claim")}
           </Link>
-          <Link href="/" className="inline-flex min-h-11 items-center px-3 underline underline-offset-4">
+          <Link href="/" className={cn(buttonBase, buttonVariants.ghost, buttonSizes.md)}>
             {t("home")}
           </Link>
         </div>

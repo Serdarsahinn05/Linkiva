@@ -31,7 +31,7 @@ export function ForgotForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("auth.forgot.title")}</h1>
+        <h1 className="text-[1.75rem] leading-tight font-semibold tracking-[-0.03em]">{t("auth.forgot.title")}</h1>
         <p className="text-ink-2">{t("auth.forgot.lede")}</p>
       </div>
 

@@ -55,7 +55,7 @@ export function AvatarUploader({ userId, url, enabled, onChange }: Props) {
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">{t("label")}</span>
       <div className="flex items-center gap-4">
-        <div className="size-16 shrink-0 overflow-hidden rounded-full border border-hairline bg-ground">
+        <div className="size-16 shrink-0 overflow-hidden rounded-full border border-glass-edge bg-glass-strong">
           {url ? (
             // eslint-disable-next-line @next/next/no-img-element -- blob URL, already 512px
             <img src={url} alt="" className="size-full object-cover" />
@@ -84,9 +84,9 @@ export function AvatarUploader({ userId, url, enabled, onChange }: Props) {
               onClick={() => input.current?.click()}
               disabled={busy}
               aria-busy={busy || undefined}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-panel)] border border-ink px-4 disabled:opacity-60"
+              className="glass inline-flex h-11 items-center gap-2 rounded-full px-4 text-[0.9375rem] font-medium disabled:opacity-60"
             >
-              {busy && <span className="print-dots" aria-hidden />}
+              {busy && <span className="dots" aria-hidden />}
               {busy ? t("uploading") : t("change")}
             </button>
             {url && !busy && (

@@ -17,7 +17,7 @@ export function PasswordInput({ className, showLabel, hideLabel, ...rest }: Prop
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? hideLabel : showLabel}
         aria-pressed={visible}
-        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-2 hover:text-ink"
+        className="absolute inset-y-0 right-1 flex w-11 items-center justify-center rounded-[var(--radius-control)] text-ink-3 hover:text-ink"
       >
         {visible ? <EyeOff size={18} strokeWidth={1.75} aria-hidden /> : <Eye size={18} strokeWidth={1.75} aria-hidden />}
       </button>

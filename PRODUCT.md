@@ -45,7 +45,9 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 
 - İsim: **Linkiva**. Alan adı: **linkiva.space**.
 - Ses: samimi ve sen diye hitap eden Türkçe. Bunu abartılı jargon ya da emoji yağmuru olmadan korur.
-- Önceki görsel kimlik (siyah zemin, glassmorphism, neon parıltı, italik uppercase başlıklar) kullanıcı tarafından **reddedildi**. Referans olarak kullanılmaz.
+- v1'in görsel kimliği (bağıran italik uppercase başlıklar, şişkin kartlar, sahte "canlı" rozetler, dağınık neon) kullanıcı tarafından **reddedildi**. Referans olarak kullanılmaz.
+- v2'nin ilk yönü olan "Etiket" (Dymo bantları, çok renkli) de 2026-09-24'te **reddedildi** ("oyuncak gibi").
+- **Bağlayıcı görsel taahhütler (kullanıcı, 2026-09-24):** premium his, yumuşak ve az renk; **glassmorphism / liquid glass**; açık ve koyu tema (varsayılan sisteme göre); marka vurgusu **monokrom**; neon/parlak renkler **yalnızca anlam taşıdığı yerde** (analitikte yeşil iyi, kırmızı kötü, mavi bilgi); mobilde **Instagram tarzı alt sekme çubuğu**.
 
 ## Evidence on Hand
 

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
-import { Tape } from "@/components/ui/tape";
+import { cn } from "@/lib/cn";
 import { sanitizeUsernameInput, USERNAME_MAX } from "@/lib/validation/username";
 import { checkUsername, createProfile, type UsernameStatus } from "../actions";
 
@@ -31,17 +31,17 @@ export function OnboardingForm({ initialUsername, host }: { initialUsername: str
   return (
     <form action={formAction} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("onboarding.title")}</h1>
+        <h1 className="text-[1.75rem] leading-tight font-semibold tracking-[-0.03em]">{t("onboarding.title")}</h1>
         <p className="text-ink-2">{t("onboarding.lede")}</p>
       </div>
 
-      {/* The address prints onto a tape as it is typed (DESIGN.md §1, signature interaction). */}
-      <div aria-hidden className="min-h-11 overflow-hidden">
-        <Tape tone="red" size="lg" lang="en" translate="no" tiltSeed={username || "x"} className="max-w-full">
-          <span className="truncate">
-            {host}/{username || "_"}
-          </span>
-        </Tape>
+      {/* Live address preview: a glass chip whose dot lights up when the name is free. */}
+      <div aria-hidden className="glass-flat flex h-12 min-w-0 items-center gap-2.5 rounded-full px-4">
+        <span className={cn("size-2 shrink-0 rounded-full transition-colors", available ? "neon bg-positive text-positive" : "bg-ink-3")} />
+        <span lang="en" translate="no" className="truncate text-[0.9375rem]">
+          <span className="text-ink-3">{host}/</span>
+          <span className="font-medium">{username || "…"}</span>
+        </span>
       </div>
 
       {result && !result.ok && result.error !== "taken" && (
@@ -61,7 +61,7 @@ export function OnboardingForm({ initialUsername, host }: { initialUsername: str
           checking ? (
             t("onboarding.checking")
           ) : available ? (
-            <span className="inline-flex items-center gap-1.5 text-tape-green">
+            <span className="inline-flex items-center gap-1.5 text-positive">
               <CircleCheck size={16} strokeWidth={1.75} aria-hidden />
               {t("onboarding.available", { username })}
             </span>
@@ -70,7 +70,7 @@ export function OnboardingForm({ initialUsername, host }: { initialUsername: str
       >
         {({ id, describedBy, invalid }) => (
           <div className="flex items-stretch">
-            <span lang="en" className="flex items-center rounded-l-[var(--radius-panel)] border border-r-0 border-hairline bg-ground px-3 text-sm text-ink-2">
+            <span lang="en" className="flex items-center rounded-l-[var(--radius-control)] border border-r-0 border-glass-edge bg-glass-strong px-3 text-sm text-ink-3">
               {host}/
             </span>
             <Input

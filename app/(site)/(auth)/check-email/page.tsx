@@ -14,7 +14,7 @@ export default async function CheckEmailPage({ searchParams }: PageProps<"/check
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-3xl font-extrabold tracking-[-0.02em] [font-variation-settings:'wdth'_88]">{t("title")}</h1>
+      <h1 className="text-[1.75rem] leading-tight font-semibold tracking-[-0.03em]">{t("title")}</h1>
       <p className="text-ink">
         {email
           ? t.rich("body", { email, strong: (chunks) => <strong>{chunks}</strong> })

@@ -37,11 +37,11 @@
 ## Faz 1: Kimlik ve onboarding
 
 - [x] Auth kurulumu (Better Auth 1.7): e-posta+şifre (doğrulama zorunlu), Google (env varsa), şifre sıfırlama, e-posta değiştirme (yeni adres doğrulanınca geçer). Güvenli hesap bağlama (`requireLocalEmailVerified`, S2 kapandı). *Oturum listesi ve e-posta değiştirme arayüzü Faz 5'teki Ayarlar sayfasında.*
-- [x] Mail şablonları (TR/EN, next-intl `createTranslator`), Etiket dünyasında tablo tabanlı HTML. Resend anahtarı yoksa geliştirmede `tmp/mailbox/` klasörüne yazılır.
+- [x] Mail şablonları (TR/EN, next-intl `createTranslator`), "Cam" dilinde tablo tabanlı HTML. Resend anahtarı yoksa geliştirmede `tmp/mailbox/` klasörüne yazılır.
 - [x] Rate limit: **Upstash yerine Better Auth'un DB depolaması** (`rate_limit` tablosu, serverless örnekler arası paylaşılır). Kurallar: giriş 5/dk, kayıt 5/10dk, sıfırlama 3/10dk, doğrulama maili 3/10dk. Upstash, Faz 4'te beacon için kalıyor.
 - [x] `proxy.ts` iyimser yönlendirme + `dashboard/layout.tsx` içinde gerçek `requireSession()` ve profil kontrolü.
 - [x] Onboarding: kullanıcı adı (anlık müsaitlik, rezerve liste, öneri, Türkçe harf çevirisi, landing'den taşınan ad), görünen ad. *Avatar Faz 2'de görsel yükleme ile birlikte.*
-- [x] Auth ve onboarding ekranları Etiket dünyasında.
+- [x] Auth ve onboarding ekranları (tasarım dili: "Cam").
 
 **Kabul:** Kayıt → mail → doğrulama → onboarding → panel akışı Playwright ile geçiyor. Kullanıcı keşfi mümkün değil. S1–S9 maddelerinden auth ile ilgili olanlar kapalı.
 
@@ -58,7 +58,7 @@
 - [x] Editör: blok ekle, satır içi düzenleme + otomatik kayıt, görünürlük, öne çıkar, yukarı/aşağı taşı, sil + "Geri al", dnd-kit sıralama (klavye dahil), sosyal hesaplar (yapıştırılan URL handle'a çevrilir), profil adı/bio.
 - [x] Server action deseni: `withProfile` → zod → sahiplik filtresi → yazma → `updateTag`. Sonuç tipi `{ ok, data } | { ok:false, error }`.
 - [x] Canlı önizleme (masaüstünde yapışkan telefon, mobilde sheet). Yerel iyimser durum + hata olursa geri alma. `useOptimistic` yerine düz state kullanıldı, çünkü otomatik kayıt debounce'lu.
-- [x] Public profil: ISR (`generateStaticParams` boş + etiketli veri önbelleği), `notFound()` gerçek 404, Etiket teması, `opengraph-image.tsx`, `sitemap.ts`, `robots.ts`, `/l/[blockId]` yönlendirmesi (tıklama sayımı Faz 4).
+- [x] Public profil: ISR (`generateStaticParams` boş + etiketli veri önbelleği), `notFound()` gerçek 404, varsayılan "Cam" teması, `opengraph-image.tsx`, `sitemap.ts`, `robots.ts`, `/l/[blockId]` yönlendirmesi (tıklama sayımı Faz 4).
 - [x] Görsel yükleme: Blob client upload, oturum kontrollü token, kullanıcı klasörüne sabit yol, tür/boyut sınırı, canvas ile 512px WebP, eski blob'u silme. ⚠️ *Yerelde Blob anahtarı kapalı (v1 production deposu). Uçtan uca yükleme testi yeni bir Blob deposuyla Faz 5'te yapılacak.*
 - [x] QR (SVG + 1024px PNG indirme, `lib/site.ts` URL'i), adresi kopyala, sayfayı aç.
 
@@ -71,13 +71,24 @@
 - `E2E` bayrağı artık yalnızca `NEXT_PUBLIC_APP_URL` localhost iken geçerli (`isE2E`).
 - zod 4 tuzağı: `z.record(z.enum(...))` tüm anahtarları zorunlu kılar, kısmi kayıt için `z.partialRecord` kullanılmalı.
 
+## Ara adım: Tasarım yönü değişikliği "Etiket" → "Cam" (2026-09-24) ✅
+
+Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü kendisi belirledi: premium, yumuşak, glassmorphism/liquid glass, açık+koyu tema (sisteme göre), monokrom marka vurgusu, yalnızca anlamlı yerlerde neon (analitik), mobilde Instagram tarzı alt sekme çubuğu.
+- [x] DESIGN.md baştan yazıldı, PRODUCT.md'ye bağlayıcı görsel taahhütler eklendi.
+- [x] Token'lar (açık/koyu), cam malzemesi (3 yoğunluk, liquid kenar, specular), Geist + Geist Mono, ortam ışığı.
+- [x] Tüm primitive'ler, auth/onboarding, editör, public profil, landing ilk ekranı, OG görseli, mail şablonu, favicon.
+- [x] Mobil alt sekme çubuğu (Linkler · Görünüm · Önizle · İstatistik · Ayarlar) + sıvı gösterge. Masaüstü cam kenar çubuğu.
+- [x] Ayarlar sayfası (tema: sistem/açık/koyu, dil). Görünüm ve İstatistik fazları gelene kadar dürüst "yakında" ekranı.
+- [x] Profil teması varsayılanı `cam` (migration `profile_theme_cam`).
+- 🐞 Bulunup düzeltilen: önizleme context'inde sonsuz render döngüsü (setter ayrı context'e alındı).
+
 ## Faz 3: Görünüm ve ek bloklar
 
-- [ ] 6 tema (`etiket, sade, gece, risograf, terminal, afis`) + özelleştirme (vurgu, font, buton stili, arka plan görseli, markayı gizle). Kontrast koruması.
+- [ ] Temalar (`cam` varsayılan; `sade`, `gece`, `kagit`, `terminal`, `afis`: DESIGN.md'deki cam diline uyumlu, profil sahibinin seçtiği) + özelleştirme (vurgu, font, buton stili, arka plan görseli, markayı gizle, açık/koyu sabitleme). Kontrast koruması.
 - [ ] Görünüm sayfasında canlı önizleme ile anında geri bildirim.
 - [ ] EMBED bloğu (YouTube, Spotify, SoundCloud; `lite` gömme: tıklanana kadar iframe yüklenmez, önce önizleme görseli gösterilir).
 - [ ] EMAIL_CAPTURE bloğu + "Kitle" sayfası (abone listesi, CSV dışa aktarma), rate limit, çift abone engeli.
-- [ ] Planlı bloklar (`startsAt`/`endsAt`), editörde "planlı" bant durumu.
+- [ ] Planlı bloklar (`startsAt`/`endsAt`), editörde "planlı" durum rozeti.
 - [ ] SEO ayarları (başlık, açıklama), profil yayında/gizli anahtarı.
 
 **Kabul:** Her tema kontrast testinden geçiyor. Embed profili yavaşlatmıyor (iframe tembel yükleniyor). Abone formu JS kapalıyken de çalışıyor (progressive enhancement).

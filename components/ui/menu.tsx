@@ -48,7 +48,7 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex size-11 items-center justify-center rounded-[var(--radius-panel)] text-ink-2 hover:bg-ground hover:text-ink"
+        className="flex size-11 items-center justify-center rounded-full text-ink-2 hover:bg-glass hover:text-ink"
       >
         <MoreHorizontal size={20} strokeWidth={1.75} aria-hidden />
       </button>
@@ -56,7 +56,7 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
         <div
           id={menuId}
           role="menu"
-          className="absolute top-full right-0 z-30 mt-1 min-w-52 rounded-[var(--radius-panel)] border border-hairline bg-panel py-1 shadow-[var(--shadow-pop)]"
+          className="glass-float sheet-in absolute top-full right-0 z-30 mt-1 min-w-56 rounded-[var(--radius-control)] p-1.5"
         >
           {items.map((item) => (
             <button
@@ -69,8 +69,8 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
                 item.onSelect();
               }}
               className={cn(
-                "flex min-h-11 w-full items-center gap-3 px-3 text-left text-[0.9375rem] hover:bg-ground focus-visible:bg-ground focus-visible:outline-none disabled:opacity-45",
-                item.danger ? "text-danger" : "text-ink",
+                "flex min-h-11 w-full items-center gap-3 rounded-[8px] px-3 text-left text-[0.9375rem] hover:bg-glass-strong focus-visible:bg-glass-strong focus-visible:outline-none disabled:opacity-40",
+                item.danger ? "text-negative" : "text-ink",
               )}
             >
               {item.icon}
