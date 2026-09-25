@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 import { SOCIAL_PLATFORMS, socialUrl } from "@/lib/socials";
 import { parseBlock, type ParsedBlock } from "@/lib/validation/blocks";
-import { inkOn, resolveAppearance } from "@/themes";
+import { GROUND, inkOn, readableAccent, resolveAppearance, type ResolvedAppearance } from "@/themes";
 import { parseEmbed } from "@/lib/embeds";
 import { EmbedCard } from "./embed-card";
 import type { ProfileLabels } from "./labels";
@@ -35,7 +35,7 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
     .filter((b): b is { id: string; highlighted: boolean; parsed: ParsedBlock } => b.parsed !== null);
 
   const look = resolveAppearance(profile.theme, profile.appearance);
-  const sceneStyle = (look.accent ? { "--p-accent": look.accent, "--p-accent-ink": inkOn(look.accent) } : {}) as React.CSSProperties;
+  const sceneStyle = sceneVars(look);
 
   return (
     <div
@@ -120,6 +120,25 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
   );
 }
 
+/** The scene's CSS variables: accent (with a readable tone per ground) and the background dim. */
+function sceneVars(look: ResolvedAppearance): React.CSSProperties {
+  const vars: Record<string, string> = {};
+  if (look.accent) {
+    const light = readableAccent(look.accent, GROUND.light);
+    const dark = readableAccent(look.accent, GROUND.dark);
+    Object.assign(vars, {
+      "--p-accent": look.accent,
+      "--p-accent-ink": inkOn(look.accent),
+      "--p-fg-light": light,
+      "--p-fg-ink-light": inkOn(light),
+      "--p-fg-dark": dark,
+      "--p-fg-ink-dark": inkOn(dark),
+    });
+  }
+  if (look.backgroundUrl) vars["--p-dim"] = `${look.backgroundDim}%`;
+  return vars as React.CSSProperties;
+}
+
 const linkClass = "p-btn glass-interactive group";
 
 function BlockView({ id, block, highlighted, mode, labels }: { id: string; block: ParsedBlock; highlighted: boolean; mode: "public" | "preview"; labels: ProfileLabels }) {
@@ -161,5 +180,28 @@ function BlockView({ id, block, highlighted, mode, labels }: { id: string; block
     }
     case "EMAIL_CAPTURE":
       return <SubscribeForm blockId={id} title={block.data.title} labels={labels} inert={mode === "preview"} />;
+    case "IMAGE": {
+      const { src, alt, title, url, w, h } = block.data;
+      const frame = "glass block w-full overflow-hidden rounded-[var(--radius-card)] p-1.5";
+      const image = (
+        // eslint-disable-next-line @next/next/no-img-element -- owner upload, resized to WebP before upload
+        <img src={src} alt={alt ?? ""} width={w} height={h} loading="lazy" decoding="async" className="h-auto w-full rounded-[14px] bg-glass-strong object-cover" />
+      );
+      return (
+        <figure className="flex w-full flex-col items-center gap-2">
+          {!url ? (
+            <div className={frame}>{image}</div>
+          ) : mode === "public" ? (
+            // Through /l/<id> like a link, so taps are counted.
+            <a href={`/l/${id}`} className={cn(frame, "glass-interactive")} rel="noopener">
+              {image}
+            </a>
+          ) : (
+            <span className={frame}>{image}</span>
+          )}
+          {title && <figcaption className="max-w-[48ch] px-2 text-center text-[0.875rem] text-ink-2 text-pretty">{title}</figcaption>}
+        </figure>
+      );
+    }
   }
 }

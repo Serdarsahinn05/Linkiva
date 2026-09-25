@@ -16,8 +16,12 @@
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --text-display: clamp(2.5rem, 6vw, 4.5rem);
+}
 
-  /* Colours are defined per theme below; these make them Tailwind utilities (bg-glass, text-ink-2…). */
+/* Colours are defined per theme below; these make them Tailwind utilities (bg-glass, text-ink-2…).
+   inline: utilities read var(--c-*) on the element itself, so a nested theme (a light profile preview
+   inside the dark dashboard) gets its own colours instead of the page root's. */
+@theme inline {
   --color-bg: var(--c-bg);
   --color-ink: var(--c-ink);
   --color-ink-2: var(--c-ink-2);
@@ -391,8 +395,23 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, color-mix(in oklch, var(--c-bg) 55%, transparent), color-mix(in oklch, var(--c-bg) 80%, transparent));
+    /* --p-dim is the owner's "Karartma" (themes: backgroundDim); the lower page gets a little more ground. */
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--c-bg) var(--p-dim, 55%), transparent),
+      color-mix(in oklch, var(--c-bg) min(calc(var(--p-dim, 55%) + 25%), 95%), transparent)
+    );
   }
+
+  /* Accent used as text/border (outline buttons): a per-ground readable tone (themes: readableAccent). */
+  .profile-scene { --p-fg: var(--p-fg-light, var(--p-accent, var(--c-ink))); --p-fg-ink: var(--p-fg-ink-light, var(--p-accent-ink, var(--c-bg))); }
+  [data-theme="dark"] .profile-scene,
+  .profile-scene[data-theme="dark"] { --p-fg: var(--p-fg-dark, var(--p-accent, var(--c-ink))); --p-fg-ink: var(--p-fg-ink-dark, var(--p-accent-ink, var(--c-bg))); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .profile-scene { --p-fg: var(--p-fg-dark, var(--p-accent, var(--c-ink))); --p-fg-ink: var(--p-fg-ink-dark, var(--p-accent-ink, var(--c-bg))); }
+  }
+  /* A profile pinned to light inside a dark page (editor preview) keeps its light tone. */
+  :root .profile-scene[data-theme="light"] { --p-fg: var(--p-fg-light, var(--p-accent, var(--c-ink))); --p-fg-ink: var(--p-fg-ink-light, var(--p-accent-ink, var(--c-bg))); }
 
   /* ─── Link buttons: glass | solid | outline ─── */
   .p-btn {
@@ -433,12 +452,12 @@
   [data-button="solid"] .p-btn:hover { opacity: 0.92; }
   [data-button="solid"] .p-btn[data-highlight] { box-shadow: 0 0 0 3px var(--c-bg), 0 0 0 5px var(--p-accent, var(--c-accent)); }
   [data-button="outline"] .p-btn {
-    border: 1.5px solid color-mix(in oklch, var(--p-accent, var(--c-ink)) 75%, transparent);
-    color: var(--p-accent, var(--c-ink));
+    border: 1.5px solid color-mix(in oklch, var(--p-fg) 75%, transparent);
+    color: var(--p-fg);
   }
-  [data-button="outline"] .p-btn:hover { background: color-mix(in oklch, var(--p-accent, var(--c-ink)) 10%, transparent); }
+  [data-button="outline"] .p-btn:hover { background: color-mix(in oklch, var(--p-fg) 10%, transparent); }
   [data-button="outline"] .p-btn[data-highlight] {
-    background: var(--p-accent, var(--c-ink));
-    color: var(--p-accent-ink, var(--c-bg));
+    background: var(--p-fg);
+    color: var(--p-fg-ink);
   }
 }

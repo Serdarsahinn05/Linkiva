@@ -41,9 +41,9 @@ export default async function HomePage() {
   const tl = await getTranslations("landing");
   const links = tl.raw("sampleLinks") as string[];
 
-  // Synthetic sample profile, clearly labelled as such (not a real user).
+  // Sample profile (the maker's own), labelled as a sample; links are inert in preview mode.
   const sample: ProfileViewData = {
-    username: "deniz",
+    username: "serdar",
     displayName: tl("sampleName"),
     bio: tl("sampleBio"),
     avatarUrl: null,
@@ -51,14 +51,14 @@ export default async function HomePage() {
     theme: "cam",
     appearance: {},
     socials: [
-      { platform: "INSTAGRAM", handle: "deniz" },
-      { platform: "BEHANCE", handle: "deniz" },
-      { platform: "EMAIL", handle: "deniz@example.com" },
+      { platform: "GITHUB", handle: "Serdarsahinn05" },
+      { platform: "LINKEDIN", handle: "serdarsahin" },
+      { platform: "EMAIL", handle: "hello@linkiva.space" },
     ],
     blocks: [
       { id: "s1", type: "HEADER", data: { text: tl("sampleHeader") }, isHighlighted: false },
-      { id: "s2", type: "LINK", data: { title: links[0], url: "https://example.com" }, isHighlighted: true },
-      { id: "s3", type: "LINK", data: { title: links[1], url: "https://example.com" }, isHighlighted: false },
+      { id: "s2", type: "LINK", data: { title: links[0], url: site.url }, isHighlighted: true },
+      { id: "s3", type: "LINK", data: { title: links[1], url: "https://github.com/Serdarsahinn05" }, isHighlighted: false },
       { id: "s4", type: "LINK", data: { title: links[2], url: "https://example.com" }, isHighlighted: false },
       { id: "s5", type: "EMAIL_CAPTURE", data: { title: tl("sampleCapture") }, isHighlighted: false },
     ],

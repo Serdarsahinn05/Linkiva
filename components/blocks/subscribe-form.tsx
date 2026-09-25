@@ -47,7 +47,8 @@ export function SubscribeForm({ blockId, title, labels, inert }: { blockId: stri
               type="submit"
               disabled={pending || inert}
               aria-label={labels.subscribeButton}
-              className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[var(--p-accent,var(--c-accent))] px-4 text-sm font-medium text-[var(--p-accent-ink,var(--c-accent-ink))] disabled:opacity-60"
+              // Dimmed only while sending; the inert preview must look like the real button.
+              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[var(--p-accent,var(--c-accent))] px-4 text-sm font-medium text-[var(--p-accent-ink,var(--c-accent-ink))] ${pending ? "opacity-60" : ""}`}
             >
               {pending ? <span className="dots" aria-hidden /> : <ArrowRight size={16} aria-hidden />}
               <span className="max-[380px]:sr-only">{labels.subscribeButton}</span>

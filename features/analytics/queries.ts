@@ -78,7 +78,7 @@ export async function getAnalytics(profile: { id: string; timezone: string }, ra
       WHERE "profileId" = ${profile.id} ${from ? Prisma.sql`AND "createdAt" >= ${from}` : Prisma.empty}
       GROUP BY 1 ORDER BY 1`),
     db.event.groupBy({ by: ["blockId"], where: { profileId: profile.id, type: "CLICK", createdAt, blockId: { not: null } }, _count: { _all: true } }),
-    db.block.findMany({ where: { profileId: profile.id, type: "LINK" }, select: { id: true, type: true, data: true }, orderBy: { position: "asc" } }),
+    db.block.findMany({ where: { profileId: profile.id, type: { in: ["LINK", "IMAGE"] } }, select: { id: true, type: true, data: true }, orderBy: { position: "asc" } }),
     db.$queryRaw<{ key: string | null; count: number }[]>(Prisma.sql`
       SELECT coalesce("utmSource", "referrerHost", 'direct') AS key, count(*)::int AS count
       FROM "event" WHERE "profileId" = ${profile.id} AND type = 'VIEW' ${from ? Prisma.sql`AND "createdAt" >= ${from}` : Prisma.empty}
@@ -91,9 +91,12 @@ export async function getAnalytics(profile: { id: string; timezone: string }, ra
 
   const clicksByBlock = new Map(clickGroups.map((g) => [g.blockId, g._count._all]));
   const links = blocks
+    // An image counts as a link only when it has one.
+    .filter((b) => b.type === "LINK" || Boolean((b.data as { url?: string } | null)?.url))
     .map((b) => {
       const parsed = parseBlock(b.type, b.data);
-      const title = parsed?.type === "LINK" ? parsed.data.title : String((b.data as { title?: string })?.title ?? "—");
+      const draft = b.data as { title?: string; alt?: string } | null;
+      const title = parsed?.type === "LINK" ? parsed.data.title : draft?.title || draft?.alt || "—";
       const clicks = clicksByBlock.get(b.id) ?? 0;
       return { id: b.id, title, clicks, ctr: totals.views > 0 ? clicks / totals.views : 0 };
     })

@@ -140,7 +140,7 @@ model Profile {
   updatedAt      DateTime @updatedAt
 }
 
-enum BlockType { LINK HEADER TEXT EMBED EMAIL_CAPTURE DIVIDER }
+enum BlockType { LINK HEADER TEXT EMBED EMAIL_CAPTURE DIVIDER IMAGE }   // IMAGE: migration block_image
 
 model Block {
   id          String    @id @default(cuid())

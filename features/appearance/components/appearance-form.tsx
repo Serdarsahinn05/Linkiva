@@ -1,7 +1,7 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
-import { Check, CircleAlert, ImagePlus, Monitor, Moon, Sun } from "lucide-react";
+import { Check, CircleAlert, Info, ImagePlus, Monitor, Moon, Sun } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
@@ -18,15 +18,19 @@ import { useAutosave } from "@/features/editor/components/use-autosave";
 import type { EditorBlock, EditorProfile, EditorSocials } from "@/features/editor/types";
 import { cn } from "@/lib/cn";
 import { liveBlocks } from "@/lib/schedule";
-import { toWebp } from "@/lib/image";
+import { averageLuminance, toWebp } from "@/lib/image";
 import { AVATAR_MAX_BYTES, AVATAR_TYPES, userUploadPrefix } from "@/lib/uploads";
 import {
   appearanceSchema,
   BUTTON_KEYS,
-  contrastRatio,
+  DIM_MAX,
   FONT_KEYS,
+  GROUND,
   isThemeKey,
+  minDim,
+  readableAccent,
   resolveAppearance,
+  suggestForBackground,
   THEME_KEYS,
   type AppearanceOverrides,
   type ThemeKey,
@@ -34,8 +38,6 @@ import {
 import { updateAppearance } from "../actions";
 
 const ACCENTS = ["#FF5A36", "#E0457B", "#2F6BFF", "#7CF5A8", "#F2B33D", "#3A2E26", "#111318"];
-const LIGHT_BG = "#F4F4F8";
-const DARK_BG = "#0B0D12";
 
 type Props = {
   userId: string;
@@ -63,8 +65,9 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
   }
 
   function pickTheme(key: ThemeKey) {
-    // A new theme starts clean; only the owner's background image is kept.
-    const next: AppearanceOverrides = overrides.backgroundUrl ? { backgroundUrl: overrides.backgroundUrl } : {};
+    // A new theme starts clean; only the owner's background image (and how it is dimmed) is kept.
+    const { backgroundUrl, backgroundDim, backgroundTone } = overrides;
+    const next: AppearanceOverrides = backgroundUrl ? { backgroundUrl, backgroundDim, backgroundTone } : {};
     setTheme(key);
     setOverrides(next);
     save({ theme: key, overrides: next });
@@ -82,12 +85,16 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
     if (file.size > AVATAR_MAX_BYTES * 3) return setUploadError(t("editor.avatar.tooBig"));
     setUploading(true);
     try {
-      const blob = await upload(`${userUploadPrefix(userId)}background.webp`, await toWebp(file, 2048), {
+      const webp = await toWebp(file, 2048);
+      const tone = Math.round((await averageLuminance(webp)) * 100) / 100;
+      const blob = await upload(`${userUploadPrefix(userId)}background.webp`, webp, {
         access: "public",
         handleUploadUrl: "/api/upload",
         contentType: "image/webp",
       });
-      override({ backgroundUrl: blob.url });
+      // Readable from the start: the mode that suits the photo, dimmed just enough (the owner can change both).
+      const { mode, dim } = suggestForBackground(tone);
+      override({ backgroundUrl: blob.url, backgroundTone: tone, backgroundDim: dim, mode });
     } catch {
       setUploadError(t("editor.avatar.failed"));
     } finally {
@@ -95,11 +102,11 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
     }
   }
 
-  // Outline buttons put the accent directly on the page: warn when it would be hard to read.
-  const lowContrast =
-    look.accent !== null &&
-    look.button === "outline" &&
-    (look.mode === "light" ? [LIGHT_BG] : look.mode === "dark" ? [DARK_BG] : [LIGHT_BG, DARK_BG]).some((bg) => contrastRatio(look.accent!, bg) < 3);
+  const grounds = (look.mode === "system" ? ["light", "dark"] : [look.mode]) as ("light" | "dark")[];
+  // Outline buttons put the accent on the page itself; the profile shifts it to a readable tone per ground.
+  const accentAdjusted = look.accent !== null && look.button === "outline" && grounds.some((g) => readableAccent(look.accent!, GROUND[g]) !== look.accent);
+  // The dim a background image needs for text to stay readable in every mode the profile can show.
+  const neededDim = look.backgroundUrl && look.backgroundTone !== null ? Math.max(...grounds.map((g) => minDim(look.backgroundTone!, g))) : 0;
 
   const preview = (
     <ProfileView
@@ -219,10 +226,10 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
                 {t("appearance.accentCustom")}
               </label>
             </div>
-            {lowContrast && (
-              <p className="flex items-center gap-1.5 text-sm text-warning">
-                <CircleAlert size={15} aria-hidden />
-                {t("appearance.lowContrast")}
+            {accentAdjusted && (
+              <p className="flex items-start gap-1.5 text-sm text-ink-2">
+                <Info size={15} className="mt-0.5 shrink-0" aria-hidden />
+                {t("appearance.accentAdjusted")}
               </p>
             )}
           </Option>
@@ -260,6 +267,38 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
               <p className="text-sm text-ink-3">{t("appearance.backgroundDisabled")}</p>
             )}
             {uploadError && <Notice tone="error">{uploadError}</Notice>}
+            {look.backgroundUrl && (
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="flex items-center justify-between gap-4 text-sm">
+                  <span className="font-medium">{t("appearance.dim")}</span>
+                  <span className="font-mono text-ink-2 tabular-nums">%{look.backgroundDim}</span>
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={DIM_MAX}
+                  step={5}
+                  value={look.backgroundDim}
+                  aria-label={t("appearance.dim")}
+                  aria-valuetext={`%${look.backgroundDim}`}
+                  onChange={(e) => override({ backgroundDim: Number(e.target.value) })}
+                  className="h-11 w-full cursor-pointer accent-ink"
+                />
+                {look.backgroundDim < neededDim ? (
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="flex items-center gap-1.5 text-sm text-warning">
+                      <CircleAlert size={15} aria-hidden />
+                      {t("appearance.dimLow")}
+                    </p>
+                    <button type="button" onClick={() => override({ backgroundDim: neededDim })} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md)}>
+                      {t("appearance.dimFix")}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-ink-3">{t("appearance.dimHint")}</p>
+                )}
+              </div>
+            )}
           </Option>
 
           <div className="flex items-center justify-between gap-4">

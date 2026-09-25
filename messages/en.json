@@ -61,15 +61,11 @@
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
     "privacy": "Privacy",
-    "sampleName": "Deniz Aydın",
-    "sampleBio": "Illustrator · Istanbul",
-    "sampleHeader": "Work",
-    "sampleLinks": [
-      "Portfolio",
-      "Print shop",
-      "Workshop dates"
-    ],
-    "sampleCapture": "Hear about new work"
+    "sampleName": "Serdar Şahin",
+    "sampleBio": "Computer engineer · Ankara",
+    "sampleHeader": "Projects",
+    "sampleLinks": ["Linkiva", "GitHub", "Résumé"],
+    "sampleCapture": "Hear about new projects"
   },
   "auth": {
     "fields": {
@@ -245,6 +241,7 @@
       "LINK": "Link",
       "HEADER": "Header",
       "TEXT": "Text",
+      "IMAGE": "Image",
       "DIVIDER": "Divider",
       "EMBED": "Embed",
       "EMAIL_CAPTURE": "Email"
@@ -289,6 +286,21 @@
       "wrongType": "Choose a JPG, PNG or WebP image.",
       "tooBig": "The image must be under 5 MB.",
       "failed": "Could not upload the photo. Try again."
+    },
+    "image": {
+      "choose": "Choose image",
+      "replace": "Replace",
+      "uploading": "Uploading",
+      "alt": "What's in the image?",
+      "altPlaceholder": "What's in it? (e.g. speaking on stage)",
+      "altHint": "Read aloud to visitors who can't see it.",
+      "caption": "Caption (optional)",
+      "link": "Link (optional)",
+      "linkPlaceholder": "Address to open on tap",
+      "disabled": "Image uploads are off in this environment.",
+      "wrongType": "Pick a JPG, PNG or WebP image.",
+      "tooBig": "The image must be under 5 MB.",
+      "failed": "Couldn't upload the image. Try again."
     },
     "embedUrl": "Video or music link",
     "embedPlaceholder": "youtube.com/watch?v=… or open.spotify.com/…",
@@ -393,7 +405,11 @@
     "backgroundDisabled": "Image uploads are turned off in this environment.",
     "branding": "Show the Linkiva badge",
     "brandingHint": "Removing it is free.",
-    "lowContrast": "This colour is hard to read in the selected mode."
+    "accentAdjusted": "On outline buttons this colour is shaded slightly darker or lighter so text stays readable.",
+    "dim": "Dim",
+    "dimHint": "The page's ground is laid over the image so text stays readable.",
+    "dimLow": "Text may be hard to read at this setting.",
+    "dimFix": "Make readable"
   },
   "blocks": {
     "embedPlay": "Play",

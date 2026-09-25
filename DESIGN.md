@@ -166,7 +166,8 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 | `afis` | açık | Bricolage Grotesque | dolu | vurgu renginden | #FF5A36 |
 
 - Özelleştirme: mod (ziyaretçiye göre/açık/koyu), font (5), buton stili (cam/dolu/çizgi), vurgu rengi (hazır + özel), arka plan görseli (kendi zemin rengiyle karartılır), "Linkiva" rozetini gizleme.
-- **Kontrast koruması:** Dolu butonda yazı rengi vurgu renginden otomatik seçilir (`inkOn`, ≥ 4.5:1 testli). Çizgi butonda vurgu, seçili modun zemininde 3:1'in altındaysa Görünüm sayfası uyarır.
+- **Kontrast koruması:** Dolu butonda yazı rengi vurgu renginden otomatik seçilir (`inkOn`, ≥ 4.5:1 testli). Çizgi butonda vurgu her zemin için ayrı hesaplanan okunur bir tonla kullanılır (`readableAccent`: gerekirse siyaha/beyaza karıştırılır, hem zeminde hem dolgu olarak ≥ 4.5:1). Arka plan görseli yüklenince ortalama parlaklığı ölçülür, mod ve **karartma** (`backgroundDim`, %0–90) okunur olacak şekilde önerilir (en az %30). Karartma, ikincil yazının 4.5:1 için gerektirdiği değerin altına çekilirse Görünüm sayfası uyarır ve "Okunur yap" sunar.
+- Renk sınıfları `@theme inline` ile tanımlıdır: iç içe tema (koyu panelde açık profil önizlemesi) kendi token'larını kullanır.
 - Profil kendi sahnesini taşır (`.profile-scene` + `data-theme/scene/font/button`), bu yüzden önizlemeler ve tema kartları gerçek CSS ile çizilir.
 
 ### Landing (Persuade)

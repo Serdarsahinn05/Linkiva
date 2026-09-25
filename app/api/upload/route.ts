@@ -2,7 +2,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { env } from "@/lib/env";
-import { AVATAR_MAX_BYTES, AVATAR_TYPES, userUploadPrefix } from "@/lib/uploads";
+import { AVATAR_MAX_BYTES, AVATAR_TYPES, blockImagePrefix, userUploadPrefix } from "@/lib/uploads";
 
 /**
  * Issues short-lived client-upload tokens (the file goes browser → Blob directly).
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       body,
       onBeforeGenerateToken: async (pathname) => {
         const prefix = userUploadPrefix(session.user.id);
-        if (!pathname.startsWith(`${prefix}avatar`) && !pathname.startsWith(`${prefix}background`)) throw new Error("forbidden path");
+        const allowed = [`${prefix}avatar`, `${prefix}background`, blockImagePrefix(session.user.id)];
+        if (!allowed.some((start) => pathname.startsWith(start))) throw new Error("forbidden path");
         return {
           allowedContentTypes: [...AVATAR_TYPES],
           maximumSizeInBytes: AVATAR_MAX_BYTES,

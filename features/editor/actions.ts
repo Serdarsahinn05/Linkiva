@@ -1,6 +1,6 @@
 "use server";
 
-import { del } from "@vercel/blob";
+import { del, list } from "@vercel/blob";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { BlockType, SocialPlatform } from "@/prisma/generated/enums";
@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { normalizeSocial } from "@/lib/socials";
-import { isOwnBlobUrl } from "@/lib/uploads";
+import { blockImagePrefix, isOwnBlobUrl } from "@/lib/uploads";
 import { blockDataSchemas, blockDefaults, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
 import { profileTag } from "@/features/profile/public";
 import type { EditorBlock } from "./types";
@@ -23,12 +23,12 @@ const fail = (error: "unauthorized" | "invalid" | "notFound" | "unknown"): Actio
  * invalidates the public profile cache. Ownership is enforced by always filtering on this profile's id
  * (v1 bug S1: updates by bare id let any user edit anyone's links).
  */
-async function withProfile<T>(body: (profile: { id: string; username: string }) => Promise<ActionResult<T>>): Promise<ActionResult<T>> {
+async function withProfile<T>(body: (profile: { id: string; username: string; userId: string }) => Promise<ActionResult<T>>): Promise<ActionResult<T>> {
   try {
     const user = await requireUser();
     const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { id: true, username: true } });
     if (!profile) return fail("notFound");
-    const result = await body(profile);
+    const result = await body({ ...profile, userId: user.id });
     if (result.ok) updateTag(profileTag(profile.username));
     return result;
   } catch (error) {
@@ -65,17 +65,37 @@ export async function addBlock(type: string): Promise<ActionResult<EditorBlock>>
 
 /** Drafts may be incomplete (empty title while typing); they are stored but not rendered publicly. */
 // partialRecord: in zod 4, z.record with enum keys would require every key.
-const draftSchema = z.partialRecord(z.enum(["title", "url", "text"]), z.string().max(Math.max(TEXT_MAX, 2048)));
+const draftSchema = z.partialRecord(z.enum(["title", "url", "text", "src", "alt", "w", "h"]), z.string().max(Math.max(TEXT_MAX, 2048)));
+
+/** An Image block may only show a file from the owner's own Blob folder (not another user's upload). */
+const foreignImage = (data: { src?: string }, userId: string) => Boolean(data.src) && !isOwnBlobUrl(data.src!, userId);
+
+/**
+ * Deletes Image-block files that no block of this profile uses any more (replaced or deleted images).
+ * Runs when a new image is set, so a deleted block's file survives its undo window.
+ */
+async function collectBlockImages(profileId: string, userId: string) {
+  if (!env.BLOB_READ_WRITE_TOKEN) return;
+  const blocks = await db.block.findMany({ where: { profileId, type: "IMAGE" }, select: { data: true } });
+  const used = new Set(blocks.map((b) => (b.data as { src?: string } | null)?.src).filter(Boolean));
+  const { blobs } = await list({ prefix: blockImagePrefix(userId), token: env.BLOB_READ_WRITE_TOKEN });
+  const unused = blobs.map((b) => b.url).filter((url) => !used.has(url));
+  if (unused.length) await del(unused, { token: env.BLOB_READ_WRITE_TOKEN });
+}
 
 export async function updateBlock(id: string, data: unknown): Promise<ActionResult<EditorBlock>> {
   const draft = draftSchema.safeParse(data);
   if (!draft.success || (draft.data.title?.length ?? 0) > TITLE_MAX) return fail("invalid");
   return withProfile(async (profile) => {
-    const block = await db.block.findFirst({ where: { id, profileId: profile.id }, select: { type: true } });
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id }, select: { type: true, data: true } });
     if (!block) return fail("notFound");
+    if (foreignImage(draft.data, profile.userId)) return fail("invalid");
     // Store the normalised form when the block is complete, the raw draft otherwise.
     const complete = blockDataSchemas[block.type].safeParse(draft.data);
     const updated = await db.block.update({ where: { id }, data: { data: complete.success ? complete.data : draft.data } });
+    if (block.type === "IMAGE" && draft.data.src !== (block.data as { src?: string } | null)?.src) {
+      await collectBlockImages(profile.id, profile.userId).catch((error) => console.error("block image cleanup failed", error));
+    }
     return ok(toEditorBlock(updated));
   });
 }
@@ -134,6 +154,7 @@ export async function restoreBlock(snapshot: DeletedBlock): Promise<ActionResult
   const draft = draftSchema.safeParse(parsed.data.data);
   if (!draft.success) return fail("invalid");
   return withProfile(async (profile) => {
+    if (foreignImage(draft.data, profile.userId)) return fail("invalid");
     const { startsAt, endsAt, ...rest } = parsed.data;
     const block = await db.block.create({
       data: { ...rest, data: draft.data, profileId: profile.id, startsAt: startsAt ? new Date(startsAt) : null, endsAt: endsAt ? new Date(endsAt) : null },

@@ -5,7 +5,7 @@ import { isLive } from "@/lib/schedule";
 import { parseBlock } from "@/lib/validation/blocks";
 
 /**
- * Public link redirect. Only visible, live LINK blocks of published profiles resolve, and only to the
+ * Public link redirect. Only visible, live LINK (and linked IMAGE) blocks of published profiles resolve, and only to the
  * validated URL stored for that block. The click is recorded after the redirect is sent (docs/ARCHITECTURE.md §7).
  */
 export async function GET(request: Request, { params }: RouteContext<"/l/[blockId]">) {
@@ -21,11 +21,13 @@ export async function GET(request: Request, { params }: RouteContext<"/l/[blockI
     isLive({ startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
   const parsed = live ? parseBlock(block.type, block.data) : null;
 
-  if (parsed?.type !== "LINK" || !block) return new NextResponse("Not found", { status: 404 });
+  // Links, and images that the owner gave a link.
+  const target = parsed?.type === "LINK" || parsed?.type === "IMAGE" ? parsed.data.url : undefined;
+  if (!target || !block) return new NextResponse("Not found", { status: 404 });
 
   const headers = new Headers(request.headers);
   const profile = block.profile;
   // Referrer of a click is the profile page itself; the source is attributed from the view instead.
   after(() => recordEvent({ type: "CLICK", profile, blockId, headers }).catch((error) => console.error("click record failed", error)));
-  return NextResponse.redirect(parsed.data.url, { status: 302, headers: { "Cache-Control": "no-store" } });
+  return NextResponse.redirect(target, { status: 302, headers: { "Cache-Control": "no-store" } });
 }

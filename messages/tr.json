@@ -61,15 +61,11 @@
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
     "privacy": "Gizlilik",
-    "sampleName": "Deniz Aydın",
-    "sampleBio": "İllüstratör · İstanbul",
-    "sampleHeader": "İşler",
-    "sampleLinks": [
-      "Portfolyo",
-      "Baskı dükkânı",
-      "Atölye takvimi"
-    ],
-    "sampleCapture": "Yeni işlerden haberdar ol"
+    "sampleName": "Serdar Şahin",
+    "sampleBio": "Bilgisayar mühendisi · Ankara",
+    "sampleHeader": "Projeler",
+    "sampleLinks": ["Linkiva", "GitHub", "Özgeçmiş"],
+    "sampleCapture": "Yeni projelerden haberdar ol"
   },
   "auth": {
     "fields": {
@@ -245,6 +241,7 @@
       "LINK": "Link",
       "HEADER": "Başlık",
       "TEXT": "Metin",
+      "IMAGE": "Görsel",
       "DIVIDER": "Ayraç",
       "EMBED": "Embed",
       "EMAIL_CAPTURE": "E-posta"
@@ -289,6 +286,21 @@
       "wrongType": "JPG, PNG ya da WebP bir görsel seç.",
       "tooBig": "Görsel 5 MB'tan küçük olmalı.",
       "failed": "Fotoğraf yüklenemedi. Tekrar dene."
+    },
+    "image": {
+      "choose": "Görsel seç",
+      "replace": "Değiştir",
+      "uploading": "Yükleniyor",
+      "alt": "Görselde ne var?",
+      "altPlaceholder": "Görselde ne var? (örn. sahnede konuşurken)",
+      "altHint": "Göremeyen ziyaretçilere okunur.",
+      "caption": "Alt yazı (isteğe bağlı)",
+      "link": "Link (isteğe bağlı)",
+      "linkPlaceholder": "Tıklayınca açılacak adres",
+      "disabled": "Görsel yükleme bu ortamda kapalı.",
+      "wrongType": "JPG, PNG ya da WebP bir görsel seç.",
+      "tooBig": "Görsel 5 MB'tan küçük olmalı.",
+      "failed": "Görsel yüklenemedi. Tekrar dene."
     },
     "embedUrl": "Video ya da müzik linki",
     "embedPlaceholder": "youtube.com/watch?v=… ya da open.spotify.com/…",
@@ -393,7 +405,11 @@
     "backgroundDisabled": "Görsel yükleme bu ortamda kapalı.",
     "branding": "Linkiva yazısını göster",
     "brandingHint": "Kaldırmak ücretsiz.",
-    "lowContrast": "Bu renk seçili modda zor okunabilir."
+    "accentAdjusted": "Okunur kalsın diye bu renk, çizgi butonlarda zemine göre biraz koyulaştırılır ya da açılır.",
+    "dim": "Karartma",
+    "dimHint": "Yazılar okunsun diye görselin üstüne zemin rengi serilir.",
+    "dimLow": "Bu ayarda yazılar zor okunabilir.",
+    "dimFix": "Okunur yap"
   },
   "blocks": {
     "embedPlay": "Oynat",

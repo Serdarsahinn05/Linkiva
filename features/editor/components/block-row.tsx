@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlignLeft, ArrowDown, ArrowUp, CalendarClock, CircleAlert, GripVertical, Heading, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
+import { AlignLeft, ArrowDown, ArrowUp, CalendarClock, CircleAlert, GripVertical, Heading, ImageIcon, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormatter, useNow, useTranslations } from "next-intl";
@@ -10,9 +10,10 @@ import { Input, inputClass } from "@/components/ui/field";
 import { Menu } from "@/components/ui/menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/cn";
-import { parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { ALT_MAX, parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
 import { parseEmbed } from "@/lib/embeds";
 import { normalizeUrl } from "@/lib/validation/url";
+import { ImageField } from "./image-field";
 import { ScheduleDialog } from "./schedule-dialog";
 import type { EditorBlock } from "../types";
 
@@ -21,6 +22,7 @@ export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
   LINK: Link2,
   HEADER: Heading,
   TEXT: AlignLeft,
+  IMAGE: ImageIcon,
   EMBED: PlayCircle,
   EMAIL_CAPTURE: Mail,
   DIVIDER: Minus,
@@ -31,6 +33,8 @@ type RowProps = {
   index: number;
   count: number;
   autoFocus: boolean;
+  userId: string;
+  uploadsEnabled: boolean;
   onChange: (data: Record<string, string>) => void;
   onFlags: (flags: { isVisible?: boolean; isHighlighted?: boolean }) => void;
   onMove: (direction: -1 | 1) => void;
@@ -38,7 +42,7 @@ type RowProps = {
   onSchedule: (schedule: { startsAt: string | null; endsAt: string | null }) => void;
 };
 
-export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
+export function BlockRow({ block, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
@@ -58,7 +62,7 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
   const embedInvalid = block.type === "EMBED" && urlTouched && Boolean(block.data.url) && parseEmbed(block.data.url ?? "") === null;
 
   const complete = parseBlock(block.type, block.data) !== null;
-  const urlInvalid = block.type === "LINK" && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
+  const urlInvalid = (block.type === "LINK" || block.type === "IMAGE") && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
   const TypeIcon = BLOCK_ICON[block.type];
   const field = (key: string) => block.data[key] ?? "";
   const set = (key: string, value: string) => onChange({ ...block.data, [key]: value });
@@ -165,6 +169,34 @@ export function BlockRow({ block, index, count, autoFocus, onChange, onFlags, on
               onChange={(e) => set("text", e.target.value)}
               className={cn(inputClass, "resize-y py-2 leading-normal")}
             />
+          )}
+          {block.type === "IMAGE" && (
+            <>
+              <ImageField userId={userId} blockId={block.id} src={field("src")} enabled={uploadsEnabled} onUploaded={(image) => onChange({ ...block.data, ...image })} />
+              <Input
+                aria-label={t("image.alt")}
+                placeholder={t("image.altPlaceholder")}
+                title={t("image.altHint")}
+                value={field("alt")}
+                maxLength={ALT_MAX}
+                onChange={(e) => set("alt", e.target.value)}
+              />
+              <Input aria-label={t("image.caption")} placeholder={t("image.caption")} value={field("title")} maxLength={TITLE_MAX} onChange={(e) => set("title", e.target.value)} />
+              <Input
+                aria-label={t("image.link")}
+                placeholder={t("image.linkPlaceholder")}
+                value={field("url")}
+                inputMode="url"
+                autoCapitalize="none"
+                spellCheck={false}
+                maxLength={2048}
+                aria-invalid={urlInvalid}
+                onChange={(e) => set("url", e.target.value)}
+                onBlur={() => setUrlTouched(true)}
+                className="text-[0.9375rem] text-ink-2"
+              />
+              {urlInvalid && <p className="text-sm text-negative">{t("urlInvalid")}</p>}
+            </>
           )}
           {block.type === "EMBED" && (
             <>

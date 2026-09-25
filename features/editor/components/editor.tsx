@@ -227,6 +227,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                       index={index}
                       count={blocks.length}
                       autoFocus={block.id === focusId}
+                      userId={userId}
+                      uploadsEnabled={uploadsEnabled}
                       onChange={(data) => changeBlock(block.id, data)}
                       onFlags={(flags) => flagBlock(block.id, flags)}
                       onMove={(direction) => move(block.id, direction)}

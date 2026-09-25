@@ -116,6 +116,7 @@ enum BlockType {
   EMBED
   EMAIL_CAPTURE
   DIVIDER
+  IMAGE
 }
 
 model Block {

@@ -72,6 +72,29 @@ describe("editor actions only touch the caller's own profile (v1 bug S1)", () =>
   });
 });
 
+describe("image blocks only show the owner's own uploads", () => {
+  const blob = (userId: string) => `https://store.public.blob.vercel-storage.com/u/${userId}/block/photo.webp`;
+
+  it("rejects another user's file and any non-Blob host, accepts the owner's own", async () => {
+    const added = await actions.addBlock("IMAGE");
+    if (!added.ok) throw new Error("addBlock failed");
+    const id = added.data.id;
+    expect(await actions.updateBlock(id, { src: blob(ids.alice), alt: "x" })).toEqual({ ok: false, error: "invalid" });
+    await actions.updateBlock(id, { src: "https://evil.example/u/x.webp" });
+    const { parseBlock } = await import("@/lib/validation/blocks");
+    expect(parseBlock("IMAGE", (await db.block.findUniqueOrThrow({ where: { id } })).data)).toBeNull();
+
+    const own = await actions.updateBlock(id, { src: blob(ids.bob), alt: "Bob", title: "", url: "bob.example", w: "1200", h: "800" });
+    expect(own.ok).toBe(true);
+    expect(parseBlock("IMAGE", (await db.block.findUniqueOrThrow({ where: { id } })).data)).toMatchObject({ data: { src: blob(ids.bob), url: "https://bob.example/" } });
+  });
+
+  it("cannot restore a block pointing at someone else's file", async () => {
+    const snapshot = { id: `img-${suffix}`, type: "IMAGE" as const, data: { src: blob(ids.alice) }, position: 5, isVisible: true, isHighlighted: false, startsAt: null, endsAt: null };
+    expect(await actions.restoreBlock(snapshot)).toEqual({ ok: false, error: "invalid" });
+  });
+});
+
 describe("phase 3 actions stay inside the caller's profile", () => {
   it("cannot schedule someone else's block, and rejects an end before the start", async () => {
     expect(await actions.setBlockSchedule(aliceBlock, { startsAt: null, endsAt: "2030-01-01T00:00:00.000Z" })).toEqual({ ok: false, error: "notFound" });
