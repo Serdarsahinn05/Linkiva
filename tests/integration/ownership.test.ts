@@ -95,6 +95,24 @@ describe("image blocks only show the owner's own uploads", () => {
   });
 });
 
+describe("link preview cards", () => {
+  it("cannot turn someone else's link into a card", async () => {
+    expect(await actions.fetchLinkCard(aliceBlock, "https://example.com")).toEqual({ ok: false, error: "notFound" });
+  });
+
+  it("never fetches private addresses", async () => {
+    for (const url of ["http://127.0.0.1/", "http://localhost:3000/", "http://169.254.169.254/latest/meta-data/", "http://[::1]/"]) {
+      const result = await actions.fetchLinkCard(bobBlock, url);
+      expect(result.ok, url).toBe(false);
+    }
+  });
+
+  it("rejects a card image from someone else's folder", async () => {
+    const img = `https://store.public.blob.vercel-storage.com/u/${ids.alice}/block/card.png`;
+    expect(await actions.updateBlock(bobBlock, { title: "Bob", url: "https://bob.example/", card: "1", img })).toEqual({ ok: false, error: "invalid" });
+  });
+});
+
 describe("phase 3 actions stay inside the caller's profile", () => {
   it("cannot schedule someone else's block, and rejects an end before the start", async () => {
     expect(await actions.setBlockSchedule(aliceBlock, { startsAt: null, endsAt: "2030-01-01T00:00:00.000Z" })).toEqual({ ok: false, error: "notFound" });

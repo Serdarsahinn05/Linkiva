@@ -7,6 +7,7 @@ import { normalizeUrl } from "./url";
 export const TITLE_MAX = 80;
 export const TEXT_MAX = 500;
 export const ALT_MAX = 150;
+export const DESC_MAX = 200;
 
 const url = z.string().transform((value, ctx) => {
   const normalized = normalizeUrl(value);
@@ -37,7 +38,14 @@ const pixels = z.string().regex(/^[1-9]\d{0,4}$/).optional();
 
 /** Block.data shape per BlockType. Every read and write of Block.data goes through these. */
 export const blockDataSchemas = {
-  LINK: z.object({ title: z.string().trim().min(1).max(TITLE_MAX), url }),
+  // card: shown as a preview card (desc + img read from the page by the owner's request, img copied to our Blob).
+  LINK: z.object({
+    title: z.string().trim().min(1).max(TITLE_MAX),
+    url,
+    card: z.enum(["1", ""]).optional(),
+    desc: z.string().trim().max(DESC_MAX).optional(),
+    img: z.union([z.literal(""), z.string().max(2048).refine(isBlobStoreUrl, "img")]).optional(),
+  }),
   HEADER: z.object({ text: z.string().trim().min(1).max(TITLE_MAX) }),
   TEXT: z.object({ text: z.string().trim().min(1).max(TEXT_MAX) }),
   DIVIDER: z.object({}),

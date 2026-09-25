@@ -302,6 +302,17 @@
       "tooBig": "The image must be under 5 MB.",
       "failed": "Couldn't upload the image. Try again."
     },
+    "card": {
+      "label": "Preview card",
+      "hint": "Shown with the site's title, description and image.",
+      "loading": "Reading the page…",
+      "desc": "Description",
+      "refresh": "Fetch from the page again",
+      "needUrl": "Enter a valid address first.",
+      "unreachable": "Couldn't read this page. The link stays a plain button.",
+      "tooMany": "Too many tries. Try again in a minute.",
+      "failed": "Couldn't get the preview. Try again."
+    },
     "embedUrl": "Video or music link",
     "embedPlaceholder": "youtube.com/watch?v=… or open.spotify.com/…",
     "embedInvalid": "Paste a YouTube, Spotify or SoundCloud link.",

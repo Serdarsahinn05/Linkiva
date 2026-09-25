@@ -1,6 +1,6 @@
 "use server";
 
-import { del, list } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { BlockType, SocialPlatform } from "@/prisma/generated/enums";
@@ -8,15 +8,19 @@ import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { normalizeSocial } from "@/lib/socials";
+import { getLinkPreview } from "@/lib/link-preview";
+import { allow } from "@/lib/ratelimit";
 import { blockImagePrefix, isOwnBlobUrl } from "@/lib/uploads";
-import { blockDataSchemas, blockDefaults, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { displayHost, normalizeUrl } from "@/lib/validation/url";
+import { blockDataSchemas, blockDefaults, DESC_MAX, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
 import { profileTag } from "@/features/profile/public";
 import type { EditorBlock } from "./types";
 
-export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: "unauthorized" | "invalid" | "notFound" | "unknown" };
+type ActionError = "unauthorized" | "invalid" | "notFound" | "unknown" | "unreachable" | "tooMany";
+export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: ActionError };
 
 const ok = <T>(data: T): ActionResult<T> => ({ ok: true, data });
-const fail = (error: "unauthorized" | "invalid" | "notFound" | "unknown"): ActionResult<never> => ({ ok: false, error });
+const fail = (error: ActionError): ActionResult<never> => ({ ok: false, error });
 
 /**
  * Every mutation runs through here: resolves the caller's own profile, runs the body, then
@@ -65,10 +69,16 @@ export async function addBlock(type: string): Promise<ActionResult<EditorBlock>>
 
 /** Drafts may be incomplete (empty title while typing); they are stored but not rendered publicly. */
 // partialRecord: in zod 4, z.record with enum keys would require every key.
-const draftSchema = z.partialRecord(z.enum(["title", "url", "text", "src", "alt", "w", "h"]), z.string().max(Math.max(TEXT_MAX, 2048)));
+const draftSchema = z.partialRecord(z.enum(["title", "url", "text", "src", "alt", "w", "h", "card", "desc", "img"]), z.string().max(Math.max(TEXT_MAX, 2048)));
 
-/** An Image block may only show a file from the owner's own Blob folder (not another user's upload). */
-const foreignImage = (data: { src?: string }, userId: string) => Boolean(data.src) && !isOwnBlobUrl(data.src!, userId);
+/** Block images (Image block src, link card img) may only be files in the owner's own Blob folder. */
+const foreignImage = (data: { src?: string; img?: string }, userId: string) =>
+  [data.src, data.img].some((file) => Boolean(file) && !isOwnBlobUrl(file!, userId));
+
+const blockFiles = (data: unknown) => {
+  const d = (data ?? {}) as { src?: string; img?: string };
+  return [d.src, d.img].filter((file): file is string => Boolean(file));
+};
 
 /**
  * Deletes Image-block files that no block of this profile uses any more (replaced or deleted images).
@@ -76,8 +86,8 @@ const foreignImage = (data: { src?: string }, userId: string) => Boolean(data.sr
  */
 async function collectBlockImages(profileId: string, userId: string) {
   if (!env.BLOB_READ_WRITE_TOKEN) return;
-  const blocks = await db.block.findMany({ where: { profileId, type: "IMAGE" }, select: { data: true } });
-  const used = new Set(blocks.map((b) => (b.data as { src?: string } | null)?.src).filter(Boolean));
+  const blocks = await db.block.findMany({ where: { profileId, type: { in: ["IMAGE", "LINK"] } }, select: { data: true } });
+  const used = new Set(blocks.flatMap((b) => blockFiles(b.data)));
   const { blobs } = await list({ prefix: blockImagePrefix(userId), token: env.BLOB_READ_WRITE_TOKEN });
   const unused = blobs.map((b) => b.url).filter((url) => !used.has(url));
   if (unused.length) await del(unused, { token: env.BLOB_READ_WRITE_TOKEN });
@@ -93,9 +103,55 @@ export async function updateBlock(id: string, data: unknown): Promise<ActionResu
     // Store the normalised form when the block is complete, the raw draft otherwise.
     const complete = blockDataSchemas[block.type].safeParse(draft.data);
     const updated = await db.block.update({ where: { id }, data: { data: complete.success ? complete.data : draft.data } });
-    if (block.type === "IMAGE" && draft.data.src !== (block.data as { src?: string } | null)?.src) {
+    const [before, after] = [blockFiles(block.data), blockFiles(draft.data)];
+    // Only when the block's files changed (a new photo or card image), not on every autosaved keystroke.
+    if (before.length !== after.length || before.some((file) => !after.includes(file))) {
       await collectBlockImages(profile.id, profile.userId).catch((error) => console.error("block image cleanup failed", error));
     }
+    return ok(toEditorBlock(updated));
+  });
+}
+
+/**
+ * Turns a link into a preview card: reads the page's title, description and image once (SSRF-guarded,
+ * lib/link-preview.ts) and copies the image to the owner's Blob folder, so visitors never load it from the
+ * other site. The owner's own title is kept; the page's title only fills an empty one.
+ */
+export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionResult<EditorBlock>> {
+  const url = typeof rawUrl === "string" ? normalizeUrl(rawUrl) : null;
+  if (!url || !/^https?:/.test(url)) return fail("invalid");
+  return withProfile(async (profile) => {
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: "LINK" }, select: { data: true } });
+    if (!block) return fail("notFound");
+    if (!(await allow("link-card", profile.userId, 10, 60))) return fail("tooMany");
+
+    const preview = await getLinkPreview(url);
+    if (!preview) return fail("unreachable");
+
+    let img = "";
+    if (preview.imageFile && env.BLOB_READ_WRITE_TOKEN) {
+      const ext = preview.imageFile.type.split("/")[1];
+      const stored = await put(`${blockImagePrefix(profile.userId)}${id}-card.${ext}`, preview.imageFile.bytes, {
+        access: "public",
+        contentType: preview.imageFile.type,
+        addRandomSuffix: true,
+        token: env.BLOB_READ_WRITE_TOKEN,
+      });
+      img = stored.url;
+    }
+
+    const current = draftSchema.safeParse(block.data).data ?? {};
+    const next = {
+      ...current,
+      url,
+      title: current.title?.trim() || (preview.title ?? displayHost(url)).slice(0, TITLE_MAX),
+      card: "1",
+      desc: (preview.description ?? "").slice(0, DESC_MAX),
+      img,
+    };
+    const complete = blockDataSchemas.LINK.safeParse(next);
+    const updated = await db.block.update({ where: { id }, data: { data: complete.success ? complete.data : next } });
+    await collectBlockImages(profile.id, profile.userId).catch((error) => console.error("block image cleanup failed", error));
     return ok(toEditorBlock(updated));
   });
 }

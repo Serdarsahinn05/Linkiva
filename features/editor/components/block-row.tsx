@@ -14,6 +14,7 @@ import { ALT_MAX, parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/block
 import { parseEmbed } from "@/lib/embeds";
 import { normalizeUrl } from "@/lib/validation/url";
 import { ImageField } from "./image-field";
+import { LinkCardFields } from "./link-card-fields";
 import { ScheduleDialog } from "./schedule-dialog";
 import type { EditorBlock } from "../types";
 
@@ -145,6 +146,7 @@ export function BlockRow({ block, index, count, autoFocus, userId, uploadsEnable
                 className="text-[0.9375rem] text-ink-2"
               />
               {urlInvalid && <p className="text-sm text-negative">{t("urlInvalid")}</p>}
+              <LinkCardFields block={block} onChange={onChange} />
             </>
           )}
           {block.type === "HEADER" && (

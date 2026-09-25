@@ -145,7 +145,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 ## v2.1: İçerik blokları ve okunabilirlik
 
 - [x] `IMAGE` bloğu (migration `block_image`): tarayıcıda 1600px WebP, `u/<id>/block/` klasörü, yalnızca sahibinin Blob dosyası kabul edilir (`updateBlock`/`restoreBlock`, sahiplik testi). Alt metin, alt yazı, isteğe bağlı link (`/l` üzerinden sayılır, istatistikte görünür). Genişlik/yükseklik saklanır (kayma yok). Kullanılmayan görseller yeni görsel ayarlanınca temizlenir.
-- [ ] Link önizleme kartı: sunucu OG başlık/açıklama/görselini bir kez okur (SSRF koruması: özel IP engeli, zaman aşımı, boyut sınırı), görsel Blob'a kopyalanır.
+- [x] Link önizleme kartı (`fetchLinkCard`, `lib/link-preview.ts`): sunucu OG başlık/açıklama/görselini sahibin isteğiyle bir kez okur (SSRF: bağlantı anında IP kontrolü, özel/metadata ağları yasak, elle en fazla 3 yönlendirme, 6 sn, HTML 512 KB / görsel 5 MB, görsel türü baytlardan). Görsel sahibin Blob klasörüne kopyalanır, dakikada 10 deneme. Açıklama editörde düzenlenir. Görselli yol yalnızca Blob açık ortamda (preview) denenecek.
 - [x] Okunabilirlik: arka plan görseli yüklenince parlaklık ölçülüp mod + karartma önerilir, karartma kaydırıcısı ve "Okunur yap". Çizgi butonda vurgu her zemin için okunur tona çekilir (uyarı yerine düzeltme). İç içe temada renk sınıfları kökten değil elemandan çözülür (`@theme inline`; önizlemedeki beyaz ikon hatası). Önizlemede abone butonu artık soluk görünmüyor.
 
 ## Sonraki aşama (v2 sonrası backlog)

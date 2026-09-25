@@ -302,6 +302,17 @@
       "tooBig": "Görsel 5 MB'tan küçük olmalı.",
       "failed": "Görsel yüklenemedi. Tekrar dene."
     },
+    "card": {
+      "label": "Önizleme kartı",
+      "hint": "Sitenin başlığı, açıklaması ve görseliyle gösterilir.",
+      "loading": "Sayfa okunuyor…",
+      "desc": "Açıklama",
+      "refresh": "Sayfadan yeniden al",
+      "needUrl": "Önce geçerli bir adres gir.",
+      "unreachable": "Bu sayfa okunamadı. Link düz buton olarak kalır.",
+      "tooMany": "Çok sık denedin. Bir dakika sonra tekrar dene.",
+      "failed": "Önizleme alınamadı. Tekrar dene."
+    },
     "embedUrl": "Video ya da müzik linki",
     "embedPlaceholder": "youtube.com/watch?v=… ya da open.spotify.com/…",
     "embedInvalid": "YouTube, Spotify ya da SoundCloud linki yapıştır.",

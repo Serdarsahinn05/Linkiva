@@ -3,9 +3,10 @@ import type { SocialPlatform } from "@/prisma/generated/enums";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 import { SOCIAL_PLATFORMS, socialUrl } from "@/lib/socials";
-import { parseBlock, type ParsedBlock } from "@/lib/validation/blocks";
+import { parseBlock, type BlockData, type ParsedBlock } from "@/lib/validation/blocks";
 import { GROUND, inkOn, readableAccent, resolveAppearance, type ResolvedAppearance } from "@/themes";
 import { parseEmbed } from "@/lib/embeds";
+import { displayHost } from "@/lib/validation/url";
 import { EmbedCard } from "./embed-card";
 import type { ProfileLabels } from "./labels";
 import { SOCIAL_ICONS } from "./social-icon";
@@ -141,9 +142,41 @@ function sceneVars(look: ResolvedAppearance): React.CSSProperties {
 
 const linkClass = "p-btn glass-interactive group";
 
+/** A link shown as a preview card: the page's image, title, description and host (read once by the owner). */
+function LinkCard({ id, data, highlighted, mode }: { id: string; data: BlockData["LINK"]; highlighted: boolean; mode: "public" | "preview" }) {
+  const body = (
+    <>
+      {data.img && (
+        // eslint-disable-next-line @next/next/no-img-element -- copied to our Blob store when the card was made
+        <img src={data.img} alt="" loading="lazy" decoding="async" className="aspect-[1.91/1] w-full rounded-[14px] bg-glass-strong object-cover" />
+      )}
+      <span className="flex flex-col gap-1 px-2.5 pt-2.5 pb-2 text-left">
+        <span className="font-medium text-balance">{data.title}</span>
+        {data.desc && <span className="line-clamp-2 text-[0.875rem] text-ink-2">{data.desc}</span>}
+        <span className="flex items-center gap-1 text-[0.8125rem] text-ink-3">
+          {displayHost(data.url)}
+          <ArrowUpRight size={13} strokeWidth={1.75} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
+      </span>
+    </>
+  );
+  const className = cn(
+    "glass glass-interactive group flex w-full flex-col overflow-hidden rounded-[var(--radius-card)] p-1.5",
+    highlighted && "shadow-[0_0_0_1.5px_var(--c-ink)]",
+  );
+  return mode === "public" ? (
+    <a href={`/l/${id}`} className={className} rel="noopener">
+      {body}
+    </a>
+  ) : (
+    <span className={cn(className, "cursor-default")}>{body}</span>
+  );
+}
+
 function BlockView({ id, block, highlighted, mode, labels }: { id: string; block: ParsedBlock; highlighted: boolean; mode: "public" | "preview"; labels: ProfileLabels }) {
   switch (block.type) {
     case "LINK": {
+      if (block.data.card === "1") return <LinkCard id={id} data={block.data} highlighted={highlighted} mode={mode} />;
       // Highlight styling depends on the button style (globals.css .p-btn[data-highlight]).
       const className = linkClass;
       const hl = highlighted ? "" : undefined;

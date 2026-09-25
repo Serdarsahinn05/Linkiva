@@ -292,3 +292,4 @@ TRACKING_SALT_SECRET
 - [ ] Hassas uç rate limit'li (auth, beacon, abone ol, upload)
 - [ ] Kullanıcı varlığı hata mesajıyla sızdırılmıyor
 - [ ] Yeni route rezerve kullanıcı adı listesine eklendi
+- [ ] Sunucu kullanıcının verdiği bir URL'e istek atıyorsa `lib/link-preview.ts` korumasından geçiyor (SSRF: bağlantı anında IP kontrolü, özel ağ yasak, elle yönlendirme, süre/boyut sınırı)
