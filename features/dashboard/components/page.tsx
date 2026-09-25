@@ -1,7 +1,19 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { ViewTransition, type ReactNode } from "react";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+
+/**
+ * Wraps a dashboard page so it comes into focus when it replaces the skeleton or the previous page.
+ * View Transitions only; browsers without them simply show the page.
+ */
+export function PageReveal({ children }: { children: ReactNode }) {
+  return (
+    <ViewTransition enter="page-in" exit="page-out" default="none">
+      {children}
+    </ViewTransition>
+  );
+}
 
 export function PageHeader({ title, children }: { title: string; children?: ReactNode }) {
   return (

@@ -6,7 +6,7 @@ import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button"
 import { TrafficChart } from "@/features/analytics/components/traffic-chart";
 import { WorldMap } from "@/features/analytics/components/world-map";
 import { getAnalytics, isRange, RANGES, type Row } from "@/features/analytics/queries";
-import { PageHeader, Section } from "@/features/dashboard/components/page";
+import { PageHeader, PageReveal, Section } from "@/features/dashboard/components/page";
 import { getOwnProfile } from "@/features/profile/queries";
 import { cn } from "@/lib/cn";
 import { requireSession } from "@/lib/session";
@@ -46,121 +46,123 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
   ];
 
   return (
-    <div className="mx-auto flex max-w-[1080px] flex-col gap-6 px-4 py-4 sm:px-8 lg:py-10">
-      <PageHeader title={t("title")}>
-        <div className="flex items-center gap-2">
-        {/* Audience has no slot in the 5-tab mobile bar; it is reached from here on phones. */}
-        <Link href="/dashboard/audience" className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "px-3 lg:hidden")}>
-          <Users size={16} aria-hidden />
-          {tNav("audience")}
-        </Link>
-        {data.totals.views > 0 && (
-          // A file download, not a navigation.
-          <a href={`/dashboard/analytics/export?range=${range}`} download className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "max-sm:px-3")}>
-            <Download size={16} aria-hidden />
-            <span className="max-sm:sr-only">{t("export")}</span>
-          </a>
-        )}
-        </div>
-      </PageHeader>
-
-      {/* Range tabs are links: shareable, back-button friendly, no client state. */}
-      <nav aria-label={t("title")} className="glass-flat flex w-fit rounded-full p-1">
-        {RANGES.map((r) => (
-          <Link
-            key={r}
-            href={`/dashboard/analytics?range=${r}`}
-            aria-current={r === range ? "page" : undefined}
-            className={cn(
-              "flex h-10 items-center rounded-full px-4 text-sm font-medium transition-colors",
-              r === range ? "bg-glass-strong text-ink shadow-[inset_0_1px_0_var(--c-glass-shine)]" : "text-ink-2 hover:text-ink",
-            )}
-          >
-            {t(`ranges.${r}`)}
+    <PageReveal>
+      <div className="mx-auto flex max-w-[1080px] flex-col gap-6 px-4 py-4 sm:px-8 lg:py-10">
+        <PageHeader title={t("title")}>
+          <div className="flex items-center gap-2">
+          {/* Audience has no slot in the 5-tab mobile bar; it is reached from here on phones. */}
+          <Link href="/dashboard/audience" className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "px-3 lg:hidden")}>
+            <Users size={16} aria-hidden />
+            {tNav("audience")}
           </Link>
-        ))}
-      </nav>
-
-      {/* Stat strip: one glass band, not a grid of cards (DESIGN.md §7). */}
-      <section className="glass grid grid-cols-2 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-4">
-        {stats.map((s, i) => (
-          <div key={s.key} className={cn("flex flex-col gap-1.5 p-5", i % 2 === 1 && "border-l border-glass-edge", i >= 2 && "max-lg:border-t max-lg:border-glass-edge", i === 2 && "lg:border-l lg:border-glass-edge")}>
-            <span className="text-sm text-ink-2">{s.label}</span>
-            <span className="font-mono text-[1.75rem] leading-none font-medium tracking-[-0.02em] tabular-nums">{s.value}</span>
-            <TrendBadge value={s.trend} relative={s.relative} empty={t("noCompare")} title={t("vsPrevious")} format={(n) => (s.relative ? pct(Math.abs(n)) : `${format.number(Math.abs(n) * 100, { maximumFractionDigits: 1 })} pp`)} />
+          {data.totals.views > 0 && (
+            // A file download, not a navigation.
+            <a href={`/dashboard/analytics/export?range=${range}`} download className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "max-sm:px-3")}>
+              <Download size={16} aria-hidden />
+              <span className="max-sm:sr-only">{t("export")}</span>
+            </a>
+          )}
           </div>
-        ))}
-      </section>
+        </PageHeader>
 
-      {data.totals.views === 0 && data.totals.clicks === 0 ? (
-        <Section>
-          <p className="py-10 text-center text-ink-2">{t("empty")}</p>
-        </Section>
-      ) : (
-        <>
-          <Section title={t("chartTitle")}>
-            <div className="flex items-center gap-4 text-sm text-ink-2">
-              <Legend className="bg-info text-info" label={t("views")} />
-              <Legend className="bg-positive text-positive" label={t("clicks")} />
-            </div>
-            <TrafficChart data={data.series} labels={{ views: t("views"), clicks: t("clicks") }} />
-          </Section>
-
-          <Section title={t("links")}>
-            {data.links.every((l) => l.clicks === 0) ? (
-              <p className="text-ink-2">{t("noClicks")}</p>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {data.links.map((link) => (
-                  <li key={link.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-1.5">
-                    <span className="truncate font-medium">{link.title}</span>
-                    <span className="font-mono text-sm tabular-nums">{format.number(link.clicks)}</span>
-                    <span className="w-14 text-right font-mono text-sm text-ink-3 tabular-nums">{pct(link.ctr)}</span>
-                    <Bar share={data.totals.clicks > 0 ? link.clicks / data.totals.clicks : 0} className="col-span-3 bg-positive" />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
-
-          <Section title={t("countries")}>
-            <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-              {data.countries.length > 0 && (
-                <WorldMap
-                  views={data.countryViews}
-                  name={regionName}
-                  formatCount={(n) => format.number(n)}
-                  formatShare={pct}
-                  labels={{ map: t("map"), views: t("mapViews"), none: t("mapNone") }}
-                />
+        {/* Range tabs are links: shareable, back-button friendly, no client state. */}
+        <nav aria-label={t("title")} className="glass-flat flex w-fit rounded-full p-1">
+          {RANGES.map((r) => (
+            <Link
+              key={r}
+              href={`/dashboard/analytics?range=${r}`}
+              aria-current={r === range ? "page" : undefined}
+              className={cn(
+                "flex h-10 items-center rounded-full px-4 text-sm font-medium transition-colors",
+                r === range ? "bg-glass-strong text-ink shadow-[inset_0_1px_0_var(--c-glass-shine)]" : "text-ink-2 hover:text-ink",
               )}
-              <RowList rows={data.countries} pct={pct} empty={t("unknown")} />
+            >
+              {t(`ranges.${r}`)}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Stat strip: one glass band, not a grid of cards (DESIGN.md §7). */}
+        <section className="glass grid grid-cols-2 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <div key={s.key} className={cn("flex flex-col gap-1.5 p-5", i % 2 === 1 && "border-l border-glass-edge", i >= 2 && "max-lg:border-t max-lg:border-glass-edge", i === 2 && "lg:border-l lg:border-glass-edge")}>
+              <span className="text-sm text-ink-2">{s.label}</span>
+              <span className="font-mono text-[1.75rem] leading-none font-medium tracking-[-0.02em] tabular-nums">{s.value}</span>
+              <TrendBadge value={s.trend} relative={s.relative} empty={t("noCompare")} title={t("vsPrevious")} format={(n) => (s.relative ? pct(Math.abs(n)) : `${format.number(Math.abs(n) * 100, { maximumFractionDigits: 1 })} pp`)} />
             </div>
+          ))}
+        </section>
+
+        {data.totals.views === 0 && data.totals.clicks === 0 ? (
+          <Section>
+            <p className="py-10 text-center text-ink-2">{t("empty")}</p>
           </Section>
+        ) : (
+          <>
+            <Section title={t("chartTitle")}>
+              <div className="flex items-center gap-4 text-sm text-ink-2">
+                <Legend className="bg-info text-info" label={t("views")} />
+                <Legend className="bg-positive text-positive" label={t("clicks")} />
+              </div>
+              <TrafficChart data={data.series} labels={{ views: t("views"), clicks: t("clicks") }} />
+            </Section>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Section title={t("sources")}>
-              <RowList rows={data.sources.map((r) => (r.key === "direct" ? { ...r, label: t("direct") } : r))} pct={pct} />
+            <Section title={t("links")}>
+              {data.links.every((l) => l.clicks === 0) ? (
+                <p className="text-ink-2">{t("noClicks")}</p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {data.links.map((link) => (
+                    <li key={link.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-1.5">
+                      <span className="truncate font-medium">{link.title}</span>
+                      <span className="font-mono text-sm tabular-nums">{format.number(link.clicks)}</span>
+                      <span className="w-14 text-right font-mono text-sm text-ink-3 tabular-nums">{pct(link.ctr)}</span>
+                      <Bar share={data.totals.clicks > 0 ? link.clicks / data.totals.clicks : 0} className="col-span-3 bg-positive" />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Section>
-            <Section title={t("devices")}>
-              <RowList rows={data.devices.map((r) => ({ ...r, label: t(`deviceNames.${r.key as "MOBILE" | "DESKTOP" | "TABLET"}`) }))} pct={pct} />
-              <h3 className="pt-2 text-[0.9375rem] font-semibold text-ink-2">{t("os")}</h3>
-              <RowList rows={data.os} pct={pct} />
-            </Section>
-            <Section title={t("browsers")}>
-              <RowList rows={data.browsers} pct={pct} />
-            </Section>
-          </div>
-        </>
-      )}
 
-      <p className="text-center text-sm text-ink-3">
-        {t("privacy")}{" "}
-        <Link href="/privacy" className="underline underline-offset-4 hover:text-ink">
-          {t("privacyLink")}
-        </Link>
-      </p>
-    </div>
+            <Section title={t("countries")}>
+              <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+                {data.countries.length > 0 && (
+                  <WorldMap
+                    views={data.countryViews}
+                    name={regionName}
+                    formatCount={(n) => format.number(n)}
+                    formatShare={pct}
+                    labels={{ map: t("map"), views: t("mapViews"), none: t("mapNone") }}
+                  />
+                )}
+                <RowList rows={data.countries} pct={pct} empty={t("unknown")} />
+              </div>
+            </Section>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Section title={t("sources")}>
+                <RowList rows={data.sources.map((r) => (r.key === "direct" ? { ...r, label: t("direct") } : r))} pct={pct} />
+              </Section>
+              <Section title={t("devices")}>
+                <RowList rows={data.devices.map((r) => ({ ...r, label: t(`deviceNames.${r.key as "MOBILE" | "DESKTOP" | "TABLET"}`) }))} pct={pct} />
+                <h3 className="pt-2 text-[0.9375rem] font-semibold text-ink-2">{t("os")}</h3>
+                <RowList rows={data.os} pct={pct} />
+              </Section>
+              <Section title={t("browsers")}>
+                <RowList rows={data.browsers} pct={pct} />
+              </Section>
+            </div>
+          </>
+        )}
+
+        <p className="text-center text-sm text-ink-3">
+          {t("privacy")}{" "}
+          <Link href="/privacy" className="underline underline-offset-4 hover:text-ink">
+            {t("privacyLink")}
+          </Link>
+        </p>
+      </div>
+    </PageReveal>
   );
 }
 

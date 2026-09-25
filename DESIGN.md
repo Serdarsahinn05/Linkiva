@@ -182,7 +182,8 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 ## 8. Hareket
 
 - Sheet eğrisi `--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1)` 280–500ms (iOS sheet eğrisi; hızlı üstel yavaşlama, hedefi aşmaz). Mikro etkileşimler `--ease-out` 160ms.
-- İmza hareketler: sıvı sekme göstergesi, specular highlight, sheet açılışı. Scroll'da "fade-up" girişleri yok.
+- İmza hareketler: sıvı sekme göstergesi, specular highlight, sheet açılışı.
+- Panel geçişi: yükleme sırasında sayfanın kendi şeklinde cam iskelet (`.bone`: dolgu `--ink` %8; ekrana sabit tek bir `--glass-shine` ışığı 1.8 sn'de bütün iskeletin üzerinden geçer). İskelet 150 ms gecikmeyle belirir. Eski sayfa ve iskelet 120 ms'de söner, yeni sayfa 320 ms `--ease-sheet` ile 8px yükselip 6px bulanıklıktan netleşir ("buğusu çözülen cam"). Kabuk (kenar çubuğu, sekme çubuğu) yerinden oynamaz. Scroll'da "fade-up" girişleri yok.
 - `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı.
 - Kütüphane eklenmez (CSS + WAAPI).
 
