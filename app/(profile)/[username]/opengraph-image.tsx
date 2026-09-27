@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getPublicProfile } from "@/features/profile/public";
+import { forImageResponse } from "@/lib/card-image";
 import { loadGeist } from "@/lib/og-fonts";
 import { liveBlocks } from "@/lib/schedule";
 import { profileDisplayUrl } from "@/lib/site";
@@ -21,7 +22,7 @@ export default async function Image({ params }: { params: Promise<{ username: st
   const found = await getPublicProfile(decodeURIComponent(username).toLowerCase());
   // An unpublished page shows nothing of its owner, not even in a share preview: the card falls back to the brand.
   const profile = found?.isPublished ? found : null;
-  const [regular, semibold] = await Promise.all([loadGeist("Geist", 400), loadGeist("Geist", 600)]);
+  const [regular, semibold, avatar] = await Promise.all([loadGeist("Geist", 400), loadGeist("Geist", 600), forImageResponse(profile?.avatarUrl, 240, "png")]);
   const fonts = [
     ...(regular ? [{ name: "Geist", data: regular, weight: 400 as const, style: "normal" as const }] : []),
     ...(semibold ? [{ name: "Geist", data: semibold, weight: 600 as const, style: "normal" as const }] : []),
@@ -63,9 +64,9 @@ export default async function Image({ params }: { params: Promise<{ username: st
         >
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              {profile?.avatarUrl ? (
+              {avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element -- Satori renders plain img
-                <img src={profile.avatarUrl} width={120} height={120} style={{ borderRadius: 999, border: `2px solid ${EDGE}`, objectFit: "cover" }} alt="" />
+                <img src={avatar} width={120} height={120} style={{ borderRadius: 999, border: `2px solid ${EDGE}`, objectFit: "cover" }} alt="" />
               ) : null}
               <div style={{ display: "flex", fontSize: name.length > 18 ? 58 : 72, fontWeight: 600, letterSpacing: "-0.035em", lineHeight: 1.02 }}>{name}</div>
             </div>

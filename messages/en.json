@@ -508,8 +508,15 @@
     "downloadPng": "Download PNG",
     "downloadSvg": "Download SVG",
     "story": "Story image",
-    "storyHint": "For your Instagram story, with the QR code (1080×1920).",
+    "storyHint": "For your Instagram story, with the QR code.",
     "storyFailed": "Couldn't make the image. Try again.",
+    "storyLook": "Story background",
+    "storyLooks": {
+      "profile": "My page",
+      "dark": "Dark",
+      "light": "Light"
+    },
+    "storyPreview": "Preview of the story image",
     "close": "Close",
     "share": "Share"
   },

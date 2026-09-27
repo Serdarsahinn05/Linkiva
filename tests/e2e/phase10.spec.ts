@@ -100,9 +100,25 @@ test("story image: 1080×1920 PNG with the QR, downloadable from the QR dialog, 
   const png = await res.body();
   // PNG header: width and height are big-endian at bytes 16 and 20.
   expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1080, 1920]);
+  // The dark and light looks are other images of the same size; an unknown look falls back to the profile's.
+  const light = await (await request.get(`/${username}/story?look=light`)).body();
+  expect(light.readUInt32BE(20)).toBe(1920);
+  expect(light.equals(png)).toBe(false);
+  expect((await request.get(`/${username}/story?look=neon`)).status()).toBe(200);
 
-  // With a mouse, the dialog downloads it (the share sheet is for touch devices).
+  // With a mouse, the dialog downloads it (the share sheet is for touch devices). The preview follows the chosen look.
   await page.getByRole("button", { name: "QR kod" }).click();
+  const preview = page.getByRole("img", { name: "Hikâye görselinin önizlemesi" });
+  await expect(preview).toHaveAttribute("src", `/${username}/story`);
+  await page.getByRole("radio", { name: "Açık" }).click();
+  await expect(preview).toHaveAttribute("src", `/${username}/story?look=light`);
+  await expect.poll(() => preview.evaluate((img: HTMLImageElement) => img.naturalHeight)).toBe(1920);
+  if (process.env.SHOT_DIR) {
+    await page.screenshot({ path: `${process.env.SHOT_DIR}/qr-1440.png` });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${process.env.SHOT_DIR}/qr-390.png` });
+    await page.setViewportSize({ width: 1440, height: 900 });
+  }
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Hikâye görseli" }).click();
   expect((await download).suggestedFilename()).toBe(`linkiva-${username}-story.png`);
