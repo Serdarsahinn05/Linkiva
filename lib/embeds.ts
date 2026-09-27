@@ -44,3 +44,44 @@ export function parseEmbed(input: string): Embed | null {
 
   return null;
 }
+
+// ─── "Latest video" of a YouTube channel (ROADMAP Faz 10) ─────────────────────
+
+export const YT_CHANNEL_ID = /^UC[A-Za-z0-9_-]{22}$/;
+export const YOUTUBE_HOSTS = ["youtube.com", "www.youtube.com", "m.youtube.com"];
+
+/**
+ * A YouTube channel address (youtube.com/@name, /channel/UC…, /c/…, /user/…), normalised to https://www.youtube.com/…,
+ * with its channel id when the address already carries it. null for anything else, videos included.
+ */
+export function youtubeChannel(input: string): { url: string; channelId?: string } | null {
+  let url: URL;
+  try {
+    url = new URL(/^https?:\/\//i.test(input.trim()) ? input.trim() : `https://${input.trim()}`);
+  } catch {
+    return null;
+  }
+  if (!YOUTUBE_HOSTS.includes(url.hostname.toLowerCase())) return null;
+  const [first, second] = url.pathname.split("/").filter(Boolean);
+  if (!first) return null;
+  if (first === "channel") return second && YT_CHANNEL_ID.test(second) ? { url: `https://www.youtube.com/channel/${second}`, channelId: second } : null;
+  if (/^@[\w.-]{3,30}$/.test(first)) return { url: `https://www.youtube.com/${first}` };
+  if ((first === "c" || first === "user") && second && /^[\w.-]{1,100}$/.test(second)) return { url: `https://www.youtube.com/${first}/${second}` };
+  return null;
+}
+
+/** The channel id on a channel page: its canonical link, or the ids YouTube embeds in the page data. */
+export function channelIdFromHtml(html: string): string | null {
+  const match =
+    html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/channel\/(UC[A-Za-z0-9_-]{22})"/) ??
+    html.match(/<meta itemprop="identifier" content="(UC[A-Za-z0-9_-]{22})"/) ??
+    html.match(/"externalId":"(UC[A-Za-z0-9_-]{22})"/);
+  return match?.[1] ?? null;
+}
+
+/** The newest video id in a channel's Atom feed. */
+export function latestVideoFromFeed(xml: string): string | null {
+  return xml.match(/<yt:videoId>([A-Za-z0-9_-]{11})<\/yt:videoId>/)?.[1] ?? null;
+}
+
+export const channelFeedUrl = (channelId: string) => `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;

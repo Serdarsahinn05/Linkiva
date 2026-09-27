@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { BlockType } from "@/prisma/generated/enums";
-import { parseEmbed } from "@/lib/embeds";
+import type { BlockSize, BlockType } from "@/prisma/generated/enums";
+import { parseEmbed, YT_CHANNEL_ID } from "@/lib/embeds";
 import { isBlobStoreUrl } from "@/lib/uploads";
 import { normalizeIban } from "./iban";
 import { normalizePhone } from "./phone";
@@ -73,8 +73,15 @@ export const blockDataSchemas = {
   HEADER: z.object({ text: z.string().trim().min(1).max(TITLE_MAX), collapsible: flag }),
   TEXT: z.object({ text: z.string().trim().min(1).max(TEXT_MAX) }),
   DIVIDER: z.object({}),
-  // Only YouTube / Spotify / SoundCloud URLs that lib/embeds.ts understands.
-  EMBED: z.object({ url: z.string().trim().max(2048).refine((v) => parseEmbed(v) !== null, "embed") }),
+  // Only YouTube / Spotify / SoundCloud URLs that lib/embeds.ts understands. latest: the channel's newest video, read from
+  // its feed when the page renders (features/profile/latest-video.ts); url is then the channel's address.
+  EMBED: z
+    .object({
+      url: z.string().trim().max(2048),
+      latest: flag,
+      channelId: z.string().regex(YT_CHANNEL_ID).optional(),
+    })
+    .refine((d) => (d.latest === "1" ? Boolean(d.channelId) : parseEmbed(d.url) !== null), "embed"),
   EMAIL_CAPTURE: z.object({ title: z.string().trim().max(TITLE_MAX).optional() }),
   // src must be a file on our Blob store; the editor action further pins it to the owner's own folder.
   // title is the optional caption; w/h reserve the image's space so the page does not jump while it loads.
@@ -171,6 +178,27 @@ export const blockDefaults: Record<EditableBlockType, Record<string, string>> = 
 };
 
 export type ParsedBlock = { [K in BlockType]: { type: K; data: BlockData[K] } }[BlockType];
+
+// ─── Grid layout (ROADMAP Faz 10) ─────────────────────────────────────────────
+
+/**
+ * Tile sizes a type may take in the grid layout; types not listed always take a full row. WIDE is always allowed,
+ * because it is the default and looks like the list. Embeds and support cards stay full-width: a 16:9 player and an
+ * IBAN with its copy button do not fit a square.
+ */
+const GRID_SIZES: Partial<Record<BlockType, readonly BlockSize[]>> = {
+  LINK: ["SMALL", "WIDE", "LARGE"],
+  IMAGE: ["SMALL", "WIDE", "LARGE"],
+  PRODUCT: ["SMALL", "WIDE", "LARGE"],
+  WHATSAPP: ["SMALL", "WIDE"],
+  CONTACT: ["SMALL", "WIDE"],
+};
+
+export const allowedSizes = (type: BlockType): readonly BlockSize[] => GRID_SIZES[type] ?? ["WIDE"];
+
+/** The size a block renders with: a stored size the type does not allow falls back to a full row. */
+export const effectiveSize = (type: BlockType, size: BlockSize | undefined): BlockSize =>
+  size && allowedSizes(type).includes(size) ? size : "WIDE";
 
 /** Parses a stored block; invalid or unfinished data returns null (the block is not rendered publicly). */
 export function parseBlock(type: BlockType, data: unknown): ParsedBlock | null {

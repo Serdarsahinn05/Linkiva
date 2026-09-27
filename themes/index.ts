@@ -26,8 +26,13 @@ export const DIM_DEFAULT = 55;
 export const DIM_MAX = 90;
 const DIM_FLOOR = 30;
 
+/** How blocks are laid out: a single column, or tiles (ROADMAP Faz 10). Not part of a theme preset. */
+export const LAYOUT_KEYS = ["list", "grid"] as const;
+export type LayoutKey = (typeof LAYOUT_KEYS)[number];
+
 /** Stored in Profile.appearance. Every field optional: missing means "use the theme's value". */
 export const appearanceSchema = z.object({
+  layout: z.enum(LAYOUT_KEYS).optional(),
   mode: z.enum(MODE_KEYS).optional(),
   font: z.enum(FONT_KEYS).optional(),
   button: z.enum(BUTTON_KEYS).optional(),
@@ -42,6 +47,7 @@ export type AppearanceOverrides = z.infer<typeof appearanceSchema>;
 
 export type ResolvedAppearance = {
   theme: ThemeKey;
+  layout: LayoutKey;
   mode: ModeKey;
   font: FontKey;
   button: ButtonKey;
@@ -52,7 +58,7 @@ export type ResolvedAppearance = {
   backgroundTone: number | null;
 };
 
-const PRESETS: Record<ThemeKey, Omit<ResolvedAppearance, "theme" | "backgroundUrl" | "backgroundDim" | "backgroundTone">> = {
+const PRESETS: Record<ThemeKey, Omit<ResolvedAppearance, "theme" | "layout" | "backgroundUrl" | "backgroundDim" | "backgroundTone">> = {
   cam: { mode: "system", font: "geist", button: "glass", scene: "cam", accent: null },
   gece: { mode: "dark", font: "geist", button: "glass", scene: "gece", accent: null },
   sade: { mode: "light", font: "geist", button: "outline", scene: "none", accent: null },
@@ -71,6 +77,7 @@ export function resolveAppearance(theme: string, raw: unknown): ResolvedAppearan
   const o = parsed.success ? parsed.data : {};
   return {
     theme: key,
+    layout: o.layout ?? "list",
     mode: o.mode ?? preset.mode,
     font: o.font ?? preset.font,
     button: o.button ?? preset.button,

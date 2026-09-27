@@ -1,10 +1,11 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import { Check, MoreHorizontal } from "lucide-react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export type MenuItem = { label: string; icon?: ReactNode; onSelect: () => void; danger?: boolean; disabled?: boolean };
+/** checked: one of a set of choices (a radio item); the current one carries a check mark. */
+export type MenuItem = { label: string; icon?: ReactNode; onSelect: () => void; danger?: boolean; disabled?: boolean; checked?: boolean };
 
 /** Overflow menu: Esc and outside click close it, arrow keys move between items, focus returns to the trigger. */
 export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
@@ -19,7 +20,7 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", onPointer);
-    rootRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')?.focus();
+    rootRef.current?.querySelector<HTMLButtonElement>('[role^="menuitem"]:not(:disabled)')?.focus();
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open]);
 
@@ -32,7 +33,7 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
     if (e.key === "Escape") return close();
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
-    const nodes = [...(rootRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)') ?? [])];
+    const nodes = [...(rootRef.current?.querySelectorAll<HTMLButtonElement>('[role^="menuitem"]:not(:disabled)') ?? [])];
     const index = nodes.indexOf(document.activeElement as HTMLButtonElement);
     nodes[(index + (e.key === "ArrowDown" ? 1 : -1) + nodes.length) % nodes.length]?.focus();
   };
@@ -62,7 +63,8 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
             <button
               key={item.label}
               type="button"
-              role="menuitem"
+              role={item.checked === undefined ? "menuitem" : "menuitemradio"}
+              aria-checked={item.checked}
               disabled={item.disabled}
               onClick={() => {
                 close();
@@ -75,6 +77,7 @@ export function Menu({ label, items }: { label: string; items: MenuItem[] }) {
             >
               {item.icon}
               {item.label}
+              {item.checked && <Check size={16} strokeWidth={2} aria-hidden className="ml-auto" />}
             </button>
           ))}
         </div>

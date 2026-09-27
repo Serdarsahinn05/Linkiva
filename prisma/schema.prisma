@@ -129,6 +129,13 @@ enum BlockType {
   COUNTDOWN
 }
 
+/// Tile size in the grid layout (ROADMAP Faz 10). Ignored by the list layout.
+enum BlockSize {
+  SMALL
+  WIDE
+  LARGE
+}
+
 model Block {
   id            String    @id @default(cuid())
   profileId     String
@@ -137,6 +144,7 @@ model Block {
   position      Int
   isVisible     Boolean   @default(true)
   isHighlighted Boolean   @default(false)
+  size          BlockSize @default(WIDE)
   /// Shape depends on `type`; always parsed through lib/validation/blocks.ts
   data          Json
   startsAt      DateTime?

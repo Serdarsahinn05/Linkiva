@@ -35,7 +35,7 @@ export async function GET(request: Request) {
           locale: true,
           timezone: true,
           createdAt: true,
-          blocks: { select: { id: true, type: true, position: true, isVisible: true, isHighlighted: true, data: true, startsAt: true, endsAt: true, createdAt: true }, orderBy: { position: "asc" } },
+          blocks: { select: { id: true, type: true, position: true, isVisible: true, isHighlighted: true, size: true, data: true, startsAt: true, endsAt: true, createdAt: true }, orderBy: { position: "asc" } },
           socials: { select: { platform: true, handle: true } },
           subscribers: { select: { email: true, createdAt: true } },
           events: { select: { type: true, blockId: true, country: true, city: true, device: true, os: true, browser: true, referrerHost: true, utmSource: true, createdAt: true }, orderBy: { createdAt: "asc" } },

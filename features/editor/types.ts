@@ -1,4 +1,4 @@
-import type { BlockType, SocialPlatform } from "@/prisma/generated/enums";
+import type { BlockSize, BlockType, SocialPlatform } from "@/prisma/generated/enums";
 
 /** A block as the editor holds it: data may be an unfinished draft. */
 export type EditorBlock = {
@@ -7,6 +7,8 @@ export type EditorBlock = {
   data: Record<string, string>;
   isVisible: boolean;
   isHighlighted: boolean;
+  /** Tile size in the grid layout. */
+  size: BlockSize;
   /** ISO strings; null = no limit. */
   startsAt: string | null;
   endsAt: string | null;
@@ -25,12 +27,13 @@ export type EditorProfile = {
 export type EditorSocials = Partial<Record<SocialPlatform, string>>;
 
 /** A stored block row in the editor's shape. */
-export const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
+export const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; size: BlockSize; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
   id: b.id,
   type: b.type,
   data: (b.data ?? {}) as Record<string, string>,
   isVisible: b.isVisible,
   isHighlighted: b.isHighlighted,
+  size: b.size,
   startsAt: b.startsAt?.toISOString() ?? null,
   endsAt: b.endsAt?.toISOString() ?? null,
 });

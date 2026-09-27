@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6–9 canlıda, sıradaki Faz 10.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6–10 canlıda, sıradaki Faz 11.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
@@ -278,21 +278,28 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 **Amaç:** Görsel olarak en belirgin fark. Bento'dan açıkta kalan "tasarlanmış sayfa" kitlesine cevap.
 
 **Izgara (bento) düzeni**
-- [ ] Veri: `appearanceSchema`'ya `layout: "list" | "grid"` (varsayılan `list`, migration gerekmez). `Block.size` kolonu: `enum BlockSize { SMALL WIDE LARGE }`, varsayılan `WIDE`, migration `block_size`. Liste düzeninde yok sayılır.
-- [ ] Render: `profile-view.tsx` düzen moduna göre liste ya da CSS grid (mobil 2 sütun, ≥ 560px 4 sütun). SMALL 1×1, WIDE tam satır, LARGE 2×2. **`grid-auto-flow: dense` kullanılmaz:** görsel sıra DOM sırasıyla aynı kalır (klavye ve ekran okuyucu).
-- [ ] Tür başına izinli boyutlar `lib/validation/blocks.ts`'te: LINK (S: ikon + başlık, W, L: önizleme kartıyla), IMAGE (S/W/L), EMBED (W/L), PRODUCT (S/L), SUPPORT/CONTACT/WHATSAPP (S/W). HEADER/TEXT/DIVIDER/EMAIL_CAPTURE/COUNTDOWN her zaman tam satır.
-- [ ] Editör: satır menüsünde "Boyut" seçimi (yalnızca ızgara modunda), önizleme gerçek ızgarayı gösterir. Sıralama listede dnd-kit ile aynen devam eder.
-- [ ] Görünüm sayfasında "Düzen: Liste / Izgara" seçimi, tema kartlarının üstünde.
+- [x] Veri: `appearanceSchema`'ya `layout: "list" | "grid"` (varsayılan `list`, migration gerekmez). `Block.size` kolonu: `enum BlockSize { SMALL WIDE LARGE }`, varsayılan `WIDE`, migration `block_size`. Liste düzeninde yok sayılır.
+- [x] Render: `profile-view.tsx` düzen moduna göre liste ya da CSS grid (mobil 2 sütun, ≥ 560px 4 sütun). SMALL 1×1, WIDE tam satır, LARGE 2×2. **`grid-auto-flow: dense` kullanılmaz:** görsel sıra DOM sırasıyla aynı kalır (klavye ve ekran okuyucu).
+- [x] Tür başına izinli boyutlar `lib/validation/blocks.ts`'te: LINK (S: ikon + başlık, W, L: önizleme kartıyla), IMAGE (S/W/L), EMBED (W/L), PRODUCT (S/L), SUPPORT/CONTACT/WHATSAPP (S/W). HEADER/TEXT/DIVIDER/EMAIL_CAPTURE/COUNTDOWN her zaman tam satır.
+- [x] Editör: satır menüsünde "Boyut" seçimi (yalnızca ızgara modunda), önizleme gerçek ızgarayı gösterir. Sıralama listede dnd-kit ile aynen devam eder.
+- [x] Görünüm sayfasında "Düzen: Liste / Izgara" seçimi, tema kartlarının üstünde.
 
 **Hikâye paylaşım kartı** (eski backlog #6'nın yarısı)
-- [ ] `app/(profile)/[username]/story/route.ts`: 1080×1920 `ImageResponse` (OG hattıyla aynı), avatar, ad, adres ve QR. İlk iş: QR SVG'sinin `ImageResponse` içinde doğru çizildiğini doğrula; çizilmezse QR matrisini `<rect>`lere çeviren küçük bir yardımcı yazılır (yeni paket yok).
-- [ ] Panelde QR diyaloğuna "Hikâye görseli" butonu. Mobilde `navigator.share({ files })`, destek yoksa indirme.
+- [x] `app/(profile)/[username]/story/route.ts`: 1080×1920 `ImageResponse` (OG hattıyla aynı), avatar, ad, adres ve QR. İlk iş: QR SVG'sinin `ImageResponse` içinde doğru çizildiğini doğrula; çizilmezse QR matrisini `<rect>`lere çeviren küçük bir yardımcı yazılır (yeni paket yok).
+- [x] Panelde QR diyaloğuna "Hikâye görseli" butonu. Mobilde `navigator.share({ files })`, destek yoksa indirme.
 
 **Son videoyu otomatik gösterme**
-- [ ] EMBED'e `latest: "1"` + `channelId`. Kanal kimliği **kayıt anında** kanal sayfasından güvenli getirmeyle bulunur (`youtube.com` host beyaz listesi).
-- [ ] Render: `https://www.youtube.com/feeds/videos.xml?channel_id=` `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile okunur. DB'ye yazılmaz. Besleme okunamazsa blok gizlenir, eski bir video uydurulmaz. Hafif gömme davranışı aynı kalır.
+- [x] EMBED'e `latest: "1"` + `channelId`. Kanal kimliği **kayıt anında** kanal sayfasından güvenli getirmeyle bulunur (`youtube.com` host beyaz listesi).
+- [x] Render: `https://www.youtube.com/feeds/videos.xml?channel_id=` `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile okunur. DB'ye yazılmaz. Besleme okunamazsa blok gizlenir, eski bir video uydurulmaz. Hafif gömme davranışı aynı kalır.
 
 **Kabul:** Izgara profilde Lighthouse erişilebilirlik 100, 390px'te taşma yok (layout testi ızgara profiliyle genişler). Hikâye görseli 1080×1920 keskin. Son video en geç bir saat içinde güncelleniyor.
+
+*Uygulama notları (2026-09-27):*
+- **Planı değiştiren kararlar:** EMBED ve SUPPORT ızgarada da tam satır (16:9 oynatıcı ve kopyala butonlu IBAN kareye sığmıyor). PRODUCT S/W/L (W varsayılan ve listedeki kart). Kayıtlı boyutu türün izin vermediği blok tam satır çizilir (`effectiveSize`). Küçük karoda ikon türden gelir, favicon çekilmez (dışarıya istek yok). Sütun sayısı ekran değil kapsayıcı genişliğinden (`@container`): editördeki telefon önizlemesi telefonun sütunlarını gösterir.
+- **Hikâye QR'ı:** `qrcode.react` hook kullandığı için Satori'de çizilmiyor, Next de route handler'da `react-dom/server`'a izin vermiyor. Kullanıcı onayıyla `uqr` eklendi (MIT, bağımlılıksız, ~10 KB): SVG'yi doğrudan verir. Avatar yoksa cam halkada adın baş harfi. Paylaşım sayfası yalnızca dokunmatik cihazda açılır (`pointer: coarse`); masaüstü Chrome da dosya paylaşabildiği halde orada indirme beklenir.
+- **Son video:** kanal sayfası AB'de onay ekranına yönlenebildiği için yalnızca YouTube host'larına `SOCS` çerezi gider (`fetchPage` → `cookie`). Besleme adresi doğrulanmış kimlikten sabit host'a kurulduğu için `link-preview` korumasından geçmez (kullanıcı URL'i değil). Canlı iki kanalda doğrulandı; e2e ağa çıkmaz.
+- **Yan bulgular:** az bloklu profilde zemin ve ortam ışığı ekranın ortasında bitiyordu (`min-h-full` yalnızca `min-height`'ı olan ebeveynde çözülmez; `main` artık flex sütun). OG görseli yayından kaldırılmış profilin adını gösteriyordu; artık markaya düşer. Veri dışa aktarma blok boyutunu da içerir.
+- **Ölçüm:** ızgara profil (production, mobil) Lighthouse erişilebilirlik **100**, performans 95. `tests/e2e/phase10.spec.ts` 390/1440'ta sütun sayısını, kare karoları, DOM sırasını ve taşmayı; hikâye görselinin boyutunu, indirmesini ve yayından kalkınca 404'ü doğrular.
 
 ---
 

@@ -52,6 +52,29 @@ describe("editor actions only touch the caller's own profile (v1 bug S1)", () =>
     expect(block.isVisible).toBe(true);
   });
 
+  it("cannot resize someone else's block, and only to a size the type allows (grid layout)", async () => {
+    expect(await actions.setBlockSize(aliceBlock, "SMALL")).toEqual({ ok: false, error: "notFound" });
+    expect((await db.block.findUniqueOrThrow({ where: { id: aliceBlock } })).size).toBe("WIDE");
+    expect(await actions.setBlockSize(bobBlock, "HUGE")).toEqual({ ok: false, error: "invalid" });
+    expect(await actions.setBlockSize(bobBlock, "LARGE")).toEqual({ ok: true, data: undefined });
+    expect((await db.block.findUniqueOrThrow({ where: { id: bobBlock } })).size).toBe("LARGE");
+    const bob = await db.profile.findUniqueOrThrow({ where: { userId: ids.bob } });
+    const header = await db.block.create({ data: { profileId: bob.id, type: "HEADER", position: 9, data: { text: "Başlık" } } });
+    expect(await actions.setBlockSize(header.id, "SMALL")).toEqual({ ok: false, error: "invalid" });
+    await db.block.delete({ where: { id: header.id } });
+  });
+
+  it("cannot point someone else's embed at a channel; only channel addresses are read", async () => {
+    const alice = await db.profile.findUniqueOrThrow({ where: { userId: ids.alice } });
+    const embed = await db.block.create({ data: { profileId: alice.id, type: "EMBED", position: 3, data: { url: "https://youtu.be/dQw4w9WgXcQ" } } });
+    // Both are refused before any request leaves the server.
+    expect(await actions.resolveLatestVideo(embed.id, "https://www.youtube.com/@linkiva")).toEqual({ ok: false, error: "notFound" });
+    expect(await actions.resolveLatestVideo(bobBlock, "https://evil.example/@linkiva")).toEqual({ ok: false, error: "invalid" });
+    expect(await actions.resolveLatestVideo(bobBlock, "https://www.youtube.com/@linkiva")).toEqual({ ok: false, error: "notFound" }); // a link, not an embed
+    expect((await db.block.findUniqueOrThrow({ where: { id: embed.id } })).data).toEqual({ url: "https://youtu.be/dQw4w9WgXcQ" });
+    await db.block.delete({ where: { id: embed.id } });
+  });
+
   it("cannot smuggle a foreign id into a reorder", async () => {
     expect(await actions.reorderBlocks([bobBlock, aliceBlock])).toEqual({ ok: false, error: "invalid" });
     expect(await actions.reorderBlocks([bobBlock])).toEqual({ ok: true, data: undefined });
@@ -90,7 +113,7 @@ describe("image blocks only show the owner's own uploads", () => {
   });
 
   it("cannot restore a block pointing at someone else's file", async () => {
-    const snapshot = { id: `img-${suffix}`, type: "IMAGE" as const, data: { src: blob(ids.alice) }, position: 5, isVisible: true, isHighlighted: false, startsAt: null, endsAt: null };
+    const snapshot = { id: `img-${suffix}`, type: "IMAGE" as const, data: { src: blob(ids.alice) }, position: 5, isVisible: true, isHighlighted: false, size: "WIDE" as const, startsAt: null, endsAt: null };
     expect(await actions.restoreBlock(snapshot)).toEqual({ ok: false, error: "invalid" });
   });
 });

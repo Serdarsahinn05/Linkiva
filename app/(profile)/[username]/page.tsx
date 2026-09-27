@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { ViewBeacon } from "@/components/blocks/view-beacon";
+import { withLatestVideos } from "@/features/profile/latest-video";
 import { getPublicProfile, getUsernameRedirect } from "@/features/profile/public";
 import { liveBlocks } from "@/lib/schedule";
 import { defaultLocale, isLocale } from "@/i18n/config";
@@ -52,9 +53,11 @@ export default async function ProfilePage({ params }: PageProps<"/[username]">) 
   const t = await getTranslations({ locale });
 
   return (
-    <main className="min-h-dvh">
+    // A flex column, so the profile scene (flex-1) reaches the bottom of a tall screen: min-height: 100% does not
+    // resolve against a parent that only has a min-height.
+    <main className="flex min-h-dvh flex-col">
       <ViewBeacon profileId={profile.id} />
-      <ProfileView profile={{ ...profile, blocks: liveBlocks(profile.blocks) }} labels={profileLabels(t)} />
+      <ProfileView profile={{ ...profile, blocks: await withLatestVideos(liveBlocks(profile.blocks), profile.username) }} labels={profileLabels(t)} />
     </main>
   );
 }

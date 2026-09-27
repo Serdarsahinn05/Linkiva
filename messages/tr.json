@@ -62,7 +62,7 @@
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
     "privacy": "Gizlilik",
-    "sampleName": "Serdar Şahin",
+    "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Bilgisayar mühendisi · Ankara",
     "sampleHeader": "Projeler",
     "sampleLinks": ["Linkiva", "GitHub", "Özgeçmiş"],
@@ -260,6 +260,11 @@
       "PRODUCT": "Ürün",
       "COUNTDOWN": "Geri sayım"
     },
+    "sizes": {
+      "SMALL": "Küçük karo",
+      "WIDE": "Tam satır",
+      "LARGE": "Büyük karo"
+    },
     "fields": {
       "title": "Başlık",
       "url": "Adres",
@@ -326,6 +331,14 @@
       "unreachable": "Bu sayfa okunamadı. Link düz buton olarak kalır.",
       "tooMany": "Çok sık denedin. Bir dakika sonra tekrar dene.",
       "failed": "Önizleme alınamadı. Tekrar dene."
+    },
+    "latest": {
+      "label": "Kanalın son videosu",
+      "hint": "Sayfanda her zaman en yeni videon görünür, saatte bir yenilenir.",
+      "loading": "Kanal okunuyor…",
+      "unreachable": "Kanal ya da videosu bulunamadı. youtube.com/channel/… adresini yapıştırmayı dene.",
+      "tooMany": "Çok sık denedin. Bir dakika sonra tekrar dene.",
+      "failed": "Kanal okunamadı. Tekrar dene."
     },
     "embedUrl": "Video ya da müzik linki",
     "embedPlaceholder": "youtube.com/watch?v=… ya da open.spotify.com/…",
@@ -494,6 +507,9 @@
     "qrBody": "Okutan herkes doğrudan sayfana gelir.",
     "downloadPng": "PNG indir",
     "downloadSvg": "SVG indir",
+    "story": "Hikâye görseli",
+    "storyHint": "Instagram hikâyen için, QR kodlu (1080×1920).",
+    "storyFailed": "Görsel hazırlanamadı. Tekrar dene.",
     "close": "Kapat",
     "share": "Paylaş"
   },
@@ -529,6 +545,15 @@
   },
   "appearance": {
     "title": "Görünüm",
+    "layout": "Düzen",
+    "layouts": {
+      "list": "Liste",
+      "grid": "Izgara"
+    },
+    "layoutHints": {
+      "list": "Alt alta, tek sütun",
+      "grid": "Karolar; boyutu blok menüsünden"
+    },
     "theme": "Tema",
     "themes": {
       "cam": "Cam",
@@ -586,6 +611,7 @@
   "blocks": {
     "embedPlay": "Oynat",
     "embedListen": "Dinle",
+    "embedLatest": "YouTube · son video",
     "subscribeTitle": "Haberdar ol",
     "subscribePlaceholder": "E-posta adresin",
     "subscribeButton": "Abone ol",
