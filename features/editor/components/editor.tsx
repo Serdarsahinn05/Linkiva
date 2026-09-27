@@ -2,7 +2,7 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useId, useState } from "react";
+import { useEffect, useEffectEvent, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
 import { profileLabels } from "@/components/blocks/labels";
@@ -13,13 +13,20 @@ import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { liveBlocks } from "@/lib/schedule";
 import { EDITABLE_BLOCK_TYPES, type EditableBlockType } from "@/lib/validation/blocks";
-import { addBlock, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setSocial, updateBlock, updateProfileBasics } from "../actions";
+import { displayHost } from "@/lib/validation/url";
+import type { AppliedImport } from "@/features/import/actions";
+import { ImportDialog } from "@/features/import/components/import-dialog";
+import { addBlock, applyTemplate, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setSocial, updateBlock, updateProfileBasics } from "../actions";
+import { detectBlock, type Detected } from "../detect-block";
+import type { TemplateKey } from "../templates";
 import type { EditorBlock, EditorProfile, EditorSocials } from "../types";
 import { AvatarUploader } from "./avatar-uploader";
 import { PageHeader, Section } from "@/features/dashboard/components/page";
 import { useRegisterPreview } from "@/features/dashboard/components/preview-context";
 import { BLOCK_ICON, BlockRow } from "./block-row";
+import { PasteField } from "./paste-field";
 import { SocialsEditor } from "./socials-editor";
+import { StartOptions } from "./start-options";
 import { SaveIndicator } from "./save-indicator";
 import { useAutosave } from "./use-autosave";
 
@@ -36,6 +43,10 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   const dndId = useId();
   const [focusId, setFocusId] = useState<string | null>(null);
   const [adding, setAdding] = useState<EditableBlockType | null>(null);
+  const [pasting, setPasting] = useState(false);
+  const [templating, setTemplating] = useState<TemplateKey | null>(null);
+  // null: closed; a string: open, prefilled with that address.
+  const [importUrl, setImportUrl] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -59,6 +70,68 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     if (!result.ok) return saveError();
     setBlocks((list) => [result.data, ...list]);
     setFocusId(result.data.id);
+  }
+
+  // ─── Smart paste ───
+  async function addDetected(detected: Detected) {
+    if (detected.kind === "IMPORT") {
+      toast({ tone: "success", message: t("paste.importOffer") });
+      return setImportUrl(detected.url);
+    }
+    setPasting(true);
+    const result = await addBlock(detected.kind, detected.kind === "EMBED" ? { url: detected.url } : { title: detected.title, url: detected.url });
+    setPasting(false);
+    if (!result.ok) return saveError();
+    setBlocks((list) => [result.data, ...list]);
+    if (detected.kind === "LINK") return toast({ tone: "success", message: t("paste.addedLink") });
+    // A player was guessed; one tap turns it back into a plain link.
+    toast({
+      tone: "success",
+      message: t("paste.addedEmbed"),
+      action: {
+        label: t("paste.asLink"),
+        onClick: async () => {
+          const link = await addBlock("LINK", { title: displayHost(detected.url), url: detected.url });
+          if (!link.ok) return saveError();
+          await deleteBlock(result.data.id);
+          setBlocks((list) => [link.data, ...list.filter((b) => b.id !== result.data.id)]);
+        },
+      },
+    });
+  }
+
+  // A link pasted anywhere on the page (outside a field or dialog) is added the same way.
+  const onPaste = useEffectEvent((e: ClipboardEvent) => {
+    if (e.target instanceof Element && e.target.closest("input, textarea, [contenteditable], dialog")) return;
+    const detected = detectBlock(e.clipboardData?.getData("text") ?? "");
+    if (!detected) return;
+    e.preventDefault();
+    void addDetected(detected);
+  });
+  useEffect(() => {
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, []);
+
+  // ─── Import and templates ───
+  function imported(result: AppliedImport) {
+    setImportUrl(null);
+    setBlocks((list) => [...list, ...result.blocks]);
+    setSocials((s) => ({ ...s, ...result.socials }));
+    setProfile((p) => ({ ...p, displayName: result.displayName ?? p.displayName, bio: result.bio ?? p.bio }));
+    toast({
+      tone: "success",
+      message: [t("import.done", { count: result.blocks.length }), result.skipped ? t("import.skipped", { count: result.skipped }) : ""].filter(Boolean).join(" "),
+    });
+  }
+
+  async function startFromTemplate(key: TemplateKey) {
+    setTemplating(key);
+    const result = await applyTemplate(key);
+    setTemplating(null);
+    if (!result.ok) return saveError();
+    setBlocks((list) => [...list, ...result.data]);
+    toast({ tone: "success", message: t("templates.applied") });
   }
 
   function changeBlock(id: string, data: Record<string, string>) {
@@ -192,7 +265,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           <h2 id="blocks-heading" className="px-1 text-[0.9375rem] font-semibold text-ink-2">
             {t("editor.blocks")}
           </h2>
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          {/* Touch screens swipe the row; wider screens (mouse, no sideways wheel) wrap it instead. */}
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
             {EDITABLE_BLOCK_TYPES.map((type) => {
               const Icon = BLOCK_ICON[type];
               return (
@@ -211,11 +285,10 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
             })}
           </div>
 
+          <PasteField onDetected={addDetected} busy={pasting} />
+
           {blocks.length === 0 ? (
-            <div className="glass-flat flex flex-col items-center gap-2 rounded-[var(--radius-card)] px-6 py-14 text-center">
-              <p className="font-medium">{t("editor.empty")}</p>
-              <p className="max-w-[40ch] text-sm text-ink-2">{t("editor.emptyHint")}</p>
-            </div>
+            <StartOptions onImport={() => setImportUrl("")} onTemplate={startFromTemplate} busy={templating} />
           ) : (
             <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
               <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
@@ -242,6 +315,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           )}
         </section>
       </div>
+
+      {importUrl !== null && <ImportDialog open initialUrl={importUrl} onClose={() => setImportUrl(null)} onImported={imported} />}
 
       {/* Desktop live preview: a glass phone. On mobile the tab bar's Preview opens it. */}
       <aside aria-label={t("editor.previewTitle")} className="hidden lg:block">

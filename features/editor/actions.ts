@@ -2,6 +2,7 @@
 
 import { del, list, put } from "@vercel/blob";
 import { updateTag } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { BlockType, SocialPlatform } from "@/prisma/generated/enums";
 import { db } from "@/lib/db";
@@ -14,7 +15,8 @@ import { blockImagePrefix, isOwnBlobUrl } from "@/lib/uploads";
 import { displayHost, normalizeUrl } from "@/lib/validation/url";
 import { blockDataSchemas, blockDefaults, DESC_MAX, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
 import { profileTag } from "@/features/profile/public";
-import type { EditorBlock } from "./types";
+import { TEMPLATE_KEYS, TEMPLATES } from "./templates";
+import { toEditorBlock, type EditorBlock } from "./types";
 
 type ActionError = "unauthorized" | "invalid" | "notFound" | "unknown" | "unreachable" | "tooMany";
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: ActionError };
@@ -42,28 +44,52 @@ async function withProfile<T>(body: (profile: { id: string; username: string; us
   }
 }
 
-const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
-  id: b.id,
-  type: b.type,
-  data: (b.data ?? {}) as Record<string, string>,
-  isVisible: b.isVisible,
-  isHighlighted: b.isHighlighted,
-  startsAt: b.startsAt?.toISOString() ?? null,
-  endsAt: b.endsAt?.toISOString() ?? null,
-});
-
 // ─── Blocks ──────────────────────────────────────────────────────────────────
 
-export async function addBlock(type: string): Promise<ActionResult<EditorBlock>> {
+/**
+ * Adds a block on top. `prefill` (smart paste) is only for links and embeds, and only when it is already a complete,
+ * valid block; everything else starts from the empty defaults.
+ */
+export async function addBlock(type: string, prefill?: unknown): Promise<ActionResult<EditorBlock>> {
   const parsed = z.enum(EDITABLE_BLOCK_TYPES).safeParse(type);
   if (!parsed.success) return fail("invalid");
+  const complete =
+    prefill === undefined
+      ? null
+      : parsed.data === "LINK"
+        ? blockDataSchemas.LINK.safeParse(prefill)
+        : parsed.data === "EMBED"
+          ? blockDataSchemas.EMBED.safeParse(prefill)
+          : undefined;
+  if (complete === undefined || (complete && !complete.success)) return fail("invalid");
+  const data = complete?.data ?? blockDefaults[parsed.data];
   return withProfile(async (profile) => {
     // New blocks go on top, where the user is looking.
     const first = await db.block.findFirst({ where: { profileId: profile.id }, orderBy: { position: "asc" }, select: { position: true } });
-    const block = await db.block.create({
-      data: { profileId: profile.id, type: parsed.data, position: (first?.position ?? 1) - 1, data: blockDefaults[parsed.data] },
-    });
+    const block = await db.block.create({ data: { profileId: profile.id, type: parsed.data, position: (first?.position ?? 1) - 1, data } });
     return ok(toEditorBlock(block));
+  });
+}
+
+/** Adds a starter page's blocks after the existing ones, in the owner's language (features/editor/templates.ts). */
+export async function applyTemplate(key: string): Promise<ActionResult<EditorBlock[]>> {
+  const parsed = z.enum(TEMPLATE_KEYS).safeParse(key);
+  if (!parsed.success) return fail("invalid");
+  const t = await getTranslations("templates.blocks");
+  // The texts are a plain string array per template (see messages/*.json).
+  const texts = t.raw(parsed.data) as string[];
+  const types = TEMPLATES[parsed.data];
+  return withProfile(async (profile) => {
+    const last = await db.block.findFirst({ where: { profileId: profile.id }, orderBy: { position: "desc" }, select: { position: true } });
+    const start = (last?.position ?? -1) + 1;
+    const blocks = await db.block.createManyAndReturn({
+      data: types.map((type, i) => {
+        const text = texts[i] ?? "";
+        const data = type === "LINK" ? { title: text, url: "" } : type === "EMAIL_CAPTURE" ? { title: text } : { text };
+        return { profileId: profile.id, type, position: start + i, data };
+      }),
+    });
+    return ok(blocks.sort((a, b) => a.position - b.position).map(toEditorBlock));
   });
 }
 

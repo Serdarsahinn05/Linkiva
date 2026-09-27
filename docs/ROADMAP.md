@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27, Faz 6 sürüyor.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6 canlıda, Faz 7 bitti (commit bekliyor).** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
@@ -175,7 +175,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 **Amaç:** Geçiş gününden önce açık denetimleri kapatmak, kullanıcı adını değiştirilebilir ama linkleri kırılmaz yapmak, gizlilik farkını yazıya dökmek.
 
 **Kapanmamış işler (Faz 5'ten)**
-- [x] Lighthouse (canlı site, mobil, 2026-09-27): landing 95/100/100/100, giriş 97/100/100/100, profil **89**/100/100/100. Profilin LCP'si ilk ekrandaki link kartı görseliydi ve `loading="lazy"` idi; ilk 3 bloğun görselleri artık hemen yükleniyor (`EAGER_BLOCKS`). Yeniden ölçüm bu dal canlıya çıkınca. Kalan: kart görselleri kaynaktaki biçimde (PNG) saklanıyor, WebP'ye çevirmek ~50 KB kazandırır (sunucuda görüntü işleme gerektiriyor, ayrı karar).
+- [x] Lighthouse (canlı site, mobil, 2026-09-27): landing 95/100/100/100, giriş 97/100/100/100, profil **89**/100/100/100. Profilin LCP'si ilk ekrandaki link kartı görseliydi ve `loading="lazy"` idi; ilk 3 bloğun görselleri artık hemen yükleniyor (`EAGER_BLOCKS`). Canlıda yeniden ölçüldü (5 koşu, medyan **87**, 82–94): tembel yükleme uyarısı kalktı ama puan değişmedi; darboğaz artık kart görselinin kendisi (sıkıştırılmamış PNG, LCP ~3.8 sn). Profil ≥ 90 için kart görsellerinin WebP'ye çevrilmesi gerekiyor (aşağıdaki karar). Kalan: kart görselleri kaynaktaki biçimde (PNG) saklanıyor, WebP'ye çevirmek ~50 KB kazandırır (sunucuda görüntü işleme gerektiriyor, ayrı karar).
 - [x] `account.spec.ts` kararsızlığı yeniden üretilemedi: tam paket 6 kez (132/132) ve `account` tek başına 9 eşzamanlı kopya geçti. Kök neden bulunmadı; tekrar görülürse iz (`trace`) saklanıyor. Aynı koşularda bulunan gerçek sorun: abone testleri aynı IP'den geldiği için tekrarlı koşuda abone rate limit'ine takılıyordu (limit doğru çalışıyor); e2e ziyaretçilerine ayrı belgeleme IP'si verildi (`visitorIp`).
 - [x] Abone formu JS kapalıyken e2e testi (`tests/e2e/phase6.spec.ts`).
 - [x] `ponytail-audit` (tüm depo, 2026-09-27): bağımlılıkların hepsinin gerçek kullanımı var, büyük fazlalık yok. Bulunan küçük ölü kod: kullanılmayan `ComingSoon` bileşeni ve "yakında" metinleri, 10 kullanılmayan çeviri anahtarı (≈45 satır). Temizlik Faz 7'nin ilk commit'ine bırakıldı. Sonuç DESIGN.md §11'de.
@@ -202,23 +202,24 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 **Amaç:** "Kayıttan sonra 60 saniyede yayında sayfa" hedefini, başka platformdan gelen ya da ne yazacağını bilmeyen kullanıcı için de tutturmak.
 
 **Linktree'den içe aktarma** (eski backlog #2)
-- [ ] `features/import/`: `importers.ts` host → ayrıştırıcı haritası. İlk ayrıştırıcı `linktree.ts`: sayfadaki `__NEXT_DATA__` JSON'undan görünen ad, bio, linkler (başlık + URL) ve sosyal hesaplar. Yapı değişirse "okunamadı" hatası döner, tahmin yapılmaz. Harita ileride bio.link / Beacons için genişler.
-- [ ] Getirme: `lib/link-preview.ts` içindeki güvenli getirme (`safeGet`) dışa açılır ve yeniden kullanılır. Ek olarak **host beyaz listesi** (`linktr.ee`), bu yüzden SSRF yüzeyi büyümez. HTML ≤ 1 MB, 6 sn.
-- [ ] Eylem `importProfile(url)`: `withProfile` → zod → getir → ayrıştır → her link `blockDataSchemas.LINK` ile doğrulanır (geçemeyen atlanır, sayısı raporlanır) → bloklar sona eklenir, sosyal hesaplar yalnızca boş platformlara yazılır, ad/bio yalnızca boşsa doldurulur. Rate limit: 10 dakikada 3.
-- [ ] Önizleme adımı: "12 link, 4 sosyal hesap bulundu" listesi, kullanıcı işaretleyip onaylar. Hiçbir şey onaysız yazılmaz.
-- [ ] Giriş noktaları: onboarding'in son adımı ("Başka yerde sayfan var mı?"), boş editör durumu, Ayarlar → Veri.
-- [ ] Test: kayıtlı HTML fikstürüyle birim testi (`tests/fixtures/linktree.html`), host dışı URL'nin reddi, sahiplik (içe aktarma yalnızca kendi profiline yazar).
+- [x] `features/import/`: `importers.ts` (host → ayrıştırıcı, yalnızca `linktr.ee/<ad>`), `linktree.ts` (`__NEXT_DATA__` → ad, bio, linkler, başlıklar, oynatıcılar, sosyal hesaplar; yapı bozuksa `null`, tahmin yok). Gerçek linktr.ee sayfalarında (TikTok, Spotify, Linktree) 2026-09-27'de doğrulandı.
+- [x] Getirme: `lib/link-preview.ts` → `fetchPage` (aynı SSRF korumaları + `hosts` beyaz listesi, son adres de kontrol edilir). 1 MB, kesilen sayfa reddedilir.
+- [x] `readImport` hiçbir şey yazmaz (kullanıcı başına 10 dakikada 3). `applyImport` yalnızca işaretlenenleri, editörle aynı şemalardan geçirerek yazar: bloklar sona, sosyal hesaplar yalnızca boş platformlara, ad/bio yalnızca boşsa. Geçersiz öğeler atlanır ve sayısı söylenir (10 dakikada 5).
+- [x] Önizleme adımı: işaretli liste (ad/bio, sosyal hesaplar, her blok ayrı), onaysız yazma yok.
+- [x] Giriş noktaları: boş editör (onboarding'den hemen sonra açılan ekran, 60 sn yolunu uzatmaz) ve `linktr.ee` adresi yapıştırılınca. *Ayarlar → Veri girişi eklenmedi; ihtiyaç olursa aynı diyalog.*
+- [x] Test: `tests/unit/import.test.ts` (sentetik fikstür `tests/fixtures/linktree.html`, host kuralları), `tests/integration/import.test.ts` (sahiplik, yalnızca boş alanları doldurma, geçersiz öğe, beyaz liste dışı host hiç getirilmez).
 
 **Başlangıç şablonları**
-- [ ] `features/onboarding/templates.ts`: Öğrenci, Müzisyen, Freelancer, İçerik üreticisi. Her biri blok dizisi (başlık, metin, link başlıkları) + tema önerisi. Metinler `messages/*.json` → `templates.*`.
-- [ ] URL'si henüz olmayan link **taslak** olarak gizli eklenir. Kural `lib/validation/blocks.ts`'te: LINK'te boş URL yalnızca `isVisible = false` iken kabul edilir. Editör satırında "Adres ekle" gösterilir, görünürlük anahtarı URL geçerli olana kadar kapalı kalır. `/l/` taslak bloğu zaten çözmez (görünür değil).
-- [ ] Onboarding'e "Şablonla başla / Boş başla" adımı. Adım atlanabilir, 60 saniye hedefini uzatmaz.
+- [x] `features/editor/templates.ts`: Öğrenci, Müzisyen, Serbest çalışan, İçerik üreticisi. Metinler `messages/*.json` → `templates.blocks`, sahibin dilinde.
+- [x] Taslak kuralı için yeni alan gerekmedi: editör zaten eksik blokları saklıyor ve "Tamamlanmadı, sayfanda görünmüyor" diye işaretliyor, public sayfa `parseBlock` ile atlıyor. Şablon linkleri başlıkla ve boş adresle eklenir. *Tema önerisi eklenmedi (kullanıcının seçtiğini ezmemek için).*
+- [x] Onboarding'e ayrı adım eklenmedi: şablonlar boş editörde, içe aktarmanın yanında (60 sn yolu aynı kaldı).
 
 **Akıllı yapıştırma**
-- [ ] `lib/detect-block.ts` → `detectBlock(url)`: `parseEmbed` tutarsa EMBED, `wa.me` / `api.whatsapp.com` WHATSAPP (Faz 8), `linktr.ee` ise içe aktarmayı öner, diğerleri LINK. Saf fonksiyon, birim testli.
-- [ ] Editörde "Link yapıştır" alanı ve boşta `paste` dinleyicisi (bir input odakta değilken). Algılanan tür toast ile söylenir, "Link olarak ekle" ile geri alınabilir.
+- [x] `features/editor/detect-block.ts` → `detectBlock`: oynatıcı → EMBED, `linktr.ee` → içe aktarma, diğerleri → başlığı host olan LINK. (WhatsApp, Faz 8'de blok gelince eklenecek.)
+- [x] Editörde "Link yapıştır" alanı (boş alana yapıştırmak doğrudan ekler) ve alan/diyalog dışında sayfaya yapıştırma. Oynatıcı tahmininde toast'ta "Link olarak ekle". `addBlock` yalnızca tam ve geçerli LINK/EMBED ön dolgusunu kabul eder.
+- [x] Test: `tests/e2e/phase7.spec.ts` (şablon taslakları yayına çıkmıyor, yapıştırma türleri, geçersiz metin, içe aktarma diyaloğu ve `linktr.ee` yapıştırınca açılması).
 
-**Kabul:** Linktree URL'si veren yeni kullanıcı 60 saniye içinde linkleri taşınmış, yayında bir sayfaya sahip (e2e, fikstür sunucusuyla). Şablon seçimi yayında boş/kırık link bırakmıyor.
+**Kabul:** Linktree URL'si veren yeni kullanıcı 60 saniye içinde linkleri taşınmış, yayında bir sayfaya sahip. Şablon seçimi yayında boş/kırık link bırakmıyor (e2e). *Not: içe aktarmanın ağ ayağı e2e'de değil (host beyaz listesi yerel fikstür sunucusuna izin vermez); ayrıştırma birim, yazma entegrasyon testinde, gerçek sayfa elle doğrulandı.*
 
 ---
 

@@ -4,13 +4,10 @@
     "description": "Linklerini, sosyal hesaplarını ve içeriklerini tek bir sayfada topla. Başka yerde ücretli olan her şey burada ücretsiz."
   },
   "common": {
-    "appName": "Linkiva",
     "login": "Giriş yap",
     "logout": "Çıkış yap",
     "startFree": "Ücretsiz başla",
     "skipToContent": "İçeriğe geç",
-    "continue": "Devam et",
-    "back": "Geri dön",
     "or": "veya",
     "loading": "Yükleniyor…",
     "genericError": "Bir şeyler ters gitti. Birazdan tekrar dene."
@@ -57,7 +54,10 @@
         "QR kod",
         "Adresinin QR kodunu SVG ya da PNG olarak indir."
       ],
-      "noSale": ["Verin satılmaz", "Yapay zekâ eğitimi yok, reklam yok, üçüncü taraflarla paylaşım yok."]
+      "noSale": [
+        "Verin satılmaz",
+        "Yapay zekâ eğitimi yok, reklam yok, üçüncü taraflarla paylaşım yok."
+      ]
     },
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
@@ -88,7 +88,6 @@
       "invalid": "E-posta veya şifre hatalı.",
       "unverified": "Önce e-postanı doğrulaman gerekiyor. Gelen kutuna yeni bir doğrulama linki gönderdik.",
       "tooMany": "Çok fazla deneme yaptın. Bir dakika sonra tekrar dene.",
-      "verified": "E-postan doğrulandı. Şimdi giriş yapabilirsin.",
       "passwordReset": "Şifren güncellendi. Yeni şifrenle giriş yap."
     },
     "register": {
@@ -150,9 +149,7 @@
     }
   },
   "dashboard": {
-    "welcome": "Sayfan yayında.",
-    "liveAt": "Adresin",
-    "comingSoon": "Editör bir sonraki adımda geliyor."
+    "welcome": "Sayfan yayında."
   },
   "mail": {
     "footer": "Bu maili, linkiva.space hesabınla ilgili bir işlem yapıldığı için aldın.",
@@ -236,7 +233,6 @@
     "socialsHint": "Kullanıcı adını ya da profil linkini yapıştır.",
     "socialInvalid": "Bu {platform} hesabını anlayamadık.",
     "blocks": "Bloklar",
-    "add": "Ekle",
     "addBlock": "{type} ekle",
     "types": {
       "LINK": "Link",
@@ -332,6 +328,82 @@
     "activeUntil": "{date} tarihine kadar yayında",
     "expired": "Süresi doldu, sayfada görünmüyor"
   },
+  "templates": {
+    "title": "Ya da bir şablonla başla",
+    "hint": "Bloklar eklenir, adreslerini sen doldurursun. Adresi olmayan link sayfanda görünmez.",
+    "applied": "Şablon eklendi. Linklerin adreslerini doldurunca sayfanda görünür.",
+    "names": {
+      "student": "Öğrenci",
+      "musician": "Müzisyen",
+      "freelancer": "Serbest çalışan",
+      "creator": "İçerik üreticisi"
+    },
+    "blocks": {
+      "student": [
+        "Özgeçmişim",
+        "GitHub",
+        "LinkedIn",
+        "Projeler",
+        "Son projem"
+      ],
+      "musician": [
+        "Spotify'da dinle",
+        "YouTube'da izle",
+        "Konserler",
+        "Bilet al",
+        "Yeni şarkılardan haberdar ol"
+      ],
+      "freelancer": [
+        "Ne yaptığımı ve kimlerle çalıştığımı kısaca anlatıyorum.",
+        "Portfolyom",
+        "Hizmetler ve fiyatlar",
+        "Benimle iletişime geç"
+      ],
+      "creator": [
+        "Son videom",
+        "Instagram",
+        "İşbirlikleri",
+        "Medya kiti",
+        "Bültenime katıl"
+      ]
+    }
+  },
+  "import": {
+    "close": "Kapat",
+    "open": "Linktree'den taşı",
+    "title": "Linklerini taşı",
+    "hint": "Linktree adresini yapıştır. Linklerini okuyup önce sana gösteririz, onaylamadan hiçbir şey eklenmez.",
+    "urlLabel": "Linktree adresin",
+    "urlPlaceholder": "linktr.ee/kullaniciadin",
+    "read": "Sayfayı oku",
+    "reading": "Okunuyor",
+    "found": "{items} blok ve {socials} sosyal hesap bulundu.",
+    "nameAndBio": "Ad ve bio (seninkiler boşsa kullanılır)",
+    "socials": "Sosyal hesaplar (boş olanlara eklenir)",
+    "apply": "Seçilenleri ekle",
+    "applying": "Ekleniyor",
+    "done": "{count} blok eklendi.",
+    "skipped": "{count} öğe geçersiz olduğu için atlandı.",
+    "back": "Başka adres",
+    "errors": {
+      "unsupported": "Şimdilik yalnızca linktr.ee adreslerini taşıyabiliyoruz.",
+      "unreachable": "Sayfaya ulaşılamadı. Adresi kontrol et.",
+      "unreadable": "Bu sayfayı okuyamadık.",
+      "empty": "Sayfada taşınacak link bulamadık.",
+      "tooMany": "Çok fazla deneme. Birkaç dakika sonra tekrar dene.",
+      "invalid": "Bu adresi anlayamadık."
+    }
+  },
+  "paste": {
+    "label": "Link yapıştır",
+    "placeholder": "Bir link yapıştır, türünü biz anlayalım",
+    "add": "Ekle",
+    "addedEmbed": "Oynatıcı olarak eklendi.",
+    "addedLink": "Link eklendi.",
+    "asLink": "Link olarak ekle",
+    "importOffer": "Bu bir Linktree sayfası. Linklerini taşımak ister misin?",
+    "invalid": "Bu adresi açamayız. https:// ile başlayan bir link dene."
+  },
   "share": {
     "address": "Adresin",
     "copy": "Kopyala",
@@ -361,11 +433,6 @@
     },
     "account": "Hesap",
     "signedInAs": "{email} olarak giriş yaptın."
-  },
-  "soon": {
-    "appearance": "Tema ve özelleştirme bir sonraki adımda geliyor.",
-    "analytics": "İstatistikler, sayfan ziyaret almaya başladığında burada görünecek.",
-    "back": "Linklere dön"
   },
   "appearance": {
     "title": "Görünüm",
@@ -426,7 +493,6 @@
   "blocks": {
     "embedPlay": "Oynat",
     "embedListen": "Dinle",
-    "embedOn": "{provider} üzerinde",
     "subscribeTitle": "Haberdar ol",
     "subscribePlaceholder": "E-posta adresin",
     "subscribeButton": "Abone ol",
@@ -441,7 +507,6 @@
     "empty": "Sayfana bir E-posta bloğu ekle; abone olanlar burada listelenir.",
     "export": "CSV indir",
     "email": "E-posta",
-    "date": "Tarih",
     "remove": "Kaldır",
     "removed": "Abone kaldırıldı."
   },
