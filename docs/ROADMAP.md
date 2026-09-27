@@ -178,7 +178,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] Lighthouse (canlı site, mobil, 2026-09-27): landing 95/100/100/100, giriş 97/100/100/100, profil **89**/100/100/100. Profilin LCP'si ilk ekrandaki link kartı görseliydi ve `loading="lazy"` idi; ilk 3 bloğun görselleri artık hemen yükleniyor (`EAGER_BLOCKS`). Yeniden ölçüm bu dal canlıya çıkınca. Kalan: kart görselleri kaynaktaki biçimde (PNG) saklanıyor, WebP'ye çevirmek ~50 KB kazandırır (sunucuda görüntü işleme gerektiriyor, ayrı karar).
 - [x] `account.spec.ts` kararsızlığı yeniden üretilemedi: tam paket 6 kez (132/132) ve `account` tek başına 9 eşzamanlı kopya geçti. Kök neden bulunmadı; tekrar görülürse iz (`trace`) saklanıyor. Aynı koşularda bulunan gerçek sorun: abone testleri aynı IP'den geldiği için tekrarlı koşuda abone rate limit'ine takılıyordu (limit doğru çalışıyor); e2e ziyaretçilerine ayrı belgeleme IP'si verildi (`visitorIp`).
 - [x] Abone formu JS kapalıyken e2e testi (`tests/e2e/phase6.spec.ts`).
-- [ ] `ponytail-review` (impeccable denetiminden sonra, sıra kuralı). Sonuç DESIGN.md §11'e.
+- [x] `ponytail-audit` (tüm depo, 2026-09-27): bağımlılıkların hepsinin gerçek kullanımı var, büyük fazlalık yok. Bulunan küçük ölü kod: kullanılmayan `ComingSoon` bileşeni ve "yakında" metinleri, 10 kullanılmayan çeviri anahtarı (≈45 satır). Temizlik Faz 7'nin ilk commit'ine bırakıldı. Sonuç DESIGN.md §11'de.
 
 **Kullanıcı adı değiştirme + 90 günlük yönlendirme** (eski backlog #1)
 - [x] Veri: `UsernameHistory { username @id, profileId, createdAt, expiresAt }`, migration `username_history`. Profil silinince cascade.

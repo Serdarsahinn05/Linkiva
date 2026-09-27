@@ -243,4 +243,5 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - **Kontrast:** açık temada `ink-3`, `positive`, `info` 4.5:1 altındaydı, koyulaştırıldı. Artık testle korunuyor.
 - **Mobil taşma:** landing hero'su 390px'te yatay taşıyordu, düzeltildi. `tests/e2e/layout.spec.ts` beş sayfayı koruyor.
 - **Lighthouse (Faz 6, canlı, mobil):** landing 95 · giriş 97 · profil 89 performans; erişilebilirlik, en iyi uygulamalar ve SEO hepsinde 100. Profil düzeltmesi (ilk ekran görselleri hemen yüklenir) ROADMAP Faz 6'da.
-- **Açık kalan:** `ponytail-review` (fazlalık denetimi) henüz çalıştırılmadı.
+- **Fazlalık denetimi (`ponytail-audit`, Faz 6):** yalın. Silinecekler: `ComingSoon` + `soon` metinleri, 10 kullanılmayan çeviri anahtarı. `DESIGN_CONTRACT` HTML yorumu §10 gereği kalır. `lib/link-preview.ts`'in düşük seviye `http` kullanımı SSRF için bilinçli (IP sabitleme `fetch` ile yapılamaz).
+- **Ayrı incelemeye:** `common.skipToContent` metni var ama "içeriğe geç" linki hiçbir sayfada yok (erişilebilirlik, klavye kullanıcıları).
