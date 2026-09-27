@@ -88,6 +88,17 @@ Resend yalnızca **gönderir**. Gelen mail ImprovMX ile yönlendiriliyor (Zoho'n
 4. Her şey tamamsa `rebuild/v2` → `master` birleştir. Production env'leri gir, alan adı zaten projeye bağlı.
 5. Canlıda kısa bir duman testi yap, sonra eski v1 Supabase projesini ve eski Blob deposunu sil.
 
+## Veritabanı değişikliği olan bir fazı canlıya almak
+
+Migration, `master`'a birleştirmeden **önce** production veritabanına uygulanır (yalnızca eksikleri ekler, veri silmez).
+Yereldeki `.env` dosyası canlı adresi uygulamanın okumadığı bir adla tutar (`PROD_DIRECT_URL`), böylece yanlışlıkla kullanılmaz:
+
+```powershell
+$env:DIRECT_URL = (Select-String -Path .env -Pattern '^PROD_DIRECT_URL="(.+)"').Matches.Groups[1].Value; npm run db:deploy
+```
+Kontrol (yalnızca okur): aynı satırda `npm run db:deploy` yerine `npx prisma migrate status` → "Database schema is up to date!".
+`.env` yoksa adres: Vercel → Settings → Environment Variables → Production `DIRECT_URL`.
+
 ## Yerel notlar
 
 - Yerel DB: `docker compose up -d`, `.env.local` → `linkiva_dev`. `npm run db:migrate` hem migration hem client üretir.

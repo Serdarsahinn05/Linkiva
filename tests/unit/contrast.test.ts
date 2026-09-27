@@ -22,7 +22,8 @@ const ratio = (a: [number, number, number], b: [number, number, number]) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
-const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+// Line endings depend on the checkout (Windows + core.autocrlf gives CRLF); the slices below expect LF.
+const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8").replace(/\r\n/g, "\n");
 function tokens(block: string) {
   const out: Record<string, [number, number, number]> = {};
   for (const m of block.matchAll(/--c-([a-z0-9-]+):\s*oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)\)/g)) {
