@@ -8,7 +8,7 @@ import { withLatestVideos } from "@/features/profile/latest-video";
 import { getPublicProfile, getUsernameRedirect } from "@/features/profile/public";
 import { liveBlocks } from "@/lib/schedule";
 import { defaultLocale, isLocale } from "@/i18n/config";
-import { profileUrl, site } from "@/lib/site";
+import { profileDisplayUrl, profileUrl, site } from "@/lib/site";
 
 // Data is cached by tag and refreshed on every edit; this bounds how late a scheduled block appears.
 export const revalidate = 300;
@@ -29,13 +29,13 @@ export async function generateMetadata({ params }: PageProps<"/[username]">): Pr
   if (!profile) return { title: site.name, robots: { index: false } };
   const name = profile.displayName || profile.username;
   const title = profile.seoTitle || `${name} (@${profile.username}) · ${site.name}`;
-  const description = profile.seoDescription || profile.bio || `${name} · ${site.host}/${profile.username}`;
+  const description = profile.seoDescription || profile.bio || `${name} · ${profileDisplayUrl(profile.username, profile.customDomain)}`;
   return {
     metadataBase: new URL(site.url),
     title,
     description,
-    alternates: { canonical: profileUrl(profile.username) },
-    openGraph: { title, description, url: profileUrl(profile.username), siteName: site.name, type: "profile" },
+    alternates: { canonical: profileUrl(profile.username, profile.customDomain) },
+    openGraph: { title, description, url: profileUrl(profile.username, profile.customDomain), siteName: site.name, type: "profile" },
     twitter: { card: "summary_large_image", title, description },
   };
 }

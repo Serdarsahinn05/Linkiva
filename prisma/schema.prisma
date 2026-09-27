@@ -108,6 +108,7 @@ model Profile {
   events         Event[]
   subscribers    Subscriber[]
   pastUsernames  UsernameHistory[]
+  customDomain   CustomDomain?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -232,6 +233,20 @@ model Subscriber {
 }
 
 /// A username the profile used before. It keeps redirecting to the current one and stays unclaimable until expiresAt.
+/// The owner's own domain, served by this profile once verified (ROADMAP Faz 11). One per profile.
+model CustomDomain {
+  id         String    @id @default(cuid())
+  profileId  String    @unique
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  /// Lower-case ASCII (punycode) host name, without port.
+  hostname   String    @unique
+  /// Set once Vercel reports the domain verified and its DNS pointing at us; the domain serves the profile only then.
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@map("custom_domain")
+}
+
 model UsernameHistory {
   username  String   @id
   profileId String

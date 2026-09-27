@@ -7,11 +7,12 @@ export const site = {
   host: new URL(appUrl).host,
 } as const;
 
-export function profileUrl(username: string): string {
-  return `${site.url}/${username}`;
+/** The profile's address: its verified custom domain when it has one (ROADMAP Faz 11), else linkiva.space/<username>. */
+export function profileUrl(username: string, domain?: string | null): string {
+  return domain ? `https://${domain}` : `${site.url}/${username}`;
 }
 
-/** "linkiva.space/serdar": for display, without protocol. */
-export function profileDisplayUrl(username: string): string {
-  return `${site.host}/${username}`;
+/** "linkiva.space/serdar" (or "serdar.com"): for display, without protocol. */
+export function profileDisplayUrl(username: string, domain?: string | null): string {
+  return domain ?? `${site.host}/${username}`;
 }

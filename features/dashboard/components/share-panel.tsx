@@ -14,14 +14,14 @@ import { STORY_LOOKS, storyPath, type StoryLook } from "@/lib/story";
 const iconButton = "flex size-10 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-glass-strong hover:text-ink";
 
 /** Profile address with copy, open and QR. The QR encodes the configured domain (v1 bug B7). */
-export function SharePanel({ username }: { username: string }) {
+export function SharePanel({ username, domain }: { username: string; domain: string | null }) {
   const t = useTranslations("share");
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [story, setStory] = useState<"idle" | "busy" | "failed">("idle");
   const [look, setLook] = useState<StoryLook>("profile");
   const qrWrap = useRef<HTMLDivElement>(null);
-  const url = profileUrl(username);
+  const url = profileUrl(username, domain);
 
   async function copy() {
     await navigator.clipboard.writeText(url);
@@ -76,7 +76,7 @@ export function SharePanel({ username }: { username: string }) {
     <div className="glass-flat flex flex-col gap-2 rounded-[var(--radius-control)] p-3">
       <span className="text-xs text-ink-3">{t("address")}</span>
       <span lang="en" translate="no" className="truncate text-sm font-medium">
-        {profileDisplayUrl(username)}
+        {profileDisplayUrl(username, domain)}
       </span>
       <div className="-mx-1 flex items-center">
         <button type="button" onClick={copy} className={iconButton} aria-label={copied ? t("copied") : t("copy")} title={t("copy")}>
@@ -101,7 +101,7 @@ export function SharePanel({ username }: { username: string }) {
             <QRCodeCanvas value={url} size={1024} level="M" marginSize={2} className="hidden" />
           </div>
           <span lang="en" className="text-sm text-ink-2">
-            {profileDisplayUrl(username)}
+            {profileDisplayUrl(username, domain)}
           </span>
           <div className="flex gap-2">
             <button type="button" onClick={() => download("png")} className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}>

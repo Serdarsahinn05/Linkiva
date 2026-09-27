@@ -11,12 +11,16 @@ export function visitorHash({ ip, userAgent, profileId, secret, date = new Date(
   return createHash("sha256").update(`${salt}|${ip}|${userAgent}|${profileId}`).digest("hex").slice(0, 32);
 }
 
-/** Only the host of the referrer is kept ("instagram.com"); paths and queries can carry personal data. */
-export function referrerHost(referrer: string | null | undefined, ownHost: string): string | null {
+/**
+ * Only the host of the referrer is kept ("instagram.com"); paths and queries can carry personal data. Our own hosts
+ * (the site, and the custom domain a request came in on) are not a source.
+ */
+export function referrerHost(referrer: string | null | undefined, ownHosts: string | (string | null)[]): string | null {
   if (!referrer) return null;
   try {
     const host = new URL(referrer).hostname.replace(/^(www|m|l|lm)\./, "");
-    if (!host || host === ownHost.replace(/^www\./, "").split(":")[0]) return null;
+    const own = [ownHosts].flat().flatMap((h) => (h ? [h.replace(/^www\./, "").split(":")[0]!.toLowerCase()] : []));
+    if (!host || own.includes(host)) return null;
     // Normalise the short-link hosts social apps use.
     const aliases: Record<string, string> = { "t.co": "x.com", "twitter.com": "x.com", "lnkd.in": "linkedin.com", "youtu.be": "youtube.com", "fb.me": "facebook.com" };
     return aliases[host] ?? host;

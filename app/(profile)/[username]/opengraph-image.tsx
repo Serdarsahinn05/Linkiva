@@ -72,7 +72,7 @@ export default async function Image({ params }: { params: Promise<{ username: st
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 28, color: INK_2 }}>
               <div style={{ display: "flex", width: 12, height: 12, borderRadius: 999, background: INK, boxShadow: `0 0 16px ${INK}` }} />
-              {profileDisplayUrl(profile?.username ?? username)}
+              {profileDisplayUrl(profile?.username ?? username, profile?.customDomain)}
             </div>
           </div>
           {links.length > 0 && (

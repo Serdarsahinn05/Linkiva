@@ -27,17 +27,20 @@ const NAV: NavItem[] = [
 // The mobile tab bar keeps Instagram's five slots; Audience is reached from the sidebar (desktop) and the Email block.
 const SIDEBAR: NavItem[] = [...NAV.slice(0, 3), { href: "/dashboard/audience", key: "audience", icon: Users }, NAV[3]!];
 
-export function DashboardShell({ username, children }: { username: string; children: ReactNode }) {
+/** domain: the profile's verified custom domain, shown and shared instead of linkiva.space/<username>. */
+export function DashboardShell({ username, domain, children }: { username: string; domain: string | null; children: ReactNode }) {
   return (
     <ToastProvider>
       <PreviewProvider>
-        <ShellFrame username={username}>{children}</ShellFrame>
+        <ShellFrame username={username} domain={domain}>
+          {children}
+        </ShellFrame>
       </PreviewProvider>
     </ToastProvider>
   );
 }
 
-function ShellFrame({ username, children }: { username: string; children: ReactNode }) {
+function ShellFrame({ username, domain, children }: { username: string; domain: string | null; children: ReactNode }) {
   const t = useTranslations();
   const pathname = usePathname();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -87,7 +90,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
             </ul>
           </nav>
           <div className="mt-auto flex flex-col gap-2">
-            <SharePanel username={username} />
+            <SharePanel username={username} domain={domain} />
             <LogoutButton />
           </div>
         </div>
@@ -149,10 +152,10 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
           {livePreview ?? <iframe src={`/${username}`} title={t("editor.previewTitle")} className="size-full border-0" />}
         </div>
       </Dialog>
-      <CommandPalette username={username} open={paletteOpen} onOpenChange={setPaletteOpen} onShare={() => setShareOpen(true)} />
+      <CommandPalette username={username} domain={domain} open={paletteOpen} onOpenChange={setPaletteOpen} onShare={() => setShareOpen(true)} />
       <Dialog open={shareOpen} onClose={() => setShareOpen(false)} title={t("share.share")} closeLabel={t("share.close")} variant="sheet">
         <div className="p-5">
-          <SharePanel username={username} />
+          <SharePanel username={username} domain={domain} />
         </div>
       </Dialog>
     </div>

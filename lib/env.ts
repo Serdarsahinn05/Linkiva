@@ -18,6 +18,11 @@ const schema = z.object({
   TRACKING_SALT_SECRET: z.string().min(16).default("dev-only-tracking-salt-secret"),
   /** Vercel Cron sends it as a Bearer token to /api/cron/daily. Without it, scheduled jobs are off. */
   CRON_SECRET: z.string().min(16).optional(),
+  /** Custom domains (Faz 11): a Vercel token with access to this project. Without all three, the feature is hidden. */
+  VERCEL_API_TOKEN: optional,
+  VERCEL_PROJECT_ID: optional,
+  /** Only for projects owned by a team; empty for a personal account. */
+  VERCEL_TEAM_ID: optional,
   /** Set by the Playwright web server only. See isE2E below. */
   E2E: z.enum(["1"]).optional(),
 });

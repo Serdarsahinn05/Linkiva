@@ -7,6 +7,8 @@ import { Preferences } from "@/features/account/components/preferences";
 import { PublishingForm } from "@/features/account/components/publishing-form";
 import { PageHeader, PageReveal, Section } from "@/features/dashboard/components/page";
 import { DigestToggle } from "@/features/digest/components/digest-toggle";
+import { DomainForm } from "@/features/domains/components/domain-form";
+import { toDomainView } from "@/features/domains/view";
 import { UsernameForm } from "@/features/profile/components/username-form";
 import { getOwnProfile } from "@/features/profile/queries";
 import { auth } from "@/lib/auth";
@@ -27,11 +29,13 @@ export default async function SettingsPage() {
   const theme = parseThemePreference((await cookies()).get(THEME_COOKIE)?.value);
   const locale = await getLocale();
 
-  const [profile, accounts, sessions] = await Promise.all([
+  const [profile, accounts, sessions, domain] = await Promise.all([
     getOwnProfile(session.user.id),
     db.account.findMany({ where: { userId: session.user.id }, select: { providerId: true, accountId: true } }),
     auth.api.listSessions({ headers: await headers() }),
+    features.domains ? db.customDomain.findFirst({ where: { profile: { userId: session.user.id } } }) : null,
   ]);
+  const td = await getTranslations("domain");
 
   return (
     <PageReveal>
@@ -41,6 +45,11 @@ export default async function SettingsPage() {
           <Section title={tp("title")}>
             <UsernameForm current={profile.username} host={site.host} />
             <PublishingForm initial={{ isPublished: profile.isPublished, seoTitle: profile.seoTitle ?? "", seoDescription: profile.seoDescription ?? "" }} />
+          </Section>
+        )}
+        {profile && features.domains && (
+          <Section title={td("title")}>
+            <DomainForm initial={domain ? toDomainView(domain, null) : null} />
           </Section>
         )}
         <Section title={t("appearance")}>

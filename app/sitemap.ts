@@ -6,7 +6,8 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const profiles = await db.profile.findMany({
-    where: { isPublished: true },
+    // A profile on its own verified domain is not listed here: its canonical address is on another host.
+    where: { isPublished: true, OR: [{ customDomain: null }, { customDomain: { verifiedAt: null } }] },
     select: { username: true, updatedAt: true },
     orderBy: { updatedAt: "desc" },
     take: 50_000, // sitemap protocol limit

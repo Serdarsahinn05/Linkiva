@@ -70,7 +70,7 @@ export async function recordEvent({ type, profile, blockId, headers, referrer, u
         device: ua.device,
         os: ua.os,
         browser: ua.browser,
-        referrerHost: referrerHost(referrer, site.host),
+        referrerHost: referrerHost(referrer, [site.host, headers.get("host")]),
         utmSource: utmSource(utm),
         dedupeKey,
       },

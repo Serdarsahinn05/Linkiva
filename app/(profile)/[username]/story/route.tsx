@@ -53,7 +53,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ user
   ];
 
   // The panel's QR component (qrcode.react) needs React hooks, which Satori cannot run: uqr gives the SVG directly.
-  const qr = renderSVG(profileUrl(profile.username), { ecc: "M", border: 0 });
+  const qr = renderSVG(profileUrl(profile.username, profile.customDomain), { ecc: "M", border: 0 });
   const qrSrc = `data:image/svg+xml;base64,${Buffer.from(qr).toString("base64")}`;
   const [avatar, background] = await Promise.all([
     forImageResponse(profile.avatarUrl, 480, "png"),
@@ -123,7 +123,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ user
         >
           {name}
         </div>
-        <div style={{ display: "flex", marginTop: 28, fontSize: 38, color: ink2, fontFamily: mono ? "Geist Mono" : undefined }}>{profileDisplayUrl(profile.username)}</div>
+        <div style={{ display: "flex", marginTop: 28, fontSize: 38, color: ink2, fontFamily: mono ? "Geist Mono" : undefined }}>{profileDisplayUrl(profile.username, profile.customDomain)}</div>
         <div
           style={{
             display: "flex",
