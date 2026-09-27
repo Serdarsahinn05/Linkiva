@@ -8,7 +8,7 @@ import { Wordmark } from "@/components/ui/surface";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
-const FREE_KEYS = ["analytics", "themes", "schedule", "highlight", "capture", "embed", "branding", "qr"] as const;
+const FREE_KEYS = ["analytics", "themes", "schedule", "highlight", "capture", "embed", "branding", "qr", "noSale"] as const;
 
 /** "linkiva.space/ [username] →": a plain GET form, works without JavaScript. */
 function ClaimForm({ id, label, placeholder, cta }: { id: string; label: string; placeholder: string; cta: string }) {

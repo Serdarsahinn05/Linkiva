@@ -12,7 +12,7 @@ type Doc = { title: string; updated: string; intro: string; sections: Section[] 
 const CONTENT: Record<"tr" | "en", Doc> = {
   tr: {
     title: "Gizlilik",
-    updated: "Son güncelleme: 24 Eylül 2026",
+    updated: "Son güncelleme: 27 Eylül 2026",
     intro: `${site.name}, profil sayfalarını ziyaret edenleri izlemez. Profil sahiplerine gösterilen istatistikler çerezsiz ve kişiyi tanımlamayan bir yöntemle ölçülür.`,
     sections: [
       {
@@ -37,6 +37,13 @@ const CONTENT: Record<"tr" | "en", Doc> = {
         ],
       },
       {
+        title: "Verini satmayız",
+        body: [
+          "Profil sahiplerinin ve ziyaretçilerin verisini yalnızca hizmeti çalıştırmak için işleriz. Hiçbir veriyi satmayız, reklam ağlarıyla paylaşmayız ve sayfalarda reklam ya da üçüncü taraf takip betiği bulunmaz.",
+          "Verilerini yapay zekâ modellerini eğitmek için kullanmayız ve hiçbir yapay zekâ sağlayıcısına göndermeyiz. Yukarıda adı geçen altyapı sağlayıcıları verini yalnızca bizim adımıza saklar ve iletir.",
+        ],
+      },
+      {
         title: "Haklarını kullanmak",
         body: [
           "KVKK ve GDPR kapsamındaki bilgi alma, düzeltme ve silme haklarını kullanmak için hesap ayarlarını kullanabilir ya da hello@linkiva.space adresine yazabilirsin. Hesabını sildiğinde sayfan, blokların, istatistiklerin ve abone listen kalıcı olarak silinir.",
@@ -46,7 +53,7 @@ const CONTENT: Record<"tr" | "en", Doc> = {
   },
   en: {
     title: "Privacy",
-    updated: "Last updated: 24 September 2026",
+    updated: "Last updated: 27 September 2026",
     intro: `${site.name} does not track the people who visit profile pages. The statistics shown to profile owners are measured without cookies and without identifying anyone.`,
     sections: [
       {
@@ -68,6 +75,13 @@ const CONTENT: Record<"tr" | "en", Doc> = {
         body: [
           "For your account we store your email address, a secure hash of your password (never the password itself), session data and the content you add to your page. If you sign in with Google we receive your name, email address and profile photo from Google.",
           "Email is sent through Resend, files are stored on Vercel Blob, the database runs on Supabase (PostgreSQL) and the app runs on Vercel.",
+        ],
+      },
+      {
+        title: "We don't sell your data",
+        body: [
+          "We process the data of profile owners and visitors only to run the service. We never sell it or share it with ad networks, and pages carry no ads or third-party tracking scripts.",
+          "We do not use your data to train AI models and do not send it to any AI provider. The infrastructure providers named above only store and transmit it on our behalf.",
         ],
       },
       {

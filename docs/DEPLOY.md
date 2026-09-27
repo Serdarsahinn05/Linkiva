@@ -94,20 +94,12 @@ Resend yalnızca **gönderir**. Gelen mail ImprovMX ile yönlendiriliyor (Zoho'n
 - Yerelde sahte istatistik varsa: `DELETE FROM event WHERE "visitorHash" LIKE 'demo-%';`
 - E2E: `PW_CHANNEL=chrome npx playwright test`. Production modu: `npm run build && PW_PROD=1 PW_CHANNEL=chrome npx playwright test`. Port 3000 doluysa `PORT=3100 NEXT_PUBLIC_APP_URL=http://localhost:3100` ile.
 
-## Durum (2026-09-24)
+## Durum (2026-09-27)
 
-Yapıldı:
-- Supabase **Frankfurt** projesi açıldı, 3 migration uygulandı (boş). Mumbai denemesi silindi.
-- Vercel **Preview** env'leri v2'ye ayrıldı (`DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_APP_URL` = dal adresi,
-  `BETTER_AUTH_SECRET`, `TRACKING_SALT_SECRET`). **Production env'leri hâlâ v1'in**, canlı v1 onlarla çalışıyor.
-- Preview: `https://linkiva-git-rebuild-v2-serdarsahinn05s-projects.vercel.app` çalışıyor, Google girişi dahil
-  (redirect URI eklendi, Branding "Linkiva").
-- Resend alan adı doğrulandı. Posta kutusu yukarıdaki gibi kurulu. Blob: mevcut depo kullanılıyor.
+**Geçiş tamamlandı.** v2 `https://linkiva.space` adresinde canlı (Production env'leri Frankfurt Supabase'i gösteriyor, `master` = v2).
+v1 Supabase projesinin ve eski Blob dosyalarının silinmesi kullanıcıda; yapılınca bu satır güncellenir.
 
-Geçiş günü (kullanıcı preview denemesini bitirince, onayıyla):
-1. Production env: `DATABASE_URL`, `DIRECT_URL` → Frankfurt; `NEXT_PUBLIC_APP_URL=https://linkiva.space`;
-   `BETTER_AUTH_SECRET`, `TRACKING_SALT_SECRET` Production'a da eklenir.
-2. Sil: `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NPM_CONFIG_LEGACY_PEER_DEPS`, çalışmayan `UPSTASH_*` (ya da yeni Upstash).
-3. Settings → Functions → Region **fra1**.
-4. `rebuild/v2` → `master` birleştir, production'da duman testi.
-5. Eski v1 Supabase projesini ve Blob'daki v1 dosyalarını sil.
+Bundan sonra: her faz (ROADMAP Faz 6–13) kendi dalında geliştirilir, Vercel dal için preview üretir, preview'da denenir,
+kullanıcı onayıyla `master`'a birleşir. Şema değişikliği olan fazlarda birleştirmeden **önce** production DB'ye
+`npm run db:deploy` (yalnızca eksik migration'lar, veri silmez) uygulanır; migration'lar geriye uyumlu yazılır
+(yeni kolon varsayılanlı ya da boş olabilir), böylece eski kod yeni şemayla da çalışır.

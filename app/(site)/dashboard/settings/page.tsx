@@ -6,10 +6,12 @@ import { LogoutButton } from "@/features/account/components/logout-button";
 import { Preferences } from "@/features/account/components/preferences";
 import { PublishingForm } from "@/features/account/components/publishing-form";
 import { PageHeader, PageReveal, Section } from "@/features/dashboard/components/page";
+import { UsernameForm } from "@/features/profile/components/username-form";
 import { getOwnProfile } from "@/features/profile/queries";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { features } from "@/lib/features";
+import { site } from "@/lib/site";
 import { requireSession } from "@/lib/session";
 import { parseThemePreference, THEME_COOKIE } from "@/lib/theme-preference";
 
@@ -36,6 +38,7 @@ export default async function SettingsPage() {
         <PageHeader title={t("title")} />
         {profile && (
           <Section title={tp("title")}>
+            <UsernameForm current={profile.username} host={site.host} />
             <PublishingForm initial={{ isPublished: profile.isPublished, seoTitle: profile.seoTitle ?? "", seoDescription: profile.seoDescription ?? "" }} />
           </Section>
         )}

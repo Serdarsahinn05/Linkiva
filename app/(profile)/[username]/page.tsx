@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { ViewBeacon } from "@/components/blocks/view-beacon";
-import { getPublicProfile } from "@/features/profile/public";
+import { getPublicProfile, getUsernameRedirect } from "@/features/profile/public";
 import { liveBlocks } from "@/lib/schedule";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { profileUrl, site } from "@/lib/site";
@@ -41,7 +41,12 @@ export async function generateMetadata({ params }: PageProps<"/[username]">): Pr
 
 export default async function ProfilePage({ params }: PageProps<"/[username]">) {
   const profile = await load(params);
-  if (!profile) notFound();
+  if (!profile) {
+    // A renamed profile keeps its old address working for 90 days (docs/ARCHITECTURE.md §6).
+    const moved = await getUsernameRedirect(decodeURIComponent((await params).username).toLowerCase());
+    if (moved) permanentRedirect(`/${moved}`);
+    notFound();
+  }
 
   const locale = isLocale(profile.locale) ? profile.locale : defaultLocale;
   const t = await getTranslations({ locale });

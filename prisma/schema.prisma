@@ -103,6 +103,7 @@ model Profile {
   socials        SocialLink[]
   events         Event[]
   subscribers    Subscriber[]
+  pastUsernames  UsernameHistory[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -211,4 +212,16 @@ model Subscriber {
 
   @@unique([profileId, email])
   @@map("subscriber")
+}
+
+/// A username the profile used before. It keeps redirecting to the current one and stays unclaimable until expiresAt.
+model UsernameHistory {
+  username  String   @id
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([profileId, createdAt])
+  @@map("username_history")
 }

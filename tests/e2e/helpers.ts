@@ -24,6 +24,12 @@ export async function lastMail(to: string, kind: string, after: number): Promise
   return url;
 }
 
+/**
+ * A fresh documentation-range IP (RFC 5737) for a test visitor. Public endpoints rate-limit per IP, so repeated runs
+ * from one machine would otherwise trip the limiter (that is the limiter working, not a bug).
+ */
+export const visitorIp = () => `198.51.100.${1 + Math.floor(Math.random() * 254)}`;
+
 export const uid = () => `${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`;
 
 /** Registers, verifies and onboards a fresh user; leaves the page on /dashboard. */

@@ -56,7 +56,8 @@
       "qr": [
         "QR kod",
         "Adresinin QR kodunu SVG ya da PNG olarak indir."
-      ]
+      ],
+      "noSale": ["Verin satılmaz", "Yapay zekâ eğitimi yok, reklam yok, üçüncü taraflarla paylaşım yok."]
     },
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
@@ -452,6 +453,15 @@
     "seoTitleHint": "Boş bırakırsan adın ve kullanıcı adın kullanılır. En fazla 70 karakter.",
     "seoDescription": "Arama motoru açıklaması",
     "seoDescriptionHint": "Boş bırakırsan bio kullanılır. En fazla 160 karakter."
+  },
+  "username": {
+    "hint": "Eski adresin {days} gün boyunca yeni adrese yönlenir, sonra başkası alabilir.",
+    "save": "Adresi değiştir",
+    "saving": "Değiştiriliyor",
+    "cancel": "Vazgeç",
+    "changed": "Adresin artık {address}.",
+    "limit": "30 gün içinde en fazla 2 kez adres değiştirebilirsin. Biraz sonra tekrar dene.",
+    "invalid": "Bu ad kullanılamaz. Küçük harf, rakam ve . _ - kullanabilirsin."
   },
   "analytics": {
     "title": "İstatistik",

@@ -24,6 +24,14 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 - **Blok çeşitliliği.** Sayfa sadece link listesi değildir. Başlık, metin, video/müzik embed'i, e-posta toplama gibi tipli bloklardan oluşur.
 - **Sadelik ve hız.** Az adım, hafif profil sayfası, sıfır karmaşa. Güçlü özelleştirme, sadeliği bozmadan sunulur.
 - **Güçlü özelleştirme.** Birbirinden gerçekten farklı temalar ve kullanıcının kendi renk, font ve buton stilini seçmesi.
+- **Verin satılmaz (2026-09-27).** Çerez yok, IP saklanmaz. Kullanıcı verisi yapay zekâ eğitiminde kullanılmaz, hiçbir LLM sağlayıcısına ya da reklam ağına gönderilmez. Rakiplerin 2026'da veri paylaşımına kaydığı noktada bu ayırt edici bir iddiadır. Pazarlama metninde rakip adı geçmez.
+- **Türkiye'yi gerçekten tanır.** IBAN ile destek, hazır mesajlı WhatsApp butonu, rehbere eklenen kartvizit, açık "İşbirliği" beyanlı affiliate kartı (ROADMAP Faz 8). Linkiva ödemeye aracılık etmez.
+
+### Pazar notu (2026-09-27)
+
+- Bento.me 2026-02-13'te kapandı (Linktree satın almıştı, veriler silindi). Izgara düzenli sayfa isteyen kitle açıkta. Cevap: ROADMAP Faz 10 ızgara düzeni.
+- Linktree'nin 2026-07-05 kullanım şartları veri paylaşımını ve yapay zekâ eğitimini açtı. Cevap: yukarıdaki "Verin satılmaz" taahhüdü.
+- Kategori komisyonlu mağazaya kaydı (%9–12). Linkiva bu yarışa girmez (aşağıda "Bilinçli olarak yapılmayanlar").
 
 ## Operating Context
 
@@ -39,7 +47,15 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 - Arayüz dili: Türkçe (varsayılan) ve İngilizce (i18n).
 - Yeniden kurulum temiz bir veritabanıyla başlar. Mevcut kullanıcı verisi taşınmaz.
 - Para kazanma modeli **karara bağlanmadı**. Ücretli plan yok, fiyatlandırma iddiası yazılmaz.
-- Portfolyo modu **ikinci aşamadır**. İlk sürümde vaat edilmez.
+- Portfolyo modu **ikinci aşamadır** (ROADMAP Faz 12). İlk sürümde vaat edilmez.
+- İçe aktarma arayüzünde kaynak platformun adı ("Linktree'den taşı") işlevsel olarak geçebilir. Pazarlama metninde (landing, OG, mail) rakip adı ve fiyatı geçmez.
+
+## Bilinçli olarak yapılmayanlar (2026-09-27)
+
+Kullanıcı açıkça istemedikçe yeniden önerilmez. Gerekçeler ROADMAP'te.
+- **Ödeme alma, mağaza, satış komisyonu.** Yerine: IBAN/destek ve affiliate ürün kartı.
+- **Yapay zekâ ile içerik ya da caption üretimi.** "Verin satılmaz" taahhüdüyle çelişir.
+- **Sticker panoları ve süs katmanları.** Cam tasarım teziyle çelişir.
 
 ## Brand Commitments
 
@@ -61,6 +77,8 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 3. **Profil ziyaretçisi misafirdir.** Profil sayfası hızlı, erişilebilir ve kullanıcının kimliğini öne çıkaran bir sayfadır. Linkiva'nın kendi markası geri planda kalır.
 4. **Doğru veri ya da hiç veri.** Analitik bot filtreli ve gerçektir. Sahte "canlı", sahte "sağlık kontrolü" yoktur.
 5. **Genişlemeye hazır, bugüne sade.** Blok modeli portfolyoyu taşıyabilir, ama bugün sadece gerekeni gösterir.
+6. **Verin satılmaz.** Kullanıcı ve ziyaretçi verisi yalnızca kullanıcıya hizmet için işlenir. Yapay zekâ eğitimi, üçüncü tarafla paylaşım ve reklam yoktur. Bir özellik bunu gerektiriyorsa yapılmaz.
+7. **Adres kırılmaz.** Kullanıcının biyografiye yapıştırdığı link, kullanıcı adı değişse bile 90 gün çalışmaya devam eder.
 
 ## Accessibility & Inclusion
 

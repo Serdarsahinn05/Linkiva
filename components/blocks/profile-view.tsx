@@ -94,9 +94,9 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
         </header>
 
         <ul className="mt-10 flex w-full flex-col gap-3">
-          {blocks.map(({ id, highlighted, parsed }) => (
+          {blocks.map(({ id, highlighted, parsed }, index) => (
             <li key={id} className="flex justify-center">
-              <BlockView id={id} block={parsed} highlighted={highlighted} mode={mode} labels={labels} />
+              <BlockView id={id} block={parsed} highlighted={highlighted} mode={mode} labels={labels} loading={index < EAGER_BLOCKS ? "eager" : "lazy"} />
             </li>
           ))}
         </ul>
@@ -142,13 +142,17 @@ function sceneVars(look: ResolvedAppearance): React.CSSProperties {
 
 const linkClass = "p-btn glass-interactive group";
 
+/** Images in the first blocks are usually on the first screen (often the LCP element): load them with the page. */
+const EAGER_BLOCKS = 3;
+type ImageLoading = "eager" | "lazy";
+
 /** A link shown as a preview card: the page's image, title, description and host (read once by the owner). */
-function LinkCard({ id, data, highlighted, mode }: { id: string; data: BlockData["LINK"]; highlighted: boolean; mode: "public" | "preview" }) {
+function LinkCard({ id, data, highlighted, mode, loading }: { id: string; data: BlockData["LINK"]; highlighted: boolean; mode: "public" | "preview"; loading: ImageLoading }) {
   const body = (
     <>
       {data.img && (
         // eslint-disable-next-line @next/next/no-img-element -- copied to our Blob store when the card was made
-        <img src={data.img} alt="" loading="lazy" decoding="async" className="aspect-[1.91/1] w-full rounded-[14px] bg-glass-strong object-cover" />
+        <img src={data.img} alt="" loading={loading} decoding="async" className="aspect-[1.91/1] w-full rounded-[14px] bg-glass-strong object-cover" />
       )}
       <span className="flex flex-col gap-1 px-2.5 pt-2.5 pb-2 text-left">
         <span className="font-medium text-balance">{data.title}</span>
@@ -173,10 +177,24 @@ function LinkCard({ id, data, highlighted, mode }: { id: string; data: BlockData
   );
 }
 
-function BlockView({ id, block, highlighted, mode, labels }: { id: string; block: ParsedBlock; highlighted: boolean; mode: "public" | "preview"; labels: ProfileLabels }) {
+function BlockView({
+  id,
+  block,
+  highlighted,
+  mode,
+  labels,
+  loading,
+}: {
+  id: string;
+  block: ParsedBlock;
+  highlighted: boolean;
+  mode: "public" | "preview";
+  labels: ProfileLabels;
+  loading: ImageLoading;
+}) {
   switch (block.type) {
     case "LINK": {
-      if (block.data.card === "1") return <LinkCard id={id} data={block.data} highlighted={highlighted} mode={mode} />;
+      if (block.data.card === "1") return <LinkCard id={id} data={block.data} highlighted={highlighted} mode={mode} loading={loading} />;
       // Highlight styling depends on the button style (globals.css .p-btn[data-highlight]).
       const className = linkClass;
       const hl = highlighted ? "" : undefined;
@@ -218,7 +236,7 @@ function BlockView({ id, block, highlighted, mode, labels }: { id: string; block
       const frame = "glass block w-full overflow-hidden rounded-[var(--radius-card)] p-1.5";
       const image = (
         // eslint-disable-next-line @next/next/no-img-element -- owner upload, resized to WebP before upload
-        <img src={src} alt={alt ?? ""} width={w} height={h} loading="lazy" decoding="async" className="h-auto w-full rounded-[14px] bg-glass-strong object-cover" />
+        <img src={src} alt={alt ?? ""} width={w} height={h} loading={loading} decoding="async" className="h-auto w-full rounded-[14px] bg-glass-strong object-cover" />
       );
       return (
         <figure className="flex w-full flex-col items-center gap-2">

@@ -15,7 +15,7 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
 | [docs/AUDIT.md](docs/AUDIT.md) | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
 
-> **Durum (2026-09-24):** v2 yeniden kurulumu onaylandı ve `rebuild/v2` dalında sürüyor. v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Kod tarafı bitti (Faz 0–5, işlem mailleri dahil). Preview Vercel'de çalışıyor; sırada kullanıcının denemesi ve **geçiş günü** (`docs/DEPLOY.md` → Durum) var; `master`'a birleştirme kullanıcı onayıyla. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
+> **Durum (2026-09-27):** v2 canlıda (`linkiva.space`, `master`). v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Faz 0–5 ve v2.1 bitti. v2 sonrası iş Faz 6–13 olarak planlandı (ROADMAP → "v2 sonrası yol haritası"): her faz ayrı dalda, "Bilinçli olarak yapılmayanlar" listesi yeniden önerilmez. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
 
 ## Stack
 
@@ -68,7 +68,7 @@ npm run build
 
 ## Git
 
-- Ana dal `master`. v2 işi `rebuild/v2` dalında yapılır. Commit ve push yalnızca kullanıcı isteyince yapılır.
+- Ana dal `master` (canlı). Her faz kendi dalında yapılır (`faz-6-guven` …), preview'da denenir, kullanıcı onayıyla birleşir. Commit ve push yalnızca kullanıcı isteyince yapılır.
 - Commit mesajı: kısa emir kipi, İngilizce veya Türkçe ama tutarlı. Örnek: `editor: add inline block editing`.
 
 ## Bitti tanımı

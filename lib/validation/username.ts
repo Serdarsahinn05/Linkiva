@@ -3,6 +3,11 @@ import { z } from "zod";
 export const USERNAME_MIN = 3;
 export const USERNAME_MAX = 30;
 
+/** A past username redirects to the current one, and nobody else can claim it, for this long. */
+export const USERNAME_REDIRECT_DAYS = 90;
+/** At most this many username changes per rolling 30 days (a redirect chain is not a feature). */
+export const USERNAME_CHANGES_PER_30_DAYS = 2;
+
 // 3–30 chars, lowercase ASCII letters/digits and . _ -, must start and end with a letter or digit.
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9._-]{1,28})[a-z0-9]$/;
 
