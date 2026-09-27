@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart3, Eye, Link2, Palette, Settings, Share2, Users, type LucideIcon } from "lucide-react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
@@ -68,6 +68,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
                     >
                       <Icon size={19} strokeWidth={1.75} aria-hidden />
                       {t(`nav.${key}`)}
+                      <PendingDot className="ml-auto" />
                     </Link>
                   </li>
                 );
@@ -157,6 +158,16 @@ function TabLink({ item, active, label }: { item: NavItem; active: boolean; labe
     >
       <Icon size={22} strokeWidth={active ? 2 : 1.75} aria-hidden />
       {label}
+      <PendingDot className="absolute bottom-1.5" />
     </Link>
   );
+}
+
+/**
+ * Shown while a dashboard link's page is still on its way. Pages are not swapped for a skeleton any more: the current
+ * page stays until the next one is ready, and this dot (fading in after 200 ms) says the tap was heard.
+ */
+function PendingDot({ className }: { className?: string }) {
+  const { pending } = useLinkStatus();
+  return pending ? <span aria-hidden className={cn("link-pending size-1.5 rounded-full bg-ink", className)} /> : null;
 }

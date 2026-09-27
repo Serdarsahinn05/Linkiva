@@ -80,10 +80,14 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
       return setImportUrl(detected.url);
     }
     setPasting(true);
-    const result = await addBlock(detected.kind, detected.kind === "EMBED" ? { url: detected.url } : { title: detected.title, url: detected.url });
+    const result =
+      detected.kind === "WHATSAPP"
+        ? await addBlock("WHATSAPP", { phone: detected.phone, message: detected.message })
+        : await addBlock(detected.kind, detected.kind === "EMBED" ? { url: detected.url } : { title: detected.title, url: detected.url });
     setPasting(false);
     if (!result.ok) return saveError();
     setBlocks((list) => [result.data, ...list]);
+    if (detected.kind === "WHATSAPP") return toast({ tone: "success", message: t("paste.addedWhatsapp") });
     if (detected.kind === "LINK") return toast({ tone: "success", message: t("paste.addedLink") });
     // A player was guessed; one tap turns it back into a plain link.
     toast({
@@ -219,6 +223,14 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     return result.data;
   }
 
+  // Blocks that fold under a collapsible header on the page, shown indented here (same rule as ProfileView).
+  const folded = new Set<string>();
+  let folding = false;
+  for (const b of blocks) {
+    if (b.type === "HEADER" || b.type === "DIVIDER") folding = b.type === "HEADER" && b.data.collapsible === "1";
+    else if (folding) folded.add(b.id);
+  }
+
   const previewProfile = {
     ...profile,
     displayName: profile.displayName || null,
@@ -297,6 +309,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                     <BlockRow
                       key={block.id}
                       block={block}
+                      nested={folded.has(block.id)}
                       index={index}
                       count={blocks.length}
                       autoFocus={block.id === focusId}

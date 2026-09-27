@@ -2,7 +2,29 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlignLeft, ArrowDown, ArrowUp, CalendarClock, CircleAlert, GripVertical, Heading, ImageIcon, Link2, Mail, Minus, PlayCircle, Star, StarOff, Trash2, type LucideIcon } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowDown,
+  ArrowUp,
+  CalendarClock,
+  CircleAlert,
+  Contact,
+  GripVertical,
+  HandCoins,
+  Heading,
+  ImageIcon,
+  Link2,
+  Mail,
+  MessageCircle,
+  Minus,
+  PlayCircle,
+  ShoppingBag,
+  Star,
+  StarOff,
+  Timer,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormatter, useNow, useTranslations } from "next-intl";
@@ -16,6 +38,7 @@ import { normalizeUrl } from "@/lib/validation/url";
 import { ImageField } from "./image-field";
 import { LinkCardFields } from "./link-card-fields";
 import { ScheduleDialog } from "./schedule-dialog";
+import { ContactSupportFields } from "./contact-support-fields";
 import type { EditorBlock } from "../types";
 
 /** Block types are told apart by icon, never by colour (DESIGN.md §6). */
@@ -27,10 +50,17 @@ export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
   EMBED: PlayCircle,
   EMAIL_CAPTURE: Mail,
   DIVIDER: Minus,
+  SUPPORT: HandCoins,
+  WHATSAPP: MessageCircle,
+  CONTACT: Contact,
+  PRODUCT: ShoppingBag,
+  COUNTDOWN: Timer,
 };
 
 type RowProps = {
   block: EditorBlock;
+  /** Folds under a collapsible header on the page: indented, with a guide line. */
+  nested?: boolean;
   index: number;
   count: number;
   autoFocus: boolean;
@@ -43,7 +73,7 @@ type RowProps = {
   onSchedule: (schedule: { startsAt: string | null; endsAt: string | null }) => void;
 };
 
-export function BlockRow({ block, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
+export function BlockRow({ block, nested, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
@@ -74,6 +104,7 @@ export function BlockRow({ block, index, count, autoFocus, userId, uploadsEnable
       style={{ transform: CSS.Translate.toString(transform), transition }}
       className={cn(
         "glass-flat relative rounded-[var(--radius-card)]",
+        nested && "ml-6 before:absolute before:top-3 before:bottom-3 before:-left-3.5 before:w-px before:bg-glass-edge",
         isDragging && "glass z-10 scale-[1.02] shadow-[0_24px_60px_-20px_rgb(0_0_0/0.5)]",
         !block.isVisible && "opacity-70",
       )}
@@ -150,16 +181,26 @@ export function BlockRow({ block, index, count, autoFocus, userId, uploadsEnable
             </>
           )}
           {block.type === "HEADER" && (
-            <Input
-              aria-label={t("fields.headerText")}
-              placeholder={t("placeholders.headerText")}
-              value={field("text")}
-              maxLength={TITLE_MAX}
-              autoFocus={autoFocus}
-              onChange={(e) => set("text", e.target.value)}
-              className="font-semibold"
-            />
+            <>
+              <Input
+                aria-label={t("fields.headerText")}
+                placeholder={t("placeholders.headerText")}
+                value={field("text")}
+                maxLength={TITLE_MAX}
+                autoFocus={autoFocus}
+                onChange={(e) => set("text", e.target.value)}
+                className="font-semibold"
+              />
+              <div className="-my-1 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{t("collapsible")}</p>
+                  <p className="text-sm text-ink-3">{t("collapsibleHint")}</p>
+                </div>
+                <Switch checked={field("collapsible") === "1"} label={t("collapsible")} onChange={(on) => set("collapsible", on ? "1" : "")} />
+              </div>
+            </>
           )}
+          <ContactSupportFields block={block} autoFocus={autoFocus} onChange={onChange} />
           {block.type === "TEXT" && (
             <textarea
               aria-label={t("fields.text")}

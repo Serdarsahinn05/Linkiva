@@ -215,7 +215,7 @@ Henüz uygulanmadı. Her biri kendi fazında, elle yazılmış migration + `migr
 | Faz | Migration | Değişiklik |
 |---|---|---|
 | 6 ✅ | `username_history` | `UsernameHistory { username @id, profileId → Profile (cascade), createdAt, expiresAt }`. Müsaitlik kontrolü süresi dolmamış kayıtları dolu sayar. |
-| 8 | `block_types_tr` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
+| 8 ✅ | `block_types_contact_support` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
 | 9 | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
 | 10 | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
 | 11 | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |

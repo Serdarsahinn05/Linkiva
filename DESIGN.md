@@ -157,7 +157,7 @@ Başlık üstüne eyebrow/kicker konmaz. Vurgu, ağırlık ve boyutla yapılır.
 - **Link butonları:** tam genişlik, 60px, 20px köşe, `glass-interactive` (specular). Başlık ortada 500 ağırlık, sağda küçük ok. Öne çıkan link: `glass-strong` + yumuşak beyaz dış parlama (monokrom). Başlık bloğu: küçük, `--ink-2`, 600. Metin bloğu: `--ink-2`. Ayraç: kısa 1px çizgi.
 - Sistem temasına uyar (profil sahibi sabitleyebilir, aşağıda).
 
-### Yeni profil blokları (planlı, Faz 8)
+### İletişim ve destek blokları (Faz 8, uygulandı)
 Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam genişlik) ve temanın buton stilini kullanır. Marka renkleri (WhatsApp yeşili vb.) **kullanılmaz**; marka ikonu monokrom, `currentColor`.
 - **Destek (IBAN):** Cam kart. Üstte ad (500), altında IBAN Geist Mono `tabular-nums`, 4'lü gruplar. Sağda ikincil hap "Kopyala"; kopyalanınca ikon onaya döner ve toast "IBAN kopyalandı" (`--positive` nokta). Altında isteğe bağlı destek linkleri normal link butonu olarak.
 - **WhatsApp:** Normal link butonu, solda monokrom marka ikonu. Başlık varsayılanı "WhatsApp'tan yaz".
@@ -209,7 +209,7 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
 - Sheet eğrisi `--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1)` 280–500ms (iOS sheet eğrisi; hızlı üstel yavaşlama, hedefi aşmaz). Mikro etkileşimler `--ease-out` 160ms.
 - İmza hareketler: sıvı sekme göstergesi, specular highlight, sheet açılışı.
-- Panel geçişi: yükleme sırasında sayfanın kendi şeklinde cam iskelet (`.bone`: dolgu `--ink` %8; ekrana sabit tek bir `--glass-shine` ışığı 1.8 sn'de bütün iskeletin üzerinden geçer). İskelet 150 ms gecikmeyle belirir. Eski sayfa ve iskelet 120 ms'de söner, yeni sayfa 320 ms `--ease-sheet` ile 8px yükselip 6px bulanıklıktan netleşir ("buğusu çözülen cam"). Kabuk (kenar çubuğu, sekme çubuğu) yerinden oynamaz. Scroll'da "fade-up" girişleri yok.
+- Panel geçişi (2026-09-27, kullanıcı geri bildirimiyle sadeleşti): iskelet yok. Eski sayfa yenisi hazır olana kadar yerinde kalır, sonra 100 ms söner ve yeni sayfa 160 ms bulanıksız belirir. Geçiş 200 ms'yi aşarsa tıklanan sekmenin altında 6px `--ink` nokta belirir (`.link-pending`). Ziyaret edilen sekmeler 30 sn önbellekten anında açılır. Kabuk yerinden oynamaz. Scroll'da "fade-up" girişleri yok. *(Eski "cam iskelet + buğusu çözülen cam" hızlı gidip gelirken göz yorduğu için kaldırıldı.)*
 - `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı.
 - Kütüphane eklenmez (CSS + WAAPI).
 

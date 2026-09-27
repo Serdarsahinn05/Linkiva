@@ -13,6 +13,17 @@ export type ProfileLabels = {
   subscribeInvalid: string;
   subscribeTooMany: string;
   subscribeError: string;
+  whatsappDefault: string;
+  contactAdd: string;
+  supportCopied: string;
+  supportCopyName: string;
+  supportCopyIban: string;
+  supportLink: string;
+  sponsored: string;
+  countdownDays: string;
+  countdownHours: string;
+  countdownMinutes: string;
+  countdownSeconds: string;
 };
 
 /** Any next-intl translator (server or client) scoped to the root namespace. */
@@ -33,5 +44,16 @@ export function profileLabels(translator: AnyTranslator): ProfileLabels {
     subscribeInvalid: t("blocks.subscribeInvalid"),
     subscribeTooMany: t("blocks.subscribeTooMany"),
     subscribeError: t("blocks.subscribeError"),
+    whatsappDefault: t("blocks.whatsappDefault"),
+    contactAdd: t("blocks.contactAdd"),
+    supportCopied: t("blocks.supportCopied"),
+    supportCopyName: t("blocks.supportCopyName"),
+    supportCopyIban: t("blocks.supportCopyIban"),
+    supportLink: t("blocks.supportLink"),
+    sponsored: t("blocks.sponsored"),
+    countdownDays: t("blocks.countdownDays"),
+    countdownHours: t("blocks.countdownHours"),
+    countdownMinutes: t("blocks.countdownMinutes"),
+    countdownSeconds: t("blocks.countdownSeconds"),
   };
 }
