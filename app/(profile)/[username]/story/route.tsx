@@ -17,6 +17,7 @@ const LIGHTS: Record<SceneKey, { light: [string, string]; dark: [string, string]
   cam: { light: ["rgba(214,212,240,0.9)", "rgba(206,228,240,0.8)"], dark: ["rgba(112,122,176,0.6)", "rgba(76,122,152,0.5)"] },
   gece: { light: ["rgba(150,130,220,0.55)", "rgba(110,150,200,0.45)"], dark: ["rgba(104,84,170,0.6)", "rgba(56,96,130,0.55)"] },
   kum: { light: ["rgba(236,208,168,0.85)", "rgba(240,210,196,0.8)"], dark: ["rgba(110,84,52,0.6)", "rgba(88,64,50,0.55)"] },
+  soft: { light: ["rgba(214,212,240,0.55)", "rgba(0,0,0,0)"], dark: ["rgba(112,122,176,0.3)", "rgba(0,0,0,0)"] },
   accent: { light: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"], dark: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"] },
   none: { light: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"], dark: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"] },
 };

@@ -26,6 +26,9 @@ export type ProfileLabels = {
   countdownHours: string;
   countdownMinutes: string;
   countdownSeconds: string;
+  /** Portfolio: the small link to a project's code, and the end of a current job ("2024 — now"). */
+  projectCode: string;
+  present: string;
 };
 
 /** Any next-intl translator (server or client) scoped to the root namespace. */
@@ -58,5 +61,7 @@ export function profileLabels(translator: AnyTranslator): ProfileLabels {
     countdownHours: t("blocks.countdownHours"),
     countdownMinutes: t("blocks.countdownMinutes"),
     countdownSeconds: t("blocks.countdownSeconds"),
+    projectCode: t("blocks.projectCode"),
+    present: t("blocks.present"),
   };
 }

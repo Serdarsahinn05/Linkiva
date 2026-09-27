@@ -56,6 +56,40 @@ const optionalNormalized = (fn: (v: string) => string | null, message: string) =
 const flag = z.enum(["1", ""]).optional();
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * A comma-separated list as the editor keeps it ("next.js, postgres"): trimmed, de-duplicated (case-insensitive) and
+ * bounded; stored back as "a, b, c". Empty items are dropped.
+ */
+export function splitList(value: string | undefined): string[] {
+  const seen = new Set<string>();
+  return (value ?? "")
+    .split(",")
+    .map((item) => item.trim().replace(/\s+/g, " "))
+    .filter((item) => item && !seen.has(item.toLocaleLowerCase("tr")) && seen.add(item.toLocaleLowerCase("tr")));
+}
+
+const list = (maxItems: number, maxLength: number, min = 0) =>
+  z
+    .string()
+    .max(4000)
+    .optional()
+    .transform((value, ctx) => {
+      const items = splitList(value);
+      if (items.length < min || items.length > maxItems || items.some((i) => i.length > maxLength)) {
+        ctx.addIssue({ code: "custom", message: "list" });
+        return z.NEVER;
+      }
+      return items.length ? items.join(", ") : undefined;
+    });
+
+/** A month or a year ("2024-06", "2024"), for experience dates. */
+const yearMonth = z
+  .string()
+  .trim()
+  .regex(/^(19|20)\d{2}(-(0[1-9]|1[0-2]))?$/)
+  .optional()
+  .or(z.literal("").transform(() => undefined));
+
 /** Pixel size kept as a string (Block.data is a string map in the editor). */
 const pixels = z.string().regex(/^[1-9]\d{0,4}$/).optional();
 
@@ -140,6 +174,29 @@ export const blockDataSchemas = {
     after: z.enum(["hide", "text"]).default("hide"),
     afterText: z.string().trim().max(TITLE_MAX).optional(),
   }),
+  // Portfolio blocks (ROADMAP Faz 12). A project links to its live page (url) and/or its code (repo); the card goes to
+  // url when there is one, and repo gets its own small link. stars: read once from GitHub on import, never live.
+  PROJECT: z.object({
+    title: z.string().trim().min(1).max(TITLE_MAX),
+    desc: z.string().trim().max(DESC_MAX).optional(),
+    url: optionalUrl,
+    repo: optionalUrl,
+    img: z.union([z.literal(""), z.string().max(2048).refine(isBlobStoreUrl, "img")]).optional(),
+    tags: list(8, 24),
+    stars: z.string().regex(/^\d{1,7}$/).optional().or(z.literal("").transform(() => undefined)),
+  }),
+  // One job or school; consecutive ones read as a timeline. No end date means "now".
+  EXPERIENCE: z
+    .object({
+      role: z.string().trim().min(1).max(TITLE_MAX),
+      org: z.string().trim().max(TITLE_MAX).optional(),
+      start: yearMonth,
+      end: yearMonth,
+      desc: z.string().trim().max(300).optional(),
+    })
+    .refine((d) => !d.start || !d.end || d.start <= d.end, "dates"),
+  // A labelled group of skills. Deliberately no levels or percentages: they claim a precision nobody has.
+  SKILLS: z.object({ title: z.string().trim().max(40).optional(), items: list(30, 32, 1) }),
 } satisfies Record<BlockType, z.ZodType>;
 
 export type BlockData = { [K in BlockType]: z.output<(typeof blockDataSchemas)[K]> };
@@ -158,6 +215,9 @@ export const EDITABLE_BLOCK_TYPES = [
   "CONTACT",
   "PRODUCT",
   "COUNTDOWN",
+  "PROJECT",
+  "EXPERIENCE",
+  "SKILLS",
 ] as const satisfies readonly BlockType[];
 export type EditableBlockType = (typeof EDITABLE_BLOCK_TYPES)[number];
 
@@ -175,6 +235,9 @@ export const blockDefaults: Record<EditableBlockType, Record<string, string>> = 
   CONTACT: { name: "", title: "", org: "", phone: "", email: "", website: "" },
   PRODUCT: { title: "", url: "", price: "", sponsored: "" },
   COUNTDOWN: { title: "", target: "", after: "hide", afterText: "" },
+  PROJECT: { title: "", desc: "", url: "", repo: "", tags: "" },
+  EXPERIENCE: { role: "", org: "", start: "", end: "", desc: "" },
+  SKILLS: { title: "", items: "" },
 };
 
 export type ParsedBlock = { [K in BlockType]: { type: K; data: BlockData[K] } }[BlockType];
@@ -190,6 +253,7 @@ const GRID_SIZES: Partial<Record<BlockType, readonly BlockSize[]>> = {
   LINK: ["SMALL", "WIDE", "LARGE"],
   IMAGE: ["SMALL", "WIDE", "LARGE"],
   PRODUCT: ["SMALL", "WIDE", "LARGE"],
+  PROJECT: ["SMALL", "WIDE", "LARGE"],
   WHATSAPP: ["SMALL", "WIDE"],
   CONTACT: ["SMALL", "WIDE"],
 };

@@ -185,6 +185,16 @@ Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam geni
 - Beklerken her DNS kaydı ayrı bir `glass-flat` kartta etiket/değer satırları (Tür · Ad · Değer), değerler Geist Mono ve kelime ortasından bölünmez; değerin yanında kopyala ikonu. Altında yayılma süresi notu, sağda "Kaldır" (hayalet) ve "Doğrula" (ikincil). Kaldırmak iki adımlı: sonucu anlatan cümle + "Evet, kaldır" (tehlike).
 - Bağlıyken tek cümle ve alan adına açılan link; panelin "Adresin" kartı, QR ve paylaşım görselleri de alan adını gösterir.
 
+### Portfolyo (Faz 12, uygulandı)
+Linkiva'nın aynı tek parça, aşağı kayan profili; yalnızca `portfolyo` temasında şu kurallar geçerli (diğer temalar değişmez):
+- **Genişlik:** profil sütunu 60rem (960px). Geniş düzen, profil kapsayıcısında 56rem yer olunca açılır (kapsayıcı sorgusu), yani telefon ve editör önizlemesi tek sütun kalır.
+- **Başlık:** sola hizalı; avatar (72 → 88 → 104px) ve yanında ad (display 600), altında bio ve sosyal ikonlar. Geniş ekranda başlık bandı iki sütun: sağda, ilk bölümden önceki düz link butonları (ör. Özgeçmiş, Birlikte çalışalım).
+- **Bölümler:** her (katlanmayan) başlık bloğu bir bölüm açar; başlık Geist Mono 13px `--ink-2` etiket + kenara uzanan 1px çizgi. Yalnızca deneyim/yetenek/metin içeren iki komşu bölüm geniş ekranda yan yana durur. Blok sırası sahibinin sırasıdır.
+- **Proje kartı (PROJECT):** cam kart; solda görsel (4:3) ya da ikon kutusu, başlık 600, 2 satır açıklama, Geist Mono çizgi hap etiketler, altta host · yıldız (Geist Mono) · "Kod" linki (kart canlı sayfaya, "Kod" repoya gider; ikisi de `/l` üzerinden sayılır). Izgarada S: ikon + başlık; L: görsel varsa cam şeritli fotoğraf, yoksa içerikle dolu karo (üstte ikon, altta büyük başlık, açıklama, etiketler, yıldız); W: kart.
+- **Deneyim (EXPERIENCE):** art arda gelenler tek zaman çizelgesi: 1px `--glass-edge` dikey çizgi, noktalar (bitişi olmayan = şimdi = dolu `--ink`, diğerleri çizgi halka). Rol 600, kurum `--ink-2`, tarih Geist Mono `--ink-3` ("Haz 2025 — şimdi").
+- **Yetenekler (SKILLS):** isteğe bağlı grup adı `--ink-3` + Geist Mono çizgi haplar. Seviye, yüzde, yıldız yok (sahte ölçüm).
+- Renk yok: GitHub dil renkleri de kullanılmaz; dil ve konu etiketleri düz metin.
+
 ### Profil temaları (kullanıcıya açık, `themes/index.ts`)
 Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
@@ -196,6 +206,7 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 | `kum` | açık | Newsreader (serif) | dolu | sıcak kum | #3A2E26 |
 | `terminal` | koyu | Geist Mono | çizgi | yok | #7CF5A8 |
 | `afis` | açık | Bricolage Grotesque | dolu | vurgu renginden | #FF5A36 |
+| `portfolyo` | sistem | Geist (+ Geist Mono etiketler) | çizgi | soluk monokrom (`soft`) | yok |
 
 - Özelleştirme: mod (ziyaretçiye göre/açık/koyu), font (5), buton stili (cam/dolu/çizgi), vurgu rengi (hazır + özel), arka plan görseli (kendi zemin rengiyle karartılır), "Linkiva" rozetini gizleme.
 - **Kontrast koruması:** Dolu butonda yazı rengi vurgu renginden otomatik seçilir (`inkOn`, ≥ 4.5:1 testli). Çizgi butonda vurgu her zemin için ayrı hesaplanan okunur bir tonla kullanılır (`readableAccent`: gerekirse siyaha/beyaza karıştırılır, hem zeminde hem dolgu olarak ≥ 4.5:1). Arka plan görseli yüklenince ortalama parlaklığı ölçülür, mod ve **karartma** (`backgroundDim`, %0–90) okunur olacak şekilde önerilir (en az %30). Karartma, ikincil yazının 4.5:1 için gerektirdiği değerin altına çekilirse Görünüm sayfası uyarır ve "Okunur yap" sunar.

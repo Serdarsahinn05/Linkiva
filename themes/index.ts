@@ -5,7 +5,7 @@ import { z } from "zod";
  * override any of them. Everything here is free (PRODUCT.md: premium features are not locked).
  */
 
-export const THEME_KEYS = ["cam", "gece", "sade", "kum", "terminal", "afis"] as const;
+export const THEME_KEYS = ["cam", "gece", "sade", "kum", "terminal", "afis", "portfolyo"] as const;
 export type ThemeKey = (typeof THEME_KEYS)[number];
 
 export const FONT_KEYS = ["geist", "serif", "rounded", "grotesk", "mono"] as const;
@@ -18,7 +18,7 @@ export const MODE_KEYS = ["system", "light", "dark"] as const;
 export type ModeKey = (typeof MODE_KEYS)[number];
 
 /** Background "scene": which ambient light sits behind the profile. */
-export type SceneKey = "cam" | "gece" | "none" | "kum" | "accent";
+export type SceneKey = "cam" | "gece" | "none" | "kum" | "accent" | "soft";
 
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 
@@ -65,7 +65,12 @@ const PRESETS: Record<ThemeKey, Omit<ResolvedAppearance, "theme" | "layout" | "b
   kum: { mode: "light", font: "serif", button: "solid", scene: "kum", accent: "#3A2E26" },
   terminal: { mode: "dark", font: "mono", button: "outline", scene: "none", accent: "#7CF5A8" },
   afis: { mode: "light", font: "grotesk", button: "solid", scene: "accent", accent: "#FF5A36" },
+  // Portfolio (ROADMAP Faz 12): quiet document look, outline buttons, a faint light; wide two-part layout on desktop.
+  portfolyo: { mode: "system", font: "geist", button: "outline", scene: "soft", accent: null },
 };
+
+/** Themes whose page is a portfolio: left-aligned header, sections, and a wide layout on large screens. */
+export const isPortfolioTheme = (theme: ThemeKey) => theme === "portfolyo";
 
 export const isThemeKey = (value: unknown): value is ThemeKey => typeof value === "string" && (THEME_KEYS as readonly string[]).includes(value);
 
@@ -77,7 +82,8 @@ export function resolveAppearance(theme: string, raw: unknown): ResolvedAppearan
   const o = parsed.success ? parsed.data : {};
   return {
     theme: key,
-    layout: o.layout ?? "list",
+    // A portfolio shows its projects as tiles unless the owner picked the list.
+    layout: o.layout ?? (isPortfolioTheme(key) ? "grid" : "list"),
     mode: o.mode ?? preset.mode,
     font: o.font ?? preset.font,
     button: o.button ?? preset.button,

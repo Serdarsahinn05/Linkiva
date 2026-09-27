@@ -258,7 +258,10 @@
       "WHATSAPP": "WhatsApp",
       "CONTACT": "Kartvizit",
       "PRODUCT": "Ürün",
-      "COUNTDOWN": "Geri sayım"
+      "COUNTDOWN": "Geri sayım",
+      "PROJECT": "Proje",
+      "EXPERIENCE": "Deneyim",
+      "SKILLS": "Yetenekler"
     },
     "sizes": {
       "SMALL": "Küçük karo",
@@ -408,6 +411,29 @@
       "text": "Yazı göster",
       "afterText": "Süre dolunca görünecek yazı",
       "afterTextPlaceholder": "Örn. Canlı yayındayız!"
+    },
+    "portfolio": {
+      "projectTitle": "Proje adı",
+      "projectDesc": "Kısa açıklama (isteğe bağlı)",
+      "projectUrl": "Canlı adres (isteğe bağlı)",
+      "projectRepo": "Kod adresi, ör. GitHub (isteğe bağlı)",
+      "projectTags": "Etiketler",
+      "projectTagsPlaceholder": "Etiketler: next.js, postgres",
+      "projectTagsHint": "Virgülle ayır, en fazla 8.",
+      "projectFetch": "Sayfadan görsel al",
+      "projectImageRemove": "Görseli kaldır",
+      "role": "Rol ya da bölüm",
+      "org": "Kurum (isteğe bağlı)",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "endHint": "Bitişi boş bırakırsan “şimdi” yazar.",
+      "datesInvalid": "Bitiş, başlangıçtan önce olamaz.",
+      "expDesc": "Ne yaptın? (isteğe bağlı)",
+      "skillsTitle": "Grup adı (isteğe bağlı, ör. Diller)",
+      "skillsItems": "Yetenekler",
+      "skillsPlaceholder": "typescript, react, postgresql",
+      "skillsHint": "Virgülle ayır, en fazla 30. Seviye ya da yüzde yok, bilerek.",
+      "listInvalid": "Çok fazla ya da çok uzun öğe var."
     }
   },
   "templates": {
@@ -418,7 +444,9 @@
       "student": "Öğrenci",
       "musician": "Müzisyen",
       "freelancer": "Serbest çalışan",
-      "creator": "İçerik üreticisi"
+      "creator": "İçerik üreticisi",
+      "developer": "Geliştirici",
+      "designer": "Tasarımcı"
     },
     "blocks": {
       "student": [
@@ -447,16 +475,39 @@
         "İşbirlikleri",
         "Medya kiti",
         "Bültenime katıl"
+      ],
+      "developer": [
+        "Özgeçmişim",
+        "GitHub",
+        "Projeler",
+        "",
+        "",
+        "Deneyim",
+        "",
+        "Yetenekler",
+        ""
+      ],
+      "designer": [
+        "Portfolyom",
+        "Dribbble",
+        "Seçili işler",
+        "",
+        "",
+        "",
+        "Deneyim",
+        "",
+        "Araçlar",
+        ""
       ]
     }
   },
   "import": {
     "close": "Kapat",
-    "open": "Linktree'den taşı",
-    "title": "Linklerini taşı",
-    "hint": "Linktree adresini yapıştır. Linklerini okuyup önce sana gösteririz, onaylamadan hiçbir şey eklenmez.",
-    "urlLabel": "Linktree adresin",
-    "urlPlaceholder": "linktr.ee/kullaniciadin",
+    "open": "Linktree ya da GitHub'dan al",
+    "title": "İçe aktar",
+    "hint": "Linktree ya da GitHub adresini yapıştır. Önce ne bulduğumuzu gösteririz, onaylamadan hiçbir şey eklenmez. GitHub'dan repoların proje kartı olur.",
+    "urlLabel": "Linktree ya da GitHub adresin",
+    "urlPlaceholder": "linktr.ee/kullaniciadin ya da github.com/kullaniciadin",
     "read": "Sayfayı oku",
     "reading": "Okunuyor",
     "found": "{items} blok ve {socials} sosyal hesap bulundu.",
@@ -468,10 +519,10 @@
     "skipped": "{count} öğe geçersiz olduğu için atlandı.",
     "back": "Başka adres",
     "errors": {
-      "unsupported": "Şimdilik yalnızca linktr.ee adreslerini taşıyabiliyoruz.",
+      "unsupported": "Şimdilik yalnızca linktr.ee ve github.com profil adreslerini okuyabiliyoruz.",
       "unreachable": "Sayfaya ulaşılamadı. Adresi kontrol et.",
       "unreadable": "Bu sayfayı okuyamadık.",
-      "empty": "Sayfada taşınacak link bulamadık.",
+      "empty": "Sayfada taşınacak bir şey bulamadık.",
       "tooMany": "Çok fazla deneme. Birkaç dakika sonra tekrar dene.",
       "invalid": "Bu adresi anlayamadık."
     }
@@ -599,7 +650,8 @@
       "sade": "Sade",
       "kum": "Kum",
       "terminal": "Terminal",
-      "afis": "Afiş"
+      "afis": "Afiş",
+      "portfolyo": "Portfolyo"
     },
     "themeHints": {
       "cam": "Buzlu cam, sisteme uyar",
@@ -607,7 +659,8 @@
       "sade": "Beyaz ve çizgi",
       "kum": "Sıcak, editoryal",
       "terminal": "Mono, fosfor yeşili",
-      "afis": "Tek renk, cesur"
+      "afis": "Tek renk, cesur",
+      "portfolyo": "Projeler ve deneyim, geniş"
     },
     "customize": "Özelleştir",
     "mode": "Mod",
@@ -668,7 +721,9 @@
     "countdownDays": "gün",
     "countdownHours": "saat",
     "countdownMinutes": "dk",
-    "countdownSeconds": "sn"
+    "countdownSeconds": "sn",
+    "projectCode": "Kod",
+    "present": "şimdi"
   },
   "audience": {
     "title": "Kitle",

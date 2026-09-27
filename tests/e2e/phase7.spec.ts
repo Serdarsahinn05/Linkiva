@@ -53,16 +53,23 @@ test("a pasted link becomes the right block", async ({ page, request }) => {
 
 test("the import dialog only reads supported pages", async ({ page }) => {
   await createUser(page, `imp-${uid()}`);
-  await page.getByRole("button", { name: "Linktree'den taşı" }).click();
-  const dialog = page.getByRole("dialog", { name: "Linklerini taşı" });
-  await dialog.getByLabel("Linktree adresin").fill("example.com/someone");
+  await page.getByRole("button", { name: "Linktree ya da GitHub'dan al" }).click();
+  const dialog = page.getByRole("dialog", { name: "İçe aktar" });
+  await dialog.getByLabel("Linktree ya da GitHub adresin").fill("example.com/someone");
   await dialog.getByRole("button", { name: "Sayfayı oku" }).click();
-  await expect(dialog.getByText("Şimdilik yalnızca linktr.ee adreslerini taşıyabiliyoruz.")).toBeVisible();
+  await expect(dialog.getByText("Şimdilik yalnızca linktr.ee ve github.com profil adreslerini okuyabiliyoruz.")).toBeVisible();
 
   // Pasting a linktr.ee address in the editor offers the import with the address filled in.
   await dialog.getByRole("button", { name: "Kapat" }).click();
   const field = page.getByLabel("Link yapıştır");
   await field.fill("linktr.ee/someone");
   await field.press("Enter");
-  await expect(page.getByRole("dialog", { name: "Linklerini taşı" }).getByLabel("Linktree adresin")).toHaveValue("https://linktr.ee/someone");
+  await expect(page.getByRole("dialog", { name: "İçe aktar" }).getByLabel("Linktree ya da GitHub adresin")).toHaveValue("https://linktr.ee/someone");
+
+  // A pasted GitHub profile is a link to it, not an import (repositories are imported from the dialog).
+  await page.getByRole("dialog", { name: "İçe aktar" }).getByRole("button", { name: "Kapat" }).click();
+  await field.fill("github.com/someone");
+  await field.press("Enter");
+  await expect(page.getByRole("dialog", { name: "İçe aktar" })).toBeHidden();
+  await expect(page.locator('input[value="https://github.com/someone"]')).toBeVisible();
 });

@@ -90,7 +90,14 @@ export async function applyTemplate(key: string): Promise<ActionResult<EditorBlo
     const blocks = await db.block.createManyAndReturn({
       data: types.map((type, i) => {
         const text = texts[i] ?? "";
-        const data = type === "LINK" ? { title: text, url: "" } : type === "EMAIL_CAPTURE" ? { title: text } : { text };
+        const data =
+          type === "LINK"
+            ? { title: text, url: "" }
+            : type === "EMAIL_CAPTURE"
+              ? { title: text }
+              : type === "HEADER" || type === "TEXT"
+                ? { text }
+                : blockDefaults[type];
         return { profileId: profile.id, type, position: start + i, data };
       }),
     });
@@ -128,6 +135,14 @@ const draftSchema = z.partialRecord(z.enum([
     "afterText",
     "latest",
     "channelId",
+    "repo",
+    "tags",
+    "stars",
+    "role",
+    "org",
+    "start",
+    "end",
+    "items",
   ]), z.string().max(Math.max(TEXT_MAX, 2048)));
 
 /** Block images (Image block src, link card img) may only be files in the owner's own Blob folder. */
@@ -181,7 +196,7 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
   if (!url || !/^https?:/.test(url)) return fail("invalid");
   return withProfile(async (profile) => {
     // Link cards and product cards read the page the same way.
-    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: { in: ["LINK", "PRODUCT"] } }, select: { data: true, type: true } });
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: { in: ["LINK", "PRODUCT", "PROJECT"] } }, select: { data: true, type: true } });
     if (!block) return fail("notFound");
     if (!(await allow("link-card", profile.userId, 10, 60))) return fail("tooMany");
 
@@ -204,13 +219,14 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
     const current = draftSchema.safeParse(block.data).data ?? {};
     const next = {
       ...current,
-      url,
+      // A project reads its live page or its repository; neither replaces the addresses the owner typed.
+      ...(block.type !== "PROJECT" && { url }),
       title: current.title?.trim() || (preview.title ?? displayHost(url)).slice(0, TITLE_MAX),
       ...(block.type === "LINK" && { card: "1" }),
       desc: (preview.description ?? "").slice(0, DESC_MAX),
       img,
     };
-    const complete = block.type === "PRODUCT" ? blockDataSchemas.PRODUCT.safeParse(next) : blockDataSchemas.LINK.safeParse(next);
+    const complete = blockDataSchemas[block.type].safeParse(next);
     const updated = await db.block.update({ where: { id }, data: { data: complete.success ? complete.data : next } });
     await collectBlockImages(profile.id, profile.userId).catch((error) => console.error("block image cleanup failed", error));
     return ok(toEditorBlock(updated));

@@ -26,7 +26,7 @@ describe("parseLinktree", () => {
   });
 
   it("drops unsafe and address-less items", () => {
-    const urls = page?.items.flatMap((i) => ("url" in i ? [i.url] : [])) ?? [];
+    const urls = page?.items.flatMap((i) => ("url" in i && i.url ? [i.url] : [])) ?? [];
     expect(urls.some((u) => u.startsWith("javascript:"))).toBe(false);
   });
 
@@ -48,7 +48,7 @@ describe("parseLinktree", () => {
 describe("findImporter", () => {
   it("accepts linktr.ee profile addresses in any common form", () => {
     for (const input of ["linktr.ee/deniz", "https://linktr.ee/deniz", "https://www.linktr.ee/deniz/", "LINKTR.EE/deniz?utm=x"]) {
-      expect(findImporter(input)?.url).toBe("https://linktr.ee/deniz");
+      expect(findImporter(input)).toMatchObject({ source: "page", url: "https://linktr.ee/deniz" });
     }
   });
 
@@ -58,7 +58,16 @@ describe("findImporter", () => {
     expect(findImporter("https://linktr.ee/")).toBeNull();
     expect(findImporter("https://linktr.ee/s/about")).toBeNull();
     expect(findImporter("javascript:alert(1)")).toBeNull();
-    expect(findImporter("https://linktr.ee/deniz")?.hosts).toEqual(["linktr.ee", "www.linktr.ee"]);
+    expect(findImporter("https://linktr.ee/deniz")).toMatchObject({ hosts: ["linktr.ee", "www.linktr.ee"] });
+  });
+
+  it("reads a GitHub user, never a repository or a GitHub page (Faz 12)", () => {
+    for (const input of ["github.com/serdarsahinn05", "https://github.com/serdarsahinn05/", "https://www.github.com/serdarsahinn05?tab=repositories"]) {
+      expect(findImporter(input)).toEqual({ source: "github", login: "serdarsahinn05" });
+    }
+    for (const input of ["https://github.com/serdarsahinn05/linkiva", "https://github.com/settings", "https://github.com/orgs", "https://github.com/-bad", "https://gist.github.com/serdar"]) {
+      expect(findImporter(input), input).toBeNull();
+    }
   });
 });
 

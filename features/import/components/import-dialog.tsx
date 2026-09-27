@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading, Link2, Play } from "lucide-react";
+import { FolderGit2, Heading, Link2, Play } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { SOCIAL_PLATFORMS } from "@/lib/socials";
 import { applyImport, readImport, type AppliedImport } from "../actions";
 import type { ImportedPage } from "../types";
 
-const KIND_ICON = { LINK: Link2, HEADER: Heading, EMBED: Play } as const;
+const KIND_ICON = { LINK: Link2, HEADER: Heading, EMBED: Play, PROJECT: FolderGit2 } as const;
 
 const KNOWN_ERRORS = ["unsupported", "unreachable", "unreadable", "empty", "tooMany", "invalid"] as const;
 const isKnownError = (code: string): code is (typeof KNOWN_ERRORS)[number] => (KNOWN_ERRORS as readonly string[]).includes(code);
@@ -123,7 +123,7 @@ export function ImportDialog({ open, initialUrl = "", onClose, onImported }: Pro
               <ul className="flex flex-col divide-y divide-glass-edge rounded-[var(--radius-control)] border border-glass-edge">
                 {page.items.map((item, i) => {
                   const Icon = KIND_ICON[item.kind];
-                  const label = item.kind === "HEADER" ? item.text : item.kind === "LINK" ? item.title : item.url;
+                  const label = item.kind === "HEADER" ? item.text : item.kind === "LINK" || item.kind === "PROJECT" ? item.title : item.url;
                   return (
                     <li key={i}>
                       <label className="flex cursor-pointer items-center gap-3 px-3 py-2.5">
@@ -137,6 +137,7 @@ export function ImportDialog({ open, initialUrl = "", onClose, onImported }: Pro
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-medium">{label}</span>
                           {item.kind === "LINK" && <span className="block truncate text-xs text-ink-3">{item.url}</span>}
+                          {item.kind === "PROJECT" && item.desc && <span className="block truncate text-xs text-ink-3">{item.desc}</span>}
                         </span>
                       </label>
                     </li>

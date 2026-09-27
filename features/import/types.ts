@@ -6,6 +6,16 @@ export const importedItemSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("LINK"), title: z.string().max(200), url: z.string().max(2048) }),
   z.object({ kind: z.literal("HEADER"), text: z.string().max(200) }),
   z.object({ kind: z.literal("EMBED"), url: z.string().max(2048) }),
+  // A GitHub repository as a portfolio project card (Faz 12).
+  z.object({
+    kind: z.literal("PROJECT"),
+    title: z.string().max(200),
+    desc: z.string().max(1000).optional(),
+    repo: z.string().max(2048),
+    url: z.string().max(2048).optional(),
+    tags: z.string().max(1000).optional(),
+    stars: z.string().max(10).optional(),
+  }),
 ]);
 
 export const importedPageSchema = z.object({

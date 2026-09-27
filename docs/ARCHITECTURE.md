@@ -219,7 +219,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 | 9 ✅ | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
 | 10 ✅ | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
 | 11 ✅ | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
-| 12 | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
+| 12 ✅ | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
 | 13 | `link_check`, `two_factor` | `LinkCheck { blockId @unique → Block (cascade), status, failCount, checkedAt }`; Better Auth `twoFactor` tabloları (CLI ile üretilir). LINK `data`'ya `gate`. |
 
 **Taslak link (Faz 7):** LINK'te boş `url` yalnızca `isVisible = false` iken geçerlidir. Kural `parseBlock`'ta değil, yazma eylemlerinde (`updateBlock`, `setVisibility`) uygulanır. Böylece public okuma yolu hiçbir zaman URL'siz link görmez.
@@ -305,7 +305,7 @@ TRACKING_SALT_SECRET
 CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer (yoksa uç 404); ayrıca özet maili çıkış token'ının HMAC anahtarı
 VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı (yoksa bölüm gizli); team id yalnızca proje bir ekipteyse
 # Planlı (faz geldiğinde lib/env.ts + .env.example'a eklenir; yoksa özellik lib/features.ts ile gizlenir)
-GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
+GITHUB_TOKEN                   # Faz 12 (uygulandı), opsiyonel: pinned repolar (GraphQL) ve 5000/saat limit; yoksa son repolar, 60/saat
 ```
 `.env.example` depoya eklenir, `.env` asla eklenmez.
 
@@ -315,6 +315,7 @@ GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 
 - **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, çalıştırma başına sınırlı parti), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İleride `DailyStat` toplaması da buraya gelir.
 - **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com` host'ları; AB onay ekranı için yalnızca bu host'lara `SOCS` çerezi), kırık link kontrolü (Faz 13). Kullanıcının verdiği her URL bu korumadan geçer. Tek istisna kullanıcı URL'i olmayan, sabit host'a doğrulanmış kimlikle kurulan YouTube beslemesi (`channelFeedUrl`).
+- **GitHub API** (Faz 12) `lib/github.ts`: sabit `api.github.com`, doğrulanmış kullanıcı adı (`lib/validation/github.ts`); kullanıcı URL'i getirilmez, bu yüzden `link-preview` korumasından geçmez. Yalnızca sahibinin içe aktarma isteğinde, 10 dakikada 3.
 - **Vercel Domains API** (Faz 11) düz `fetch` ile `lib/vercel-domains.ts`'ten çağrılır. Kullanıcı girdisi yalnızca doğrulanmış hostname olarak gider.
 
 ---
