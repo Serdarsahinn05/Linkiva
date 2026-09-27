@@ -1,14 +1,36 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
+import { domainRoute } from "@/lib/custom-domains";
 
-// Optimistic redirect only: a missing cookie means "surely logged out". The authoritative
-// session check happens in the dashboard/onboarding server components.
-export function proxy(request: NextRequest) {
-  if (!getSessionCookie(request)) {
-    const url = new URL("/login", request.url);
-    return NextResponse.redirect(url);
+/**
+ * A path no route matches: Next answers it with the site's 404 page (app/global-not-found.tsx) and a 404 status. A bare
+ * empty 404 would show the browser's own error screen instead.
+ */
+const notFound = (request: NextRequest) => NextResponse.rewrite(new URL("/_domain/not-found", request.url));
+
+export async function proxy(request: NextRequest) {
+  const host = request.headers.get("host") ?? "";
+  const { pathname } = request.nextUrl;
+  const route = domainRoute(host, pathname);
+
+  // A custom domain (ROADMAP Faz 11) shows its profile's pages and nothing else of the site.
+  if (route.kind !== "main") {
+    if (route.kind === "pass") return NextResponse.next();
+    if (route.kind === "notFound") return notFound(request);
+    // Loaded only for custom domains: requests to the site itself never initialise the database client here.
+    const { usernameForHost } = await import("@/lib/domain-lookup");
+    const username = await usernameForHost(host.split(":")[0]!.toLowerCase());
+    if (!username) return notFound(request);
+    return NextResponse.rewrite(new URL(`/${username}${route.path}${request.nextUrl.search}`, request.url));
+  }
+
+  // Optimistic redirect only: a missing cookie means "surely logged out". The authoritative
+  // session check happens in the dashboard/onboarding server components.
+  if ((pathname.startsWith("/dashboard") || pathname === "/onboarding") && !getSessionCookie(request)) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/dashboard/:path*", "/onboarding"] };
+// Every request, so a custom domain is recognised on any path; Next's own static files are left alone.
+export const config = { matcher: ["/((?!_next/static|_next/image).*)"] };

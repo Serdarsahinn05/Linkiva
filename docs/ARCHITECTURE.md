@@ -218,7 +218,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 | 8 ✅ | `block_types_contact_support` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
 | 9 ✅ | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
 | 10 ✅ | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
-| 11 | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
+| 11 ✅ | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
 | 12 | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
 | 13 | `link_check`, `two_factor` | `LinkCheck { blockId @unique → Block (cascade), status, failCount, checkedAt }`; Better Auth `twoFactor` tabloları (CLI ile üretilir). LINK `data`'ya `gate`. |
 
@@ -239,7 +239,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 - Kullanıcı bulunamazsa `notFound()` çağrılır ve HTTP 404 döner. *(Faz 6'dan sonra:* önce `UsernameHistory`'ye bakılır; süresi dolmamış eski ad `permanentRedirect` (308) ile yeni ada gider.)*
 - *(Faz 10)* Profil render'ı dış kaynak okuyabilir (YouTube RSS, `features/profile/latest-video.ts`) ama yalnızca `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile; okunamazsa blok gizlenir. DB'ye yazma kuralı değişmez.
 - *(Faz 10)* Hikâye görseli `app/(profile)/[username]/story/route.tsx`: `ImageResponse`, yalnızca yayındaki profil (değilse 404), QR `uqr` ile SVG. OG ve hikâye aynı font yükleyicisini kullanır (`lib/og-fonts.ts`).
-- *(Faz 11)* Özel alan adında `proxy.ts` host'u doğrulanmış `CustomDomain` kaydına göre `/<username>` yoluna rewrite eder. Kanonik URL `lib/site.ts` → `profileUrl(profile)` üzerinden gelir.
+- *(Faz 11)* Özel alan adında `proxy.ts` host'u doğrulanmış `CustomDomain` kaydına göre `/<username>` yoluna rewrite eder (`lib/custom-domains.ts` → `domainRoute`, `lib/domain-lookup.ts` 60 sn bellek önbelleği). Yalnızca profilin kendi sayfaları; `/l`, `/api/e` ve Next dosyaları geçer, gerisi 404. Kanonik URL `lib/site.ts` → `profileUrl(username, domain)` üzerinden gelir.
 - OG görseli `opengraph-image.tsx` ile üretilir. Aynı etiketi kullanır, `?v=Date.now()` kullanılmaz.
 
 ---
@@ -303,8 +303,8 @@ UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   # opsiyonel lokal
 BLOB_READ_WRITE_TOKEN
 TRACKING_SALT_SECRET
 CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer (yoksa uç 404); ayrıca özet maili çıkış token'ının HMAC anahtarı
+VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı (yoksa bölüm gizli); team id yalnızca proje bir ekipteyse
 # Planlı (faz geldiğinde lib/env.ts + .env.example'a eklenir; yoksa özellik lib/features.ts ile gizlenir)
-VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı
 GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 ```
 `.env.example` depoya eklenir, `.env` asla eklenmez.

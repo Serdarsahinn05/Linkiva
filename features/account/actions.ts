@@ -8,9 +8,11 @@ import { LOCALE_COOKIE, locales } from "@/i18n/config";
 import { db } from "@/lib/db";
 import { sendMailQuietly } from "@/lib/mail/send";
 import { env } from "@/lib/env";
+import { features } from "@/lib/features";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { THEME_COOKIE } from "@/lib/theme-preference";
 import { userUploadPrefix } from "@/lib/uploads";
+import { removeDomain } from "@/lib/vercel-domains";
 import { profileTag } from "@/features/profile/public";
 
 const YEAR = 60 * 60 * 24 * 365;
@@ -40,7 +42,7 @@ export type DeleteAccountResult = { ok: true } | { ok: false; error: "unauthoriz
 export async function deleteAccount(confirmation: string): Promise<DeleteAccountResult> {
   try {
     const user = await requireUser();
-    const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { username: true } });
+    const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { username: true, customDomain: { select: { hostname: true } } } });
     const expected = profile?.username ?? user.email;
     if (typeof confirmation !== "string" || confirmation.trim().toLowerCase() !== expected.toLowerCase()) return { ok: false, error: "confirm" };
 
@@ -51,6 +53,12 @@ export async function deleteAccount(confirmation: string): Promise<DeleteAccount
         if (page.blobs.length) await del(page.blobs.map((b) => b.url), { token: env.BLOB_READ_WRITE_TOKEN });
         cursor = page.hasMore ? page.cursor : undefined;
       } while (cursor);
+    }
+
+    // The custom domain leaves the Vercel project too. If Vercel cannot be reached the account still goes: without its
+    // row the proxy answers 404 for that name, and the orphan is logged for manual removal.
+    if (profile?.customDomain && features.domains) {
+      await removeDomain(profile.customDomain.hostname).catch((error) => console.error("custom domain removal failed", profile.customDomain?.hostname, error));
     }
 
     await db.$transaction([db.verification.deleteMany({ where: { identifier: user.email } }), db.user.delete({ where: { id: user.id } })]);

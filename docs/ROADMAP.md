@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6–10 canlıda, sıradaki Faz 11.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6–11 canlıda, sıradaki Faz 12.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
@@ -308,15 +308,23 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 **Amaç:** Rakiplerde her zaman ücretli olan özelliği ücretsiz vermek (PRODUCT ilke 1'in en güçlü kanıtı).
 
-- [ ] Veri: `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }`, migration `custom_domain`.
-- [ ] Vercel Domains API (`lib/vercel-domains.ts`, düz `fetch`, paket yok): ekle, doğrulama durumunu sorgula, kaldır. Env: `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` (`lib/env.ts` + `.env.example`; yoksa özellik gizlenir, `lib/features.ts`).
-- [ ] Yönlendirme: `proxy.ts` gelen host ana host değilse ve doğrulanmış bir `CustomDomain` ise isteği `/<username>` yoluna rewrite eder. Host → kullanıcı adı eşlemesi önbellekli (etiketli). Özel alan adında panel ve auth yolları 404 döner.
-- [ ] `lib/site.ts` → `profileUrl(profile)` özel alan adı varsa onu döndürür. QR, OG, kanonik URL ve paylaşım kartı bunu kullanır. `/l/` ve `/api/e` göreli adreslerle özel alan adında da çalışır.
-- [ ] Arayüz: Ayarlar → Alan adı. Hostname zod ile doğrulanır (yalnızca alan adı; ana alan adının alt alanları ve IP yasak). Eklenince gereken DNS kaydı (CNAME/A) gösterilir, "Doğrula" düğmesi durumu yeniler. Kaldırma ve hesap silmede Vercel'den de silinir.
-- [ ] Güvenlik: profil başına bir alan adı, ekleme rate limit'i, başka profilde kayıtlı host reddedilir (aynı cevap, sızıntı yok). Sahiplik testi.
-- [ ] `docs/DEPLOY.md`'ye Vercel token'ı oluşturma adımları (adım adım, tıklanacak yerle).
+- [x] Veri: `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }`, migration `custom_domain`.
+- [x] Vercel Domains API (`lib/vercel-domains.ts`, düz `fetch`, paket yok): ekle, doğrulama durumunu sorgula, kaldır. Env: `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` (`lib/env.ts` + `.env.example`; yoksa özellik gizlenir, `lib/features.ts`).
+- [x] Yönlendirme: `proxy.ts` gelen host ana host değilse ve doğrulanmış bir `CustomDomain` ise isteği `/<username>` yoluna rewrite eder. Host → kullanıcı adı eşlemesi önbellekli (etiketli). Özel alan adında panel ve auth yolları 404 döner.
+- [x] `lib/site.ts` → `profileUrl(profile)` özel alan adı varsa onu döndürür. QR, OG, kanonik URL ve paylaşım kartı bunu kullanır. `/l/` ve `/api/e` göreli adreslerle özel alan adında da çalışır.
+- [x] Arayüz: Ayarlar → Alan adı. Hostname zod ile doğrulanır (yalnızca alan adı; ana alan adının alt alanları ve IP yasak). Eklenince gereken DNS kaydı (CNAME/A) gösterilir, "Doğrula" düğmesi durumu yeniler. Kaldırma ve hesap silmede Vercel'den de silinir.
+- [x] Güvenlik: profil başına bir alan adı, ekleme rate limit'i, başka profilde kayıtlı host reddedilir (aynı cevap, sızıntı yok). Sahiplik testi.
+- [x] `docs/DEPLOY.md`'ye Vercel token'ı oluşturma adımları (adım adım, tıklanacak yerle).
 
 **Kabul:** Test alan adı preview'da profili açıyor, tıklama ve görüntülenme doğru profile sayılıyor, alan adı kaldırılınca 404.
+
+*Uygulama notları (2026-09-27):*
+- **Proxy:** Next 16'da proxy Node.js runtime'ında çalışır; host → kullanıcı adı eşlemesi veritabanından, örnek başına 60 sn bellek önbelleğiyle (ıskalar da; kaldırılan alan adı en geç bir dakikada durur). Etiketli önbellek proxy'de kullanılamadığı için plandaki "etiketli" yerine bu. Karar saf fonksiyonda (`lib/custom-domains.ts` → `domainRoute`): `/`, `/story`, OG görseli profile rewrite; `/l/…`, `/api/e`, Next dosyaları ve ikonlar olduğu gibi; geri kalan her şey sitenin 404 sayfası (boş 404 tarayıcının hata ekranını gösteriyordu). Matcher artık tüm istekler (statik Next dosyaları hariç).
+- **Doğrulama:** alan adı Vercel'de doğrulanmış **ve** DNS'i bize yönleniyorsa (`/v6/domains/…/config` → `misconfigured: false`) `verifiedAt` yazılır; yalnızca o zaman profil servis edilir. Başka Vercel hesabındaki bir alan adı için Vercel'in istediği TXT kaydı da tabloda gösterilir. Kök alan adı `A 76.76.21.21`, alt alan adı `CNAME cname.vercel-dns.com` (`com.tr` gibi iki parçalı uzantılar bilinir).
+- **Adresler:** `profileUrl`/`profileDisplayUrl` isteğe bağlı alan adı alır; kanonik adres, OG, hikâye görseli, QR, panelde "Adresin" kartı ve komut paleti doğrulanmış alan adını kullanır. Özel alan adlı profiller sitemap'e girmez (kanonik adresleri başka host'ta). Özel alan adından gelen tıklamada o alan adı "kaynak" sayılmaz.
+- **Bilinen sınır:** sahibinin oturum çerezi linkiva.space'e ait, bu yüzden sahibin kendi alan adındaki ziyaretleri istatistikten ayıklanamaz.
+- **Hesap silme:** alan adı Vercel projesinden de kaldırılır (Vercel'e ulaşılamazsa hesap yine silinir, proxy o ad için 404 verir, hata günlüğe yazılır).
+- **Test:** `tests/unit/domains.test.ts` (ad ayrıştırma, yönlendirme kuralı, DNS kaydı), `tests/integration/domains.test.ts` (Vercel taklitli: sahiplik, aynı cevap, doğrulanmadan servis yok, proxy'nin kendisi), `tests/e2e/phase11.spec.ts` (Chrome `*.localhost`'u yerel makineye çözer: gerçek render, `/l` tıklaması, panel/giriş/başka profil 404).
 
 ---
 

@@ -21,6 +21,8 @@ export type PublicProfile = {
   isPublished: boolean;
   seoTitle: string | null;
   seoDescription: string | null;
+  /** Verified custom domain (the profile's canonical address), or null. */
+  customDomain: string | null;
   blocks: PublicBlock[];
   socials: { platform: SocialPlatform; handle: string }[];
 };
@@ -41,6 +43,7 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
     include: {
       blocks: { where: { isVisible: true }, orderBy: { position: "asc" } },
       socials: true,
+      customDomain: { select: { hostname: true, verifiedAt: true } },
     },
   });
   if (!profile) return null;
@@ -58,6 +61,7 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
     isPublished: profile.isPublished,
     seoTitle: profile.seoTitle,
     seoDescription: profile.seoDescription,
+    customDomain: profile.customDomain?.verifiedAt ? profile.customDomain.hostname : null,
     blocks: profile.blocks.map((b) => ({
       id: b.id,
       type: b.type,

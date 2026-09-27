@@ -16,7 +16,19 @@ type Command = { id: string; group: "add" | "go" | "page"; label: string; icon: 
  * ⌘K / Ctrl+K on desktop (DESIGN.md §6): add any block, jump to a page, share. Keyboard first: type to filter,
  * arrows to move, Enter to run. Block commands go through /dashboard?add=<type>, so they work from every page.
  */
-export function CommandPalette({ username, open, onOpenChange, onShare }: { username: string; open: boolean; onOpenChange: (open: boolean) => void; onShare: () => void }) {
+export function CommandPalette({
+  username,
+  domain,
+  open,
+  onOpenChange,
+  onShare,
+}: {
+  username: string;
+  domain: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onShare: () => void;
+}) {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
@@ -53,19 +65,19 @@ export function CommandPalette({ username, open, onOpenChange, onShare }: { user
       { id: "go-analytics", group: "go", label: t("nav.analytics"), icon: BarChart3, run: go("/dashboard/analytics") },
       { id: "go-audience", group: "go", label: t("nav.audience"), icon: Users, run: go("/dashboard/audience") },
       { id: "go-settings", group: "go", label: t("nav.settings"), icon: Settings, run: go("/dashboard/settings") },
-      { id: "open", group: "page", label: t("palette.openPage"), icon: ExternalLink, run: () => window.open(profileUrl(username), "_blank", "noopener") },
+      { id: "open", group: "page", label: t("palette.openPage"), icon: ExternalLink, run: () => window.open(profileUrl(username, domain), "_blank", "noopener") },
       {
         id: "copy",
         group: "page",
         label: t("palette.copyAddress"),
         icon: Copy,
         run: () => {
-          void navigator.clipboard.writeText(profileUrl(username)).then(() => toast({ tone: "success", message: t("palette.copied") }));
+          void navigator.clipboard.writeText(profileUrl(username, domain)).then(() => toast({ tone: "success", message: t("palette.copied") }));
         },
       },
       { id: "share", group: "page", label: t("palette.share"), icon: QrCode, run: onShare },
     ];
-  }, [t, router, username, toast, onShare]);
+  }, [t, router, username, domain, toast, onShare]);
 
   const needle = query.trim().toLocaleLowerCase(locale);
   const shown = needle ? commands.filter((c) => c.label.toLocaleLowerCase(locale).includes(needle)) : commands;

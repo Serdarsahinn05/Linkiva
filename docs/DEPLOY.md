@@ -81,6 +81,25 @@ Resend yalnızca **gönderir**. Gelen mail ImprovMX ile yönlendiriliyor (Zoho'n
   "iletinin gönderildiği adresten yanıtla" açık. Elle gönderilen mailler Resend kotasından düşer.
 - Ücretli gerçek kutu gerekirse: Purelymail, Zoho Mail Lite, Google Workspace (DNS'te yalnız MX/SPF değişir).
 
+## 5b. Özel alan adı (Faz 11)
+
+Kullanıcıların kendi alan adlarını bağlayabilmesi için uygulamanın Vercel projene alan adı ekleyip çıkarabilmesi gerekir.
+Üç değer girilir; biri eksikse Ayarlar'daki "Alan adı" bölümü hiç görünmez.
+
+1. **Token:** vercel.com → sağ üstte profil resmin → **Account Settings** → soldan **Tokens** → **Create Token**.
+   - Token Name: `linkiva-domains`
+   - Scope: projenin bulunduğu hesap/ekip (ör. "serdarsahinn05's projects")
+   - Expiration: **No Expiration** (ya da 1 yıl; dolunca yenilemek gerekir)
+   - **Create** → çıkan değeri hemen kopyala, bir daha gösterilmez. Bu `VERCEL_API_TOKEN`.
+2. **Proje kimliği:** Vercel → Linkiva projesi → **Settings** → **General** → **Project ID** satırındaki kopyala ikonu. Bu `VERCEL_PROJECT_ID` (`prj_…`).
+3. **Ekip kimliği:** Vercel'de sol üstteki ekip adına tıkla → **Settings** → **General** → **Team ID** (`team_…`). Bu `VERCEL_TEAM_ID`.
+   Proje kişisel hesaptaysa ve ekip yoksa boş bırakılır; Vercel'in yeni hesaplarında her proje bir ekipte durur, o yüzden çoğunlukla gerekir.
+4. Vercel → proje → **Settings** → **Environment Variables** → üçünü de yalnızca **Production** için ekle → **Deployments** → son yayında `···` → **Redeploy**.
+
+Kullanıcı Ayarlar → Alan adı'ndan alan adını ekler, ekranda gösterilen DNS kaydını (kök alan adı için `A 76.76.21.21`, alt alan adı
+için `CNAME cname.vercel-dns.com`) kendi alan adı sağlayıcısında girer ve "Doğrula"ya basar. Vercel SSL sertifikasını kendisi verir.
+Alan adları Vercel panelinde Settings → Domains altında da görünür; oradan elle silme yapılmaz, uygulama kendi kaydıyla birlikte siler.
+
 ## 6. Önce dene, sonra birleştir
 
 1. `rebuild/v2` dalını GitHub'a gönder. Vercel dal için bir **preview** adresi üretir.

@@ -179,6 +179,12 @@ Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam geni
 - Işıklar kendi renginin saydamına söner (Satori `transparent`'ı saydam siyah sayar, açık zeminde gri şerit bırakıyordu).
 - **Son video:** EMBED bir YouTube kanal adresiyse satırda "Kanalın son videosu" anahtarı. Önizlemede video yerine "YouTube · son video" düz butonu (hangi videonun geleceği yayında belli olur).
 
+### Özel alan adı (Faz 11, Ayarlar)
+- Ayrı bir cam bölüm "Alan adı". Boşken tek cümle açıklama + alan ve ikincil hap "Bağla".
+- Eklenince: alan adı (500) ve sağda durum rozeti: "Bağlı" `--positive` nokta (anlamlı durum), "DNS bekleniyor" `--ink-3` nokta.
+- Beklerken her DNS kaydı ayrı bir `glass-flat` kartta etiket/değer satırları (Tür · Ad · Değer), değerler Geist Mono ve kelime ortasından bölünmez; değerin yanında kopyala ikonu. Altında yayılma süresi notu, sağda "Kaldır" (hayalet) ve "Doğrula" (ikincil). Kaldırmak iki adımlı: sonucu anlatan cümle + "Evet, kaldır" (tehlike).
+- Bağlıyken tek cümle ve alan adına açılan link; panelin "Adresin" kartı, QR ve paylaşım görselleri de alan adını gösterir.
+
 ### Profil temaları (kullanıcıya açık, `themes/index.ts`)
 Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
