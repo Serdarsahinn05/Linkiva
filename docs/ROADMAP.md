@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6 canlıda, Faz 7 bitti (commit bekliyor).** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6 ve Faz 7 canlıda.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra

@@ -68,7 +68,7 @@ npm run build
 
 ## Git
 
-- Ana dal `master` (canlı). Her faz kendi dalında yapılır (`faz-6-guven` …), preview'da denenir, kullanıcı onayıyla birleşir. Commit ve push yalnızca kullanıcı isteyince yapılır.
+- Ana dal `master` (canlı). Her faz kendi dalında yapılır (`faz-6-guven` …); yerel kontroller yeşil olunca kullanıcı onayıyla doğrudan `master`'a birleşir (preview adımı yok, kullanıcı canlıda dener). Commit ve push yalnızca kullanıcı isteyince yapılır.
 - Commit mesajı: kısa emir kipi, İngilizce veya Türkçe ama tutarlı. Örnek: `editor: add inline block editing`.
 
 ## Bitti tanımı
