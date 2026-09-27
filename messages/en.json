@@ -258,7 +258,10 @@
       "WHATSAPP": "WhatsApp",
       "CONTACT": "Contact card",
       "PRODUCT": "Product",
-      "COUNTDOWN": "Countdown"
+      "COUNTDOWN": "Countdown",
+      "PROJECT": "Project",
+      "EXPERIENCE": "Experience",
+      "SKILLS": "Skills"
     },
     "sizes": {
       "SMALL": "Small tile",
@@ -408,6 +411,29 @@
       "text": "Show a line of text",
       "afterText": "Text shown when it ends",
       "afterTextPlaceholder": "e.g. We're live!"
+    },
+    "portfolio": {
+      "projectTitle": "Project name",
+      "projectDesc": "Short description (optional)",
+      "projectUrl": "Live address (optional)",
+      "projectRepo": "Code address, e.g. GitHub (optional)",
+      "projectTags": "Tags",
+      "projectTagsPlaceholder": "Tags: next.js, postgres",
+      "projectTagsHint": "Separate with commas, up to 8.",
+      "projectFetch": "Get image from the page",
+      "projectImageRemove": "Remove image",
+      "role": "Role or degree",
+      "org": "Organisation (optional)",
+      "start": "Start",
+      "end": "End",
+      "endHint": "Leave the end empty and it reads “now”.",
+      "datesInvalid": "The end can't be before the start.",
+      "expDesc": "What did you do? (optional)",
+      "skillsTitle": "Group name (optional, e.g. Languages)",
+      "skillsItems": "Skills",
+      "skillsPlaceholder": "typescript, react, postgresql",
+      "skillsHint": "Separate with commas, up to 30. No levels or percentages, on purpose.",
+      "listInvalid": "Too many items, or one is too long."
     }
   },
   "templates": {
@@ -418,7 +444,9 @@
       "student": "Student",
       "musician": "Musician",
       "freelancer": "Freelancer",
-      "creator": "Creator"
+      "creator": "Creator",
+      "developer": "Developer",
+      "designer": "Designer"
     },
     "blocks": {
       "student": [
@@ -447,16 +475,39 @@
         "Collaborations",
         "Media kit",
         "Join my newsletter"
+      ],
+      "developer": [
+        "My résumé",
+        "GitHub",
+        "Projects",
+        "",
+        "",
+        "Experience",
+        "",
+        "Skills",
+        ""
+      ],
+      "designer": [
+        "My portfolio",
+        "Dribbble",
+        "Selected work",
+        "",
+        "",
+        "",
+        "Experience",
+        "",
+        "Tools",
+        ""
       ]
     }
   },
   "import": {
     "close": "Close",
-    "open": "Move from Linktree",
-    "title": "Bring your links over",
-    "hint": "Paste your Linktree address. We read your links and show them to you first; nothing is added until you confirm.",
-    "urlLabel": "Your Linktree address",
-    "urlPlaceholder": "linktr.ee/yourname",
+    "open": "Import from Linktree or GitHub",
+    "title": "Import",
+    "hint": "Paste your Linktree or GitHub address. We show what we found first; nothing is added until you confirm. GitHub repositories become project cards.",
+    "urlLabel": "Your Linktree or GitHub address",
+    "urlPlaceholder": "linktr.ee/yourname or github.com/yourname",
     "read": "Read page",
     "reading": "Reading",
     "found": "Found {items} blocks and {socials} social accounts.",
@@ -468,10 +519,10 @@
     "skipped": "Skipped {count} invalid items.",
     "back": "Another address",
     "errors": {
-      "unsupported": "For now we can only move linktr.ee pages.",
+      "unsupported": "For now we can read linktr.ee and github.com profile addresses only.",
       "unreachable": "Couldn't reach that page. Check the address.",
       "unreadable": "We couldn't read that page.",
-      "empty": "We found no links to move on that page.",
+      "empty": "We found nothing to import on that page.",
       "tooMany": "Too many attempts. Try again in a few minutes.",
       "invalid": "We couldn't understand that address."
     }
@@ -599,7 +650,8 @@
       "sade": "Plain",
       "kum": "Sand",
       "terminal": "Terminal",
-      "afis": "Poster"
+      "afis": "Poster",
+      "portfolyo": "Portfolio"
     },
     "themeHints": {
       "cam": "Frosted glass, follows the system",
@@ -607,7 +659,8 @@
       "sade": "White and lines",
       "kum": "Warm, editorial",
       "terminal": "Mono, phosphor green",
-      "afis": "One colour, bold"
+      "afis": "One colour, bold",
+      "portfolyo": "Projects and experience, wide"
     },
     "customize": "Customise",
     "mode": "Mode",
@@ -668,7 +721,9 @@
     "countdownDays": "days",
     "countdownHours": "hrs",
     "countdownMinutes": "min",
-    "countdownSeconds": "sec"
+    "countdownSeconds": "sec",
+    "projectCode": "Code",
+    "present": "now"
   },
   "audience": {
     "title": "Audience",

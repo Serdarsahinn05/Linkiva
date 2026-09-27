@@ -1,4 +1,4 @@
-import { isImportableUrl } from "@/features/import/importers";
+import { findImporter } from "@/features/import/importers";
 import { parseEmbed } from "@/lib/embeds";
 import { normalizePhone } from "@/lib/validation/phone";
 import { displayHost, normalizeUrl } from "@/lib/validation/url";
@@ -16,7 +16,9 @@ export function detectBlock(input: string): Detected | null {
   if (!text || /\s/.test(text)) return null;
   const url = normalizeUrl(text);
   if (!url) return null;
-  if (isImportableUrl(url)) return { kind: "IMPORT", url };
+  // Only another bio-link page is imported on paste; a pasted GitHub profile is usually meant as a link to it (its
+  // repositories are imported from the import dialog instead).
+  if (findImporter(url)?.source === "page") return { kind: "IMPORT", url };
   if (parseEmbed(url)) return { kind: "EMBED", url };
   const whatsapp = parseWhatsapp(new URL(url));
   if (whatsapp) return whatsapp;

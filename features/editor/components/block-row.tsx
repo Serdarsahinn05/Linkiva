@@ -4,11 +4,13 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   AlignLeft,
+  Briefcase,
   ArrowDown,
   ArrowUp,
   CalendarClock,
   CircleAlert,
   Contact,
+  FolderGit2,
   Grid2x2,
   GripVertical,
   HandCoins,
@@ -24,6 +26,7 @@ import {
   Square,
   Star,
   StarOff,
+  Tags,
   Timer,
   Trash2,
   type LucideIcon,
@@ -45,6 +48,7 @@ import { LinkCardFields } from "./link-card-fields";
 import { ScheduleDialog } from "./schedule-dialog";
 import { Sparkline } from "./sparkline";
 import { ContactSupportFields } from "./contact-support-fields";
+import { PortfolioFields } from "./portfolio-fields";
 import type { EditorBlock } from "../types";
 
 /** Block types are told apart by icon, never by colour (DESIGN.md §6). */
@@ -61,12 +65,15 @@ export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
   CONTACT: Contact,
   PRODUCT: ShoppingBag,
   COUNTDOWN: Timer,
+  PROJECT: FolderGit2,
+  EXPERIENCE: Briefcase,
+  SKILLS: Tags,
 };
 
 const SIZE_ICON: Record<BlockSize, LucideIcon> = { SMALL: Square, WIDE: RectangleHorizontal, LARGE: Grid2x2 };
 
 /** Blocks whose taps are counted (the /l route and support copies). */
-const TAPPABLE = new Set<EditorBlock["type"]>(["LINK", "IMAGE", "PRODUCT", "WHATSAPP", "CONTACT", "SUPPORT"]);
+const TAPPABLE = new Set<EditorBlock["type"]>(["LINK", "IMAGE", "PRODUCT", "WHATSAPP", "CONTACT", "SUPPORT", "PROJECT"]);
 
 type RowProps = {
   block: EditorBlock;
@@ -233,6 +240,7 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
             </>
           )}
           <ContactSupportFields block={block} autoFocus={autoFocus} onChange={onChange} />
+          <PortfolioFields block={block} autoFocus={autoFocus} onChange={onChange} />
           {block.type === "TEXT" && (
             <textarea
               aria-label={t("fields.text")}

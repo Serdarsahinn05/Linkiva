@@ -84,6 +84,32 @@ describe("applying an import", () => {
   });
 });
 
+describe("GitHub repositories as project cards (Faz 12)", () => {
+  it("adds valid projects to the caller's own page and skips ones with an unsafe address", async () => {
+    actingUser.id = ids.bob;
+    const result = await applyImport({
+      items: [
+        { kind: "PROJECT", title: "linkiva", desc: "Bio-link", repo: "https://github.com/bob/linkiva", url: "https://linkiva.space", tags: "next.js, next.js, postgres", stars: "12" },
+        { kind: "PROJECT", title: "evil", repo: "javascript:alert(1)" },
+      ],
+      socials: [{ platform: "GITHUB", value: "bob" }],
+    });
+    expect(result).toMatchObject({ ok: true, data: { skipped: 1 } });
+    const bob = await profileOf(ids.bob);
+    const project = bob.blocks.find((b) => b.type === "PROJECT");
+    // Tags are de-duplicated by the same schema the editor uses.
+    expect(project?.data).toEqual({ title: "linkiva", desc: "Bio-link", repo: "https://github.com/bob/linkiva", url: "https://linkiva.space/", tags: "next.js, postgres", stars: "12" });
+    expect(bob.socials.find((s) => s.platform === "GITHUB")?.handle).toBe("bob");
+    expect((await profileOf(ids.alice)).blocks.some((b) => b.type === "PROJECT")).toBe(false);
+  });
+
+  it("reads only github.com user addresses, never a repository or another host", async () => {
+    actingUser.id = ids.bob;
+    expect(await readImport("https://github.com/bob/linkiva")).toEqual({ ok: false, error: "unsupported" });
+    expect(await readImport("https://gitlab.com/bob")).toEqual({ ok: false, error: "unsupported" });
+  });
+});
+
 describe("reading an import", () => {
   it("never fetches a host that is not allow-listed", async () => {
     actingUser.id = ids.bob;

@@ -100,6 +100,15 @@ Kullanıcı Ayarlar → Alan adı'ndan alan adını ekler, ekranda gösterilen D
 için `CNAME cname.vercel-dns.com`) kendi alan adı sağlayıcısında girer ve "Doğrula"ya basar. Vercel SSL sertifikasını kendisi verir.
 Alan adları Vercel panelinde Settings → Domains altında da görünür; oradan elle silme yapılmaz, uygulama kendi kaydıyla birlikte siler.
 
+## 5c. GitHub içe aktarma anahtarı (Faz 12, isteğe bağlı)
+
+Anahtar olmadan da çalışır: GitHub'dan içe aktarma son güncellenen repoları getirir, ama bütün sunucu için saatte 60 istek sınırı vardır.
+Anahtarla sabitlenmiş (pinned) repolar gelir ve sınır saatte 5000 olur.
+
+1. github.com → sağ üstte profil resmin → **Settings** → en altta **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
+2. Token name: `linkiva-import`, Expiration: 1 yıl (dolunca yenilenir), Repository access: **Public repositories (read-only)**. Başka izin verme.
+3. **Generate token** → değeri kopyala → Vercel → proje → Settings → Environment Variables → `GITHUB_TOKEN`, yalnızca **Production** → Redeploy.
+
 ## 6. Önce dene, sonra birleştir
 
 1. `rebuild/v2` dalını GitHub'a gönder. Vercel dal için bir **preview** adresi üretir.

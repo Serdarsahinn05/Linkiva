@@ -382,6 +382,7 @@
   .profile-scene[data-scene="kum"] { --s-1: oklch(86% 0.06 70); --s-2: oklch(90% 0.05 35); }
   [data-theme="dark"] .profile-scene[data-scene="kum"],
   .profile-scene[data-scene="kum"][data-theme="dark"] { --s-1: oklch(40% 0.06 60); --s-2: oklch(34% 0.05 30); }
+  .profile-scene[data-scene="soft"] { --s-1: color-mix(in oklch, var(--c-ambient-1) 50%, transparent); --s-2: transparent; }
   .profile-scene[data-scene="accent"] {
     --s-1: color-mix(in oklch, var(--p-accent, var(--c-ink)) 55%, transparent);
     --s-2: color-mix(in oklch, var(--p-accent, var(--c-ink)) 30%, transparent);

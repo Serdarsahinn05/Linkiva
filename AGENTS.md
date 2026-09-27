@@ -15,7 +15,7 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
 | [docs/AUDIT.md](docs/AUDIT.md) | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
 
-> **Durum (2026-09-27):** v2 canlıda (`linkiva.space`, `master`). v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Faz 0–11 ve v2.1 bitti, sıradaki Faz 12. v2 sonrası iş Faz 6–13 olarak planlandı (ROADMAP → "v2 sonrası yol haritası"): her faz ayrı dalda, "Bilinçli olarak yapılmayanlar" listesi yeniden önerilmez. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
+> **Durum (2026-09-27):** v2 canlıda (`linkiva.space`, `master`). v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Faz 0–12 ve v2.1 bitti, sıradaki Faz 13. v2 sonrası iş Faz 6–13 olarak planlandı (ROADMAP → "v2 sonrası yol haritası"): her faz ayrı dalda, "Bilinçli olarak yapılmayanlar" listesi yeniden önerilmez. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
 
 ## Stack
 

@@ -9,6 +9,7 @@ import { normalizeSocial } from "@/lib/socials";
 import { blockDataSchemas } from "@/lib/validation/blocks";
 import { profileTag } from "@/features/profile/public";
 import { toEditorBlock, type EditorBlock, type EditorSocials } from "@/features/editor/types";
+import { readGithub, type GithubProfile } from "@/lib/github";
 import { findImporter } from "./importers";
 import { importedPageSchema, type ImportedPage } from "./types";
 
@@ -25,6 +26,24 @@ export type AppliedImport = {
   /** Items that did not pass validation and were left out. */
   skipped: number;
 };
+
+/** Repositories as project cards, plus the GitHub account as a social link. Texts are trimmed to the block limits. */
+function githubToImport(github: GithubProfile, login: string): ImportedPage {
+  return {
+    displayName: github.name ?? undefined,
+    bio: github.bio ?? undefined,
+    socials: [{ platform: "GITHUB", value: login }],
+    items: github.repos.map((r) => ({
+      kind: "PROJECT" as const,
+      title: r.name.slice(0, 80),
+      desc: r.description?.slice(0, 200) || undefined,
+      repo: r.url,
+      url: r.homepage ?? undefined,
+      tags: (r.topics.length ? r.topics : r.language ? [r.language.toLowerCase()] : []).slice(0, 5).join(", ") || undefined,
+      stars: r.stars > 0 ? String(r.stars) : undefined,
+    })),
+  };
+}
 
 const fail = (error: ImportError): { ok: false; error: ImportError } => ({ ok: false, error });
 
@@ -45,6 +64,13 @@ export async function readImport(input: string): Promise<ImportResult<ImportedPa
     const importer = findImporter(input);
     if (!importer) return fail("unsupported");
     if (!(await allow("import", user.id, 3, 600))) return fail("tooMany");
+
+    if (importer.source === "github") {
+      const github = await readGithub(importer.login);
+      if (!github) return fail("unreachable");
+      if (github.repos.length === 0) return fail("empty");
+      return { ok: true, data: githubToImport(github, importer.login) };
+    }
 
     // Linktree pages run to a few hundred KB of markup; the profile data sits at the end.
     const page = await fetchPage(importer.url, { maxBytes: 1024 * 1024, hosts: importer.hosts });
@@ -75,14 +101,16 @@ export async function applyImport(input: unknown): Promise<ImportResult<AppliedI
     if (!profile) return fail("notFound");
 
     let skipped = 0;
-    const data: { type: "LINK" | "HEADER" | "EMBED"; data: object }[] = [];
+    const data: { type: "LINK" | "HEADER" | "EMBED" | "PROJECT"; data: object }[] = [];
     for (const item of page.items) {
       const result =
         item.kind === "LINK"
           ? blockDataSchemas.LINK.safeParse({ title: item.title, url: item.url })
           : item.kind === "HEADER"
             ? blockDataSchemas.HEADER.safeParse({ text: item.text })
-            : blockDataSchemas.EMBED.safeParse({ url: item.url });
+            : item.kind === "PROJECT"
+              ? blockDataSchemas.PROJECT.safeParse({ title: item.title, desc: item.desc, repo: item.repo, url: item.url, tags: item.tags, stars: item.stars })
+              : blockDataSchemas.EMBED.safeParse({ url: item.url });
       if (result.success) data.push({ type: item.kind, data: result.data });
       else skipped++;
     }

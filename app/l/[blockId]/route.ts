@@ -9,8 +9,13 @@ import { buildVcard, vcardFileName } from "@/lib/vcard";
  * Where a tap on a block leads. Links, images, products and support links go to their validated URL; WhatsApp is
  * rebuilt from the normalised number (never a stored URL); a contact card is a .vcf download. null: nothing to open.
  */
-function target(block: ParsedBlock): { redirect: string } | { vcard: string; fileName: string } | null {
+function target(block: ParsedBlock, part: string | null): { redirect: string } | { vcard: string; fileName: string } | null {
   switch (block.type) {
+    // A project card opens its live page, else its code; its small "Code" link asks for the repository (?k=repo).
+    case "PROJECT": {
+      const url = part === "repo" ? block.data.repo : (block.data.url ?? block.data.repo);
+      return url ? { redirect: url } : null;
+    }
     case "LINK":
     case "PRODUCT":
       return { redirect: block.data.url };
@@ -44,7 +49,7 @@ export async function GET(request: Request, { params }: RouteContext<"/l/[blockI
     block.profile.isPublished &&
     isLive({ startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
   const parsed = live ? parseBlock(block.type, block.data) : null;
-  const destination = parsed ? target(parsed) : null;
+  const destination = parsed ? target(parsed, new URL(request.url).searchParams.get("k")) : null;
   if (!destination || !block) return new NextResponse("Not found", { status: 404 });
 
   const headers = new Headers(request.headers);

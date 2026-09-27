@@ -23,6 +23,8 @@ const schema = z.object({
   VERCEL_PROJECT_ID: optional,
   /** Only for projects owned by a team; empty for a personal account. */
   VERCEL_TEAM_ID: optional,
+  /** GitHub import (Faz 12), optional: with it, pinned repositories are read and the rate limit is 5000/h instead of 60/h. */
+  GITHUB_TOKEN: optional,
   /** Set by the Playwright web server only. See isE2E below. */
   E2E: z.enum(["1"]).optional(),
 });

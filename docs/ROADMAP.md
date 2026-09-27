@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6–11 canlıda, sıradaki Faz 12.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6–12 canlıda, sıradaki Faz 13.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
@@ -332,12 +332,20 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 **Amaç:** Geliştirici ve tasarımcılar için proje odaklı sayfa. Izgara düzeni (Faz 10) üzerine kurulur.
 
-- [ ] Bloklar (migration `block_types_portfolio`): `PROJECT { title, desc?, img?, tags[], url? }`, `EXPERIENCE { role, org, start, end?, desc? }`, `SKILLS { items[] }`.
-- [ ] GitHub: kullanıcı adından pinned repolar (token varsa GraphQL, yoksa REST'te son güncellenen repolar). Kayıt anında çekilir, `PROJECT` bloklarına dönüştürülür, istenirse yenilenir. Render'da dış istek yok.
-- [ ] Tema: `portfolyo` (DESIGN §7 tablosuna eklenir, monokrom, Geist Mono vurgulu). `terminal` teması portfolyo bloklarıyla uyumlu hale getirilir.
-- [ ] Onboarding şablonlarına "Geliştirici / Tasarımcı" eklenir (Faz 7 altyapısı).
+- [x] Bloklar (migration `block_types_portfolio`): `PROJECT { title, desc?, img?, tags[], url? }`, `EXPERIENCE { role, org, start, end?, desc? }`, `SKILLS { items[] }`.
+- [x] GitHub: kullanıcı adından pinned repolar (token varsa GraphQL, yoksa REST'te son güncellenen repolar). Kayıt anında çekilir, `PROJECT` bloklarına dönüştürülür, istenirse yenilenir. Render'da dış istek yok.
+- [x] Tema: `portfolyo` (DESIGN §7 tablosuna eklenir, monokrom, Geist Mono vurgulu). `terminal` teması portfolyo bloklarıyla uyumlu hale getirilir.
+- [x] Onboarding şablonlarına "Geliştirici / Tasarımcı" eklenir (Faz 7 altyapısı).
 
 **Kabul:** GitHub kullanıcı adından 60 saniyede portfolyo sayfası. PROJECT kartları ızgarada S/W/L boyutlarında düzgün.
+
+*Uygulama notları (2026-09-27):*
+- **Tasarım:** kullanıcıyla tıklanabilir taslak üzerinden kararlaştırıldı (Claude Design tuvali "Linkiva Portfolyo Teması"): tek parça profil, masaüstünde 960px, başlık bandı + sağda intro linkler, yan yana deneyim/yetenekler. Kullanıcının kendi sitesinin (yapışkan kenar çubuklu) kopyası bilinçli olarak yapılmadı. Ayrıntı DESIGN.md §7 Portfolyo.
+- **Veri:** `PROJECT { title, desc?, url?, repo?, img?, tags?, stars? }`, `EXPERIENCE { role, org?, start?, end?, desc? }` (ay ya da yıl; bitiş yoksa "şimdi", bitiş başlangıçtan önce olamaz), `SKILLS { title?, items }`. Listeler editörde virgüllü metin, sunucuda temizlenip tekilleştirilir (`splitList`). Plandaki `tags[]`/`items[]` dizileri yerine metin: `Block.data` editörde düz metin haritası.
+- **Tıklama:** kart `url`'e (yoksa `repo`'ya), küçük "Kod" linki `/l/<id>?k=repo` ile repoya; ikisi de sayılır. Proje görseli ve açıklaması link kartlarıyla aynı güvenli getirmeyle bir kez okunur ("Sayfadan görsel al"), sahibinin yazdığı adresleri değiştirmez.
+- **GitHub:** içe aktarma diyaloğunun ikinci kaynağı (`github.com/<kullanıcı>`); `lib/github.ts` sabit `api.github.com` host'una doğrulanmış kullanıcı adıyla gider. `GITHUB_TOKEN` varsa sabitlenmiş repolar (GraphQL), yoksa fork/arşiv olmayan son güncellenenler (en çok 8); `<login>/<login>` profil README deposu atlanır. Ad/bio yalnızca boşsa, GitHub sosyal hesabı boşsa eklenir. Kullanıcının hesabında canlı doğrulandı. Yapıştırılan GitHub profili içe aktarmayı **açmaz** (genelde link olarak eklenmek istenir); yalnızca Linktree gibi bio-link sayfaları açar.
+- **Şablonlar:** Geliştirici ve Tasarımcı; proje/deneyim/yetenek blokları boş taslak eklenir (uydurma içerik yayına çıkmaz). Tema değiştirilmez.
+- **Test:** `tests/unit/portfolio.test.ts` (şemalar, şablon taslakları, tema varsayılanı), `tests/unit/import.test.ts` (GitHub adresleri), `tests/integration/import.test.ts` (GitHub projeleri yalnızca kendi profiline, güvensiz adres atlanır, repo/başka host okunmaz), `tests/e2e/phase12.spec.ts` (1440'ta başlık bandı ve yan yana bölümler, 390'da tek sütun, tek zaman çizelgesi, `?k=repo`, editörden üç blok).
 
 ---
 
