@@ -17,6 +17,7 @@ export type PublicProfile = {
   appearance: unknown;
   showBranding: boolean;
   locale: string;
+  timezone: string;
   isPublished: boolean;
   seoTitle: string | null;
   seoDescription: string | null;
@@ -52,6 +53,7 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
     appearance: profile.appearance,
     showBranding: profile.showBranding,
     locale: profile.locale,
+    timezone: profile.timezone,
     isPublished: profile.isPublished,
     seoTitle: profile.seoTitle,
     seoDescription: profile.seoDescription,

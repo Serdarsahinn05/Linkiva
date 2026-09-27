@@ -241,7 +241,12 @@
       "IMAGE": "Image",
       "DIVIDER": "Divider",
       "EMBED": "Embed",
-      "EMAIL_CAPTURE": "Email"
+      "EMAIL_CAPTURE": "Email",
+      "SUPPORT": "Support",
+      "WHATSAPP": "WhatsApp",
+      "CONTACT": "Contact card",
+      "PRODUCT": "Product",
+      "COUNTDOWN": "Countdown"
     },
     "fields": {
       "title": "Title",
@@ -326,7 +331,58 @@
     "scheduleOrder": "The end must be after the start.",
     "scheduledFor": "Goes live {date}",
     "activeUntil": "Live until {date}",
-    "expired": "Expired, not shown on your page"
+    "expired": "Expired, not shown on your page",
+    "collapsible": "Fold what's below",
+    "collapsibleHint": "Blocks up to the next header or divider open under this header.",
+    "support": {
+      "name": "Account holder's name",
+      "iban": "IBAN",
+      "ibanPlaceholder": "TR00 0000 0000 0000 0000 0000 00",
+      "ibanInvalid": "That isn't a valid IBAN. Check the country code and digits.",
+      "note": "Short note (optional)",
+      "notePlaceholder": "e.g. If you'd like to support me",
+      "linkLabel": "Support link label (optional)",
+      "linkLabelPlaceholder": "e.g. Buy me a coffee",
+      "link": "Support link (optional)",
+      "linkPlaceholder": "papara.com/… or buymeacoffee.com/…",
+      "publicWarning": "The IBAN and name are public on your page."
+    },
+    "whatsapp": {
+      "phone": "Phone number",
+      "phonePlaceholder": "+90 532 123 45 67",
+      "phoneInvalid": "We couldn't read that number. Without a country code it's taken as Turkish.",
+      "message": "Prefilled message (optional)",
+      "messagePlaceholder": "Hi, I found you through your page.",
+      "title": "Button text (optional)"
+    },
+    "contact": {
+      "name": "Full name",
+      "title": "Title (optional)",
+      "org": "Company (optional)",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website",
+      "needOne": "Add at least one of phone, email or website."
+    },
+    "product": {
+      "title": "Product name",
+      "url": "Product link",
+      "price": "Price (optional)",
+      "pricePlaceholder": "e.g. $19",
+      "fetch": "Get image and description from the page",
+      "sponsored": "Sponsored / ad",
+      "sponsoredHint": "Turn on for paid or affiliate links; the card says \"Sponsored\"."
+    },
+    "countdown": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. The show starts",
+      "target": "Date and time",
+      "after": "When it ends",
+      "hide": "Hide the block",
+      "text": "Show a line of text",
+      "afterText": "Text shown when it ends",
+      "afterTextPlaceholder": "e.g. We're live!"
+    }
   },
   "templates": {
     "title": "Or start from a template",
@@ -399,6 +455,7 @@
     "placeholder": "Paste a link, we'll work out the type",
     "add": "Add",
     "addedEmbed": "Added as a player.",
+    "addedWhatsapp": "Added as a WhatsApp button.",
     "addedLink": "Link added.",
     "asLink": "Add as a link",
     "importOffer": "That's a Linktree page. Want to move your links over?",
@@ -499,7 +556,19 @@
     "subscribeDone": "Thanks, you are on the list.",
     "subscribeInvalid": "Enter a valid email address.",
     "subscribeTooMany": "Too many attempts. Try again soon.",
-    "subscribeError": "We could not save that right now. Try again."
+    "subscribeError": "We could not save that right now. Try again.",
+    "whatsappDefault": "Message on WhatsApp",
+    "contactAdd": "Add to contacts",
+    "supportCopy": "Copy",
+    "supportCopied": "Copied",
+    "supportCopyName": "Copy name",
+    "supportCopyIban": "Copy IBAN",
+    "supportLink": "Support me",
+    "sponsored": "Sponsored",
+    "countdownDays": "days",
+    "countdownHours": "hrs",
+    "countdownMinutes": "min",
+    "countdownSeconds": "sec"
   },
   "audience": {
     "title": "Audience",

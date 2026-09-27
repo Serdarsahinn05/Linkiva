@@ -47,7 +47,7 @@ async function withProfile<T>(body: (profile: { id: string; username: string; us
 // ─── Blocks ──────────────────────────────────────────────────────────────────
 
 /**
- * Adds a block on top. `prefill` (smart paste) is only for links and embeds, and only when it is already a complete,
+ * Adds a block on top. `prefill` (smart paste) is only for links, embeds and WhatsApp, and only when it is already a complete,
  * valid block; everything else starts from the empty defaults.
  */
 export async function addBlock(type: string, prefill?: unknown): Promise<ActionResult<EditorBlock>> {
@@ -60,7 +60,9 @@ export async function addBlock(type: string, prefill?: unknown): Promise<ActionR
         ? blockDataSchemas.LINK.safeParse(prefill)
         : parsed.data === "EMBED"
           ? blockDataSchemas.EMBED.safeParse(prefill)
-          : undefined;
+          : parsed.data === "WHATSAPP"
+            ? blockDataSchemas.WHATSAPP.safeParse(prefill)
+            : undefined;
   if (complete === undefined || (complete && !complete.success)) return fail("invalid");
   const data = complete?.data ?? blockDefaults[parsed.data];
   return withProfile(async (profile) => {
@@ -95,7 +97,33 @@ export async function applyTemplate(key: string): Promise<ActionResult<EditorBlo
 
 /** Drafts may be incomplete (empty title while typing); they are stored but not rendered publicly. */
 // partialRecord: in zod 4, z.record with enum keys would require every key.
-const draftSchema = z.partialRecord(z.enum(["title", "url", "text", "src", "alt", "w", "h", "card", "desc", "img"]), z.string().max(Math.max(TEXT_MAX, 2048)));
+const draftSchema = z.partialRecord(z.enum([
+    "title",
+    "url",
+    "text",
+    "src",
+    "alt",
+    "w",
+    "h",
+    "card",
+    "desc",
+    "img",
+    "collapsible",
+    "name",
+    "iban",
+    "note",
+    "urlLabel",
+    "phone",
+    "message",
+    "org",
+    "email",
+    "website",
+    "price",
+    "sponsored",
+    "target",
+    "after",
+    "afterText",
+  ]), z.string().max(Math.max(TEXT_MAX, 2048)));
 
 /** Block images (Image block src, link card img) may only be files in the owner's own Blob folder. */
 const foreignImage = (data: { src?: string; img?: string }, userId: string) =>
@@ -147,7 +175,8 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
   const url = typeof rawUrl === "string" ? normalizeUrl(rawUrl) : null;
   if (!url || !/^https?:/.test(url)) return fail("invalid");
   return withProfile(async (profile) => {
-    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: "LINK" }, select: { data: true } });
+    // Link cards and product cards read the page the same way.
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: { in: ["LINK", "PRODUCT"] } }, select: { data: true, type: true } });
     if (!block) return fail("notFound");
     if (!(await allow("link-card", profile.userId, 10, 60))) return fail("tooMany");
 
@@ -171,11 +200,11 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
       ...current,
       url,
       title: current.title?.trim() || (preview.title ?? displayHost(url)).slice(0, TITLE_MAX),
-      card: "1",
+      ...(block.type === "LINK" && { card: "1" }),
       desc: (preview.description ?? "").slice(0, DESC_MAX),
       img,
     };
-    const complete = blockDataSchemas.LINK.safeParse(next);
+    const complete = block.type === "PRODUCT" ? blockDataSchemas.PRODUCT.safeParse(next) : blockDataSchemas.LINK.safeParse(next);
     const updated = await db.block.update({ where: { id }, data: { data: complete.success ? complete.data : next } });
     await collectBlockImages(profile.id, profile.userId).catch((error) => console.error("block image cleanup failed", error));
     return ok(toEditorBlock(updated));

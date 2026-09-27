@@ -25,7 +25,7 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 - **Sadelik ve hız.** Az adım, hafif profil sayfası, sıfır karmaşa. Güçlü özelleştirme, sadeliği bozmadan sunulur.
 - **Güçlü özelleştirme.** Birbirinden gerçekten farklı temalar ve kullanıcının kendi renk, font ve buton stilini seçmesi.
 - **Verin satılmaz (2026-09-27).** Çerez yok, IP saklanmaz. Kullanıcı verisi yapay zekâ eğitiminde kullanılmaz, hiçbir LLM sağlayıcısına ya da reklam ağına gönderilmez. Rakiplerin 2026'da veri paylaşımına kaydığı noktada bu ayırt edici bir iddiadır. Pazarlama metninde rakip adı geçmez.
-- **Türkiye'yi gerçekten tanır.** IBAN ile destek, hazır mesajlı WhatsApp butonu, rehbere eklenen kartvizit, açık "İşbirliği" beyanlı affiliate kartı (ROADMAP Faz 8). Linkiva ödemeye aracılık etmez.
+- **Yerel alışkanlıkları tanır (önce Türkiye, her ülkede çalışır).** IBAN ile destek, hazır mesajlı WhatsApp butonu, rehbere eklenen kartvizit, açık "İşbirliği" beyanlı affiliate kartı (ROADMAP Faz 8). Linkiva ödemeye aracılık etmez.
 
 ### Pazar notu (2026-09-27)
 

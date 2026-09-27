@@ -118,6 +118,11 @@ enum BlockType {
   EMAIL_CAPTURE
   DIVIDER
   IMAGE
+  SUPPORT
+  WHATSAPP
+  CONTACT
+  PRODUCT
+  COUNTDOWN
 }
 
 model Block {

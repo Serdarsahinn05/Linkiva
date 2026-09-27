@@ -241,7 +241,12 @@
       "IMAGE": "Görsel",
       "DIVIDER": "Ayraç",
       "EMBED": "Embed",
-      "EMAIL_CAPTURE": "E-posta"
+      "EMAIL_CAPTURE": "E-posta",
+      "SUPPORT": "Destek",
+      "WHATSAPP": "WhatsApp",
+      "CONTACT": "Kartvizit",
+      "PRODUCT": "Ürün",
+      "COUNTDOWN": "Geri sayım"
     },
     "fields": {
       "title": "Başlık",
@@ -326,7 +331,58 @@
     "scheduleOrder": "Bitiş, başlangıçtan sonra olmalı.",
     "scheduledFor": "{date} tarihinde yayında",
     "activeUntil": "{date} tarihine kadar yayında",
-    "expired": "Süresi doldu, sayfada görünmüyor"
+    "expired": "Süresi doldu, sayfada görünmüyor",
+    "collapsible": "Altındakileri katla",
+    "collapsibleHint": "Sonraki başlığa ya da ayraca kadar olan bloklar bu başlığın altında açılır.",
+    "support": {
+      "name": "Hesap sahibinin adı",
+      "iban": "IBAN",
+      "ibanPlaceholder": "TR00 0000 0000 0000 0000 0000 00",
+      "ibanInvalid": "Bu geçerli bir IBAN değil. Ülke kodu ve rakamları kontrol et.",
+      "note": "Kısa not (isteğe bağlı)",
+      "notePlaceholder": "Örn. Destek olmak istersen",
+      "linkLabel": "Destek linki başlığı (isteğe bağlı)",
+      "linkLabelPlaceholder": "Örn. Kahve ısmarla",
+      "link": "Destek linki (isteğe bağlı)",
+      "linkPlaceholder": "papara.com/… ya da buymeacoffee.com/…",
+      "publicWarning": "IBAN ve ad sayfanda herkese açık görünür."
+    },
+    "whatsapp": {
+      "phone": "Telefon numarası",
+      "phonePlaceholder": "0532 123 45 67",
+      "phoneInvalid": "Bu numarayı anlayamadık. Ülke kodu yoksa Türkiye numarası sayılır.",
+      "message": "Hazır mesaj (isteğe bağlı)",
+      "messagePlaceholder": "Merhaba, sayfandan geliyorum.",
+      "title": "Buton yazısı (isteğe bağlı)"
+    },
+    "contact": {
+      "name": "Ad soyad",
+      "title": "Unvan (isteğe bağlı)",
+      "org": "Şirket (isteğe bağlı)",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "website": "Web sitesi",
+      "needOne": "Telefon, e-posta ya da web sitesinden en az birini ekle."
+    },
+    "product": {
+      "title": "Ürün adı",
+      "url": "Ürün linki",
+      "price": "Fiyat (isteğe bağlı)",
+      "pricePlaceholder": "Örn. ₺249",
+      "fetch": "Sayfadan görsel ve açıklama al",
+      "sponsored": "İşbirliği / reklam",
+      "sponsoredHint": "Ücretli ya da affiliate bir linkse açık tut; kartta \"İşbirliği\" yazar."
+    },
+    "countdown": {
+      "title": "Başlık",
+      "titlePlaceholder": "Örn. Konser başlıyor",
+      "target": "Tarih ve saat",
+      "after": "Süre dolunca",
+      "hide": "Bloğu gizle",
+      "text": "Yazı göster",
+      "afterText": "Süre dolunca görünecek yazı",
+      "afterTextPlaceholder": "Örn. Canlı yayındayız!"
+    }
   },
   "templates": {
     "title": "Ya da bir şablonla başla",
@@ -399,6 +455,7 @@
     "placeholder": "Bir link yapıştır, türünü biz anlayalım",
     "add": "Ekle",
     "addedEmbed": "Oynatıcı olarak eklendi.",
+    "addedWhatsapp": "WhatsApp butonu olarak eklendi.",
     "addedLink": "Link eklendi.",
     "asLink": "Link olarak ekle",
     "importOffer": "Bu bir Linktree sayfası. Linklerini taşımak ister misin?",
@@ -499,7 +556,19 @@
     "subscribeDone": "Teşekkürler, listedesin.",
     "subscribeInvalid": "Geçerli bir e-posta adresi yaz.",
     "subscribeTooMany": "Çok fazla deneme. Biraz sonra tekrar dene.",
-    "subscribeError": "Şu an kaydedemedik. Tekrar dene."
+    "subscribeError": "Şu an kaydedemedik. Tekrar dene.",
+    "whatsappDefault": "WhatsApp'tan yaz",
+    "contactAdd": "Rehbere ekle",
+    "supportCopy": "Kopyala",
+    "supportCopied": "Kopyalandı",
+    "supportCopyName": "Adı kopyala",
+    "supportCopyIban": "IBAN'ı kopyala",
+    "supportLink": "Destek ol",
+    "sponsored": "İşbirliği",
+    "countdownDays": "gün",
+    "countdownHours": "saat",
+    "countdownMinutes": "dk",
+    "countdownSeconds": "sn"
   },
   "audience": {
     "title": "Kitle",

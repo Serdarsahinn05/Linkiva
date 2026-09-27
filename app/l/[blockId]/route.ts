@@ -2,11 +2,35 @@ import { after, NextResponse } from "next/server";
 import { recordEvent } from "@/features/analytics/record";
 import { db } from "@/lib/db";
 import { isLive } from "@/lib/schedule";
-import { parseBlock } from "@/lib/validation/blocks";
+import { parseBlock, type ParsedBlock } from "@/lib/validation/blocks";
+import { buildVcard, vcardFileName } from "@/lib/vcard";
 
 /**
- * Public link redirect. Only visible, live LINK (and linked IMAGE) blocks of published profiles resolve, and only to the
- * validated URL stored for that block. The click is recorded after the redirect is sent (docs/ARCHITECTURE.md §7).
+ * Where a tap on a block leads. Links, images, products and support links go to their validated URL; WhatsApp is
+ * rebuilt from the normalised number (never a stored URL); a contact card is a .vcf download. null: nothing to open.
+ */
+function target(block: ParsedBlock): { redirect: string } | { vcard: string; fileName: string } | null {
+  switch (block.type) {
+    case "LINK":
+    case "PRODUCT":
+      return { redirect: block.data.url };
+    case "IMAGE":
+    case "SUPPORT":
+      return block.data.url ? { redirect: block.data.url } : null;
+    case "WHATSAPP": {
+      const text = block.data.message ? `?text=${encodeURIComponent(block.data.message)}` : "";
+      return { redirect: `https://wa.me/${block.data.phone}${text}` };
+    }
+    case "CONTACT":
+      return { vcard: buildVcard(block.data), fileName: vcardFileName(block.data.name) };
+    default:
+      return null;
+  }
+}
+
+/**
+ * Public block link. Only visible, live blocks of published profiles resolve. The tap is recorded after the response
+ * is sent (docs/ARCHITECTURE.md §7).
  */
 export async function GET(request: Request, { params }: RouteContext<"/l/[blockId]">) {
   const { blockId } = await params;
@@ -20,14 +44,22 @@ export async function GET(request: Request, { params }: RouteContext<"/l/[blockI
     block.profile.isPublished &&
     isLive({ startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
   const parsed = live ? parseBlock(block.type, block.data) : null;
-
-  // Links, and images that the owner gave a link.
-  const target = parsed?.type === "LINK" || parsed?.type === "IMAGE" ? parsed.data.url : undefined;
-  if (!target || !block) return new NextResponse("Not found", { status: 404 });
+  const destination = parsed ? target(parsed) : null;
+  if (!destination || !block) return new NextResponse("Not found", { status: 404 });
 
   const headers = new Headers(request.headers);
   const profile = block.profile;
   // Referrer of a click is the profile page itself; the source is attributed from the view instead.
   after(() => recordEvent({ type: "CLICK", profile, blockId, headers }).catch((error) => console.error("click record failed", error)));
-  return NextResponse.redirect(target, { status: 302, headers: { "Cache-Control": "no-store" } });
+
+  if ("vcard" in destination) {
+    return new NextResponse(destination.vcard, {
+      headers: {
+        "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${destination.fileName}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+  return NextResponse.redirect(destination.redirect, { status: 302, headers: { "Cache-Control": "no-store" } });
 }

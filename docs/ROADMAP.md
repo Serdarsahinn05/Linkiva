@@ -150,14 +150,14 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6 ve Faz 7 canlıda.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6 ve 7 canlıda, Faz 8 bitti (birleştirme bekliyor).** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
 
 1. **Güven ve kırılmayan linkler önce (Faz 6).** Gerçek kullanıcı geldikten sonra kullanıcı adı değiştirme ve yönlendirme sonradan eklenirse biyografilerdeki linkler kırılır. Kapanmamış denetimler de geçişten önce biter.
 2. **Kayıt engelini kaldır (Faz 7).** İçe aktarma, şablon ve akıllı yapıştırma "ilk 60 saniye" hedefine doğrudan hizmet eder.
-3. **Türkiye'ye özel, ucuz ve ayırt edici bloklar (Faz 8).** Blok modeli bunları neredeyse bedava taşır.
+3. **İletişim ve destek blokları (Faz 8).** Rakiplerin ödeme aracına dayanan özelliklerinin yerel karşılıkları (önce Türkiye, ama her ülkede çalışır). Blok modeli bunları neredeyse bedava taşır.
 4. **Geri dönüş sebebi (Faz 9).** Editör hızlandırıcıları, anlaşılır analitik ve haftalık özet.
 5. **Büyük görsel fark (Faz 10).** Izgara düzeni, hikâye kartı, son videoyu otomatik gösterme.
 6. **Altyapı isteyen işler (Faz 11–13).** Özel alan adı, portfolyo, bakım ve güvenlik.
@@ -223,25 +223,26 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ---
 
-## Faz 8: Türkiye blokları
+## Faz 8: İletişim ve destek blokları
 
-**Amaç:** Türkiye'deki içerik üreticisi, freelancer ve küçük işletmenin gerçek ihtiyaçları. Ödemeye aracılık yok.
+**Amaç:** İçerik üreticisi, freelancer ve küçük işletmenin iletişim ve destek ihtiyaçları, ödemeye aracılık etmeden. Önce Türkiye'deki alışkanlıklar düşünüldü (IBAN, WhatsApp, reklam beyanı), ama hepsi her ülkede çalışır: IBAN her ülkeden, telefon uluslararası (ülke kodu yoksa Türkiye varsayılır).
 
 **Ortak altyapı**
-- [ ] Tek migration `block_types_tr`: `BlockType` enum'una `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN` eklenir. Veri `Block.data` içinde; her tür için `blockDataSchemas` şeması ve `components/blocks/` altında render'cı (önizleme ve profil aynı bileşen).
-- [ ] `/l/[blockId]` tür başına davranış kazanır: LINK/IMAGE/PRODUCT/WHATSAPP → 302, CONTACT → `.vcf` dosyası. Hepsi tıklama olarak sayılır.
-- [ ] Kopyalama olayı: `/api/e` beacon'ı `{ p, b, k: "copy" }` kabul eder ve `record.ts` üzerinden CLICK yazar (tek yazma noktası korunur, tekrar kilidi aynı). İstatistikte kopyalama link tıklaması gibi görünür.
-- [ ] Editör "Blok ekle" menüsü gruplanır: İçerik · Bağlantı · İletişim ve destek · Kitle.
+- [x] Migration `block_types_contact_support`: `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. Şemalar `lib/validation/blocks.ts`, render'cılar `components/blocks/` (önizleme ve profil aynı bileşen), editör alanları `features/editor/components/contact-support-fields.tsx`.
+- [x] `/l/[blockId]` tür başına: LINK/IMAGE/PRODUCT/SUPPORT linki → 302, WHATSAPP → numaradan sunucuda kurulan `wa.me`, CONTACT → `.vcf`. Hepsi tıklama sayılır.
+- [x] Kopyalama: `/api/e` `{ p, b, k: "copy" }` → yalnızca o profilin görünür SUPPORT bloğu için `record.ts` üzerinden CLICK.
+- [ ] ~~"Blok ekle" menüsünü gruplamak~~: 12 tür oklu kaydırma satırında (`ScrollRow`) kaldı; kalabalık gelirse gruplu menüye geçilir.
 
 **Bloklar**
-- [ ] **SUPPORT (IBAN / destek):** `{ name, iban?, note?, links?: [{ label, url }] }`. IBAN `TR` + 24 hane, mod-97 sağlaması sunucuda (`lib/validation/iban.ts`, birim testli), 4'lü gruplarla gösterilir. "IBAN'ı kopyala" ve "Adı kopyala" butonları (Clipboard API; JS yoksa metin seçilebilir). Papara / Buy Me a Coffee gibi linkler şema beyaz listesinden geçer. Editörde uyarı: "IBAN sayfanda herkese açık görünür."
-- [ ] **WHATSAPP:** `{ phone, message? }`. Telefon E.164'e normalize edilir (`+90` varsayılan), URL her zaman `https://wa.me/<phone>?text=` olarak **sunucuda kurulur** (kullanıcıdan URL alınmaz). İkon react-icons marka ikonu, monokrom.
-- [ ] **CONTACT (kartvizit):** `{ name, title?, org?, phone?, email?, website? }`. `/l/<id>` `text/vcard; charset=utf-8` + `Content-Disposition: attachment` döner. vCard 3.0 alanları kaçışlı (`,;\` ve satır sonu), `lib/vcard.ts` birim testli. Buton: "Rehbere ekle".
-- [ ] **PRODUCT (ürün / affiliate kartı):** `{ title, url, price?, img?, store?, sponsored? }`. Görsel ve başlık v2.1'deki link önizleme hattıyla alınır (`fetchLinkCard`). Fiyat serbest metin (≤ 20 karakter, ör. "₺249"); kur/stok iddiası yok. `sponsored: "1"` ise kartta "İşbirliği" etiketi görünür (Reklam Kurulu'nun sosyal medya etkileyicisi kılavuzu açık reklam beyanı ister). Mağaza adı URL host'undan türetilir.
-- [ ] **COUNTDOWN:** `{ title, target, after: "hide" | "text", afterText? }`. Sunucu hedef tarihi profil saat diliminde `Intl` ile yazar (JS'siz çalışır), küçük bir istemci bileşeni geri sayar. `after: "hide"` ise bloğun `endsAt`'i hedefe eşitlenir; planlı blok kuralı ve ISR `revalidate` mevcut hattı kullanır.
-- [ ] **Link grubu (açılır başlık):** Yeni tür değil. HEADER'a `collapsible: "1"` alanı eklenir. Sonraki HEADER ya da DIVIDER'a kadarki bloklar `<details>/<summary>` içinde render edilir (JS'siz, erişilebilir). Editörde grup içeriği girintili gösterilir.
+- [x] **SUPPORT:** ad, IBAN (her ülke: ISO 13616 biçimi + mod-97, bilinen ülkelerde tam uzunluk; `lib/validation/iban.ts`, 4'lü gösterim), not, tek bir destek linki (başlıklı). Kopyala butonu (Clipboard API; JS yoksa metin seçilebilir), editörde "herkese açık" uyarısı. *Plandaki link listesi yerine tek link: tek ihtiyaç Papara/BMAC linkiydi.*
+- [x] **WHATSAPP:** telefon E.164 rakamları (`lib/validation/phone.ts`, yerel TR biçimleri), hazır mesaj, buton yazısı. Monokrom marka ikonu.
+- [x] **CONTACT:** ad, unvan, şirket, telefon/e-posta/web'den en az biri. vCard 3.0 (`lib/vcard.ts`, kaçışlı, CRLF), ASCII dosya adı.
+- [x] **PRODUCT:** ad, link, fiyat (serbest metin, Geist Mono), sayfadan görsel+açıklama (`fetchLinkCard` PRODUCT'ı da kabul eder), "İşbirliği" anahtarı → kartta etiket + `rel="sponsored"`.
+- [x] **COUNTDOWN:** başlık, tarih-saat, bitince gizle/yazı göster. Sunucu tarihi profil saat diliminde yazar (JS'siz çalışır), istemci geri sayar (reduced motion'da dakikada bir). *"Gizle" `endsAt` ile değil `liveBlocks` içinde süzülür: ek alan gerekmedi.*
+- [x] **Link grubu:** HEADER `collapsible`, `<details>/<summary>` (JS'siz). Editörde katlanan bloklar girintili ve kılavuz çizgili.
+- [x] Akıllı yapıştırma: `wa.me` / `api.whatsapp.com/send` → WHATSAPP butonu.
 
-**Test:** Her tür için şema birim testi, sahiplik entegrasyon testi (başkasının SUPPORT/CONTACT bloğunu güncelleyememe), e2e (vCard indirilip ayrıştırılıyor, WhatsApp 302 hedefi, kopyalama sayılıyor, geri sayım JS kapalıyken tarih gösteriyor, grup açılıp kapanıyor).
+**Test:** `tests/unit/contact-support-blocks.test.ts` (IBAN, telefon, vCard enjeksiyonu, şemalar, biten geri sayım, WhatsApp tespiti), `tests/integration/contact-support-blocks.test.ts` (başkasının IBAN'ını değiştirememe, WhatsApp ön dolgusu), `tests/e2e/phase8.spec.ts` (JS'siz profil, grup açılıyor, `wa.me` 302 hedefi, vCard indirme).
 
 **Kabul:** Her yeni blok altı temada kontrast testinden geçiyor ve 390px'te taşmıyor. Hiçbir blok kullanıcıdan ham URL alıp doğrulamadan yönlendirmiyor.
 
@@ -332,6 +333,12 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 **Kabul:** Kırık link kontrolü özel ağ adreslerine hiç istek atmıyor (test). 2FA açık hesaba kod olmadan girilemiyor (e2e).
 
 ---
+
+## Kullanıcı geri bildirimiyle yapılan düzeltmeler (2026-09-27)
+
+- [x] Editörde blok türü satırı PC'de kaydırılamıyordu: cam oklar (yalnızca fare), odak çerçevesi kırpılmıyor, oklar ortalı.
+- [x] Mobilde Görünüm seçim kutuları taşıyordu: satıra sığmayınca kart köşesi, seçenekler satırı paylaşır.
+- [x] **Panel geçişlerinde iskelet kaldırıldı** ("her geçişte iskelet göz yoruyor"): `loading.tsx` dosyaları silindi, geçişte eski sayfa yenisi hazır olana kadar kalır; ziyaret edilen sekmeler 30 sn istemci önbelleğinde (`staleTimes.dynamic`, değişiklikler önbelleği temizler); 200 ms'den uzun süren geçişte tıklanan sekmenin altında küçük bir nokta (`useLinkStatus`). Sayfa geçişi 160 ms bulanıksız solma.
 
 ## Bilinçli olarak yapılmayanlar
 
