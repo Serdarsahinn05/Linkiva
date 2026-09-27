@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
+import { Heatmap } from "@/features/analytics/components/heatmap";
 import { TrafficChart } from "@/features/analytics/components/traffic-chart";
 import { WorldMap } from "@/features/analytics/components/world-map";
-import { getAnalytics, isRange, RANGES, type Row } from "@/features/analytics/queries";
+import { computeInsights, type Insight } from "@/features/analytics/insights";
+import { getAnalytics, getAnalyticsExtras, isRange, RANGES, type Row } from "@/features/analytics/queries";
 import { PageHeader, PageReveal, Section } from "@/features/dashboard/components/page";
 import { getOwnProfile } from "@/features/profile/queries";
 import { cn } from "@/lib/cn";
@@ -26,7 +28,15 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
   const t = await getTranslations("analytics");
   const tNav = await getTranslations("nav");
   const format = await getFormatter();
-  const data = await getAnalytics(profile, range, locale);
+  const [data, extras] = await Promise.all([getAnalytics(profile, range, locale), getAnalyticsExtras(profile, range)]);
+  const insights = computeInsights({
+    totalViews: data.totals.views,
+    sources: data.sources,
+    links: data.links,
+    sourceLinks: extras.sourceLinks,
+    heatmap: extras.heatmap,
+    previousLinkClicks: range === "all" ? undefined : extras.previousLinkClicks,
+  });
   const regionNames = new Intl.DisplayNames([locale], { type: "region" });
   const regionName = (iso: string) => {
     try {
@@ -93,6 +103,18 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
           ))}
         </section>
 
+        {insights.length > 0 && (
+          <Section title={t("insightsTitle")}>
+            <ul className="flex flex-col divide-y divide-glass-edge">
+              {insights.map((insight) => (
+                <li key={insight.kind} className="py-2.5 first:pt-0 last:pb-0 text-pretty">
+                  <InsightText insight={insight} t={t} pct={pct} />
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
         {data.totals.views === 0 && data.totals.clicks === 0 ? (
           <Section>
             <p className="py-10 text-center text-ink-2">{t("empty")}</p>
@@ -106,6 +128,17 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
               </div>
               <TrafficChart data={data.series} labels={{ views: t("views"), clicks: t("clicks") }} />
             </Section>
+
+            {data.totals.views > 0 && (
+              <Section title={t("heatmapTitle")}>
+                <Heatmap
+                  data={extras.heatmap}
+                  locale={locale}
+                  label={t("heatmapLabel")}
+                  cellLabel={(day, hours, views) => t("heatmapCell", { day, hours, views })}
+                />
+              </Section>
+            )}
 
             <Section title={t("links")}>
               {data.links.every((l) => l.clicks === 0) ? (
@@ -164,6 +197,25 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
       </div>
     </PageReveal>
   );
+}
+
+type Translate = Awaited<ReturnType<typeof getTranslations<"analytics">>>;
+
+/** One insight sentence: figures in the data face; only a change's figure carries its direction colour (DESIGN.md §7). */
+function InsightText({ insight, t, pct }: { insight: Insight; t: Translate; pct: (n: number) => string }) {
+  const n = (chunks: React.ReactNode) => <span className="font-mono tabular-nums">{chunks}</span>;
+  const hour = (h: number) => `${String(h).padStart(2, "0")}:00`;
+  switch (insight.kind) {
+    case "sourceLink":
+      return t.rich("insight.sourceLink", { source: insight.source === "direct" ? t("direct") : insight.source, link: insight.linkTitle, share: pct(insight.share), n });
+    case "peakHours":
+      return t.rich("insight.peakHours", { from: hour(insight.from), to: hour(insight.to), share: pct(insight.share), n });
+    case "linkChange": {
+      const up = insight.change > 0;
+      const tone = (chunks: React.ReactNode) => <span className={cn("font-mono tabular-nums", up ? "text-positive" : "text-negative")}>{chunks}</span>;
+      return t.rich(up ? "insight.linkUp" : "insight.linkDown", { link: insight.linkTitle, change: pct(Math.abs(insight.change)), n: tone });
+    }
+  }
 }
 
 /** Semantic neon: up is green, down is red, nothing to compare is neutral (DESIGN.md §3). */

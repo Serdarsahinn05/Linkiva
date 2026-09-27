@@ -5,6 +5,7 @@ import { updateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { BlockType, SocialPlatform } from "@/prisma/generated/enums";
+import { toCardWebp } from "@/lib/card-image";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { requireUser, UnauthorizedError } from "@/lib/session";
@@ -184,11 +185,12 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
     if (!preview) return fail("unreachable");
 
     let img = "";
-    if (preview.imageFile && env.BLOB_READ_WRITE_TOKEN) {
-      const ext = preview.imageFile.type.split("/")[1];
-      const stored = await put(`${blockImagePrefix(profile.userId)}${id}-card.${ext}`, preview.imageFile.bytes, {
+    // Stored as a resized WebP: the card image is often the profile's largest paint (Lighthouse LCP).
+    const webp = preview.imageFile && env.BLOB_READ_WRITE_TOKEN ? await toCardWebp(preview.imageFile.bytes) : null;
+    if (webp) {
+      const stored = await put(`${blockImagePrefix(profile.userId)}${id}-card.webp`, webp, {
         access: "public",
-        contentType: preview.imageFile.type,
+        contentType: "image/webp",
         addRandomSuffix: true,
         token: env.BLOB_READ_WRITE_TOKEN,
       });

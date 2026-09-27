@@ -33,6 +33,7 @@ Vercel → proje → Settings → Environment Variables. **Preview** ve **Produc
 | `TRACKING_SALT_SECRET` | `openssl rand -base64 32` |
 | `UPSTASH_REDIS_REST_URL`, `..._TOKEN` | İsteğe bağlı. Boşsa hız sınırı bellekte tutulur (sunucusuz ortamda zayıf). Upstash'te yeni bir Redis veritabanı açıp değerleri al. |
 | `BLOB_READ_WRITE_TOKEN` | Otomatik gelir (aşağıda) |
+| `CRON_SECRET` | `openssl rand -base64 32` (en az 16 karakter). Yalnızca **Production**. Vercel Cron bunu `Authorization: Bearer` olarak gönderir; boşsa haftalık özet maili kapalıdır (`/api/cron/daily` 404). |
 
 v1'den kalan `NEXTAUTH_*`, `EMAIL_*` gibi değişkenleri sil. v2 bunları okumuyor.
 

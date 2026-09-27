@@ -206,6 +206,18 @@
       "body": "İsteğin üzerine Linkiva hesabın, sayfan, istatistiklerin ve abone listen kalıcı olarak silindi. Adresin artık başkaları tarafından alınabilir.",
       "cta": "",
       "security": "Bunu sen yapmadıysan hemen bize yaz: hello@linkiva.space"
+    },
+    "digest": {
+      "subject": "Linkiva: sayfanın geçen haftası",
+      "preheader": "{views} görüntülenme, {clicks} tıklama.",
+      "heading": "Sayfanın geçen haftası",
+      "views": "Görüntülenme",
+      "clicks": "Tıklama",
+      "vsLastWeek": "önceki haftaya göre",
+      "topLinks": "En çok tıklananlar",
+      "cta": "İstatistiklerimi aç",
+      "footer": "Bu maili haftalık özet açık olduğu için aldın.",
+      "unsubscribe": "Özeti kapat"
     }
   },
   "profile": {
@@ -332,6 +344,7 @@
     "scheduledFor": "{date} tarihinde yayında",
     "activeUntil": "{date} tarihine kadar yayında",
     "expired": "Süresi doldu, sayfada görünmüyor",
+    "sparkline": "Son 7 günde {count} tıklama",
     "collapsible": "Altındakileri katla",
     "collapsibleHint": "Sonraki başlığa ya da ayraca kadar olan bloklar bu başlığın altında açılır.",
     "support": {
@@ -461,6 +474,16 @@
     "importOffer": "Bu bir Linktree sayfası. Linklerini taşımak ister misin?",
     "invalid": "Bu adresi açamayız. https:// ile başlayan bir link dene."
   },
+  "palette": {
+    "title": "Komutlar",
+    "search": "Ara",
+    "placeholder": "Ne yapmak istersin? (ör. link ekle, tema)",
+    "empty": "Eşleşen komut yok.",
+    "openPage": "Sayfamı aç",
+    "copyAddress": "Adresimi kopyala",
+    "copied": "Adres kopyalandı.",
+    "share": "QR kodu ve paylaşım"
+  },
   "share": {
     "address": "Adresin",
     "copy": "Kopyala",
@@ -489,7 +512,20 @@
       "en": "English"
     },
     "account": "Hesap",
-    "signedInAs": "{email} olarak giriş yaptın."
+    "signedInAs": "{email} olarak giriş yaptın.",
+    "notifications": "Bildirimler",
+    "digest": "Haftalık özet",
+    "digestHint": "Her pazartesi geçen haftanın görüntülenme ve tıklamaları. O hafta ziyaret yoksa gönderilmez."
+  },
+  "unsubscribe": {
+    "title": "Haftalık özeti kapat",
+    "body": "Pazartesi günleri gelen özet maili artık gönderilmeyecek. Hesabınla ilgili önemli mailler (şifre, güvenlik) gelmeye devam eder.",
+    "confirm": "Özeti kapat",
+    "done": "Özet kapatıldı",
+    "doneBody": "Fikrini değiştirirsen Ayarlar → Bildirimler'den yeniden açabilirsin.",
+    "invalid": "Bu link geçersiz",
+    "invalidBody": "Link bozulmuş olabilir. Özeti giriş yapıp Ayarlar → Bildirimler'den kapatabilirsin.",
+    "error": "Bir sorun oldu, tekrar dene."
   },
   "appearance": {
     "title": "Görünüm",
@@ -633,7 +669,17 @@
     "privacyLink": "Nasıl ölçüyoruz?",
     "map": "Ziyaretçi haritası",
     "mapViews": "görüntülenme",
-    "mapNone": "Henüz ziyaret yok"
+    "mapNone": "Henüz ziyaret yok",
+    "insightsTitle": "Öne çıkanlar",
+    "insight": {
+      "sourceLink": "{source} üzerinden gelenler en çok “{link}” linkine tıkladı (<n>{share}</n>).",
+      "peakHours": "En yoğun saatler <n>{from}–{to}</n> (ziyaretlerin <n>{share}</n>).",
+      "linkUp": "“{link}” tıklamaları önceki döneme göre <n>{change}</n> arttı.",
+      "linkDown": "“{link}” tıklamaları önceki döneme göre <n>{change}</n> azaldı."
+    },
+    "heatmapTitle": "Ziyaret saatleri",
+    "heatmapLabel": "Haftanın günlerine ve saatlere göre görüntülenmeler",
+    "heatmapCell": "{day} {hours} · {views} görüntülenme"
   },
   "account": {
     "email": "E-posta",

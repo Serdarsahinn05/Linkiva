@@ -6,6 +6,7 @@ import { LogoutButton } from "@/features/account/components/logout-button";
 import { Preferences } from "@/features/account/components/preferences";
 import { PublishingForm } from "@/features/account/components/publishing-form";
 import { PageHeader, PageReveal, Section } from "@/features/dashboard/components/page";
+import { DigestToggle } from "@/features/digest/components/digest-toggle";
 import { UsernameForm } from "@/features/profile/components/username-form";
 import { getOwnProfile } from "@/features/profile/queries";
 import { auth } from "@/lib/auth";
@@ -45,6 +46,11 @@ export default async function SettingsPage() {
         <Section title={t("appearance")}>
           <Preferences theme={theme} locale={locale} />
         </Section>
+        {profile && (
+          <Section title={t("notifications")}>
+            <DigestToggle initial={profile.weeklyDigest} />
+          </Section>
+        )}
         <AccountSecurity
           email={session.user.email}
           username={profile?.username ?? session.user.email}

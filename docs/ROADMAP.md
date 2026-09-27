@@ -253,19 +253,21 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 **Amaç:** Kullanıcının panele geri dönmesi için sebep, döndüğünde işini hızlı bitirmesi.
 
 **Editör**
-- [ ] **Komut paleti (⌘K / Ctrl+K):** `features/dashboard/components/command-palette.tsx`, mevcut `Dialog` + `Menu` primitive'leriyle (ek paket yok). Komutlar: blok ekle (tür başına), sayfaya git, temayı değiştir, QR indir, adresi kopyala, içe aktar. Klavyeyle tam kullanılır. Yalnızca masaüstü (mobilde alt çubuk var).
-- [ ] **Satır içi mini grafik:** Editördeki her tıklanabilir blokta son 7 günün tıklaması. Tek SQL sorgusu (`features/analytics/queries.ts` → `getBlockSparklines(profileId)`, blok × gün `GROUP BY`), satır başına satır içi SVG `polyline` (recharts değil). Renk `--positive`. Veri yoksa çizgi yok, "—" yazar.
+- [x] **Komut paleti (⌘K / Ctrl+K):** `features/dashboard/components/command-palette.tsx`, mevcut `Dialog` + `Menu` primitive'leriyle (ek paket yok). Komutlar: blok ekle (tür başına), sayfaya git, temayı değiştir, QR indir, adresi kopyala, içe aktar. Klavyeyle tam kullanılır. Yalnızca masaüstü (mobilde alt çubuk var).
+- [x] **Satır içi mini grafik:** Editördeki her tıklanabilir blokta son 7 günün tıklaması. Tek SQL sorgusu (`features/analytics/queries.ts` → `getBlockSparklines(profileId)`, blok × gün `GROUP BY`), satır başına satır içi SVG `polyline` (recharts değil). Renk `--positive`. Veri yoksa çizgi yok, "—" yazar.
 
 **Analitik**
-- [ ] **Cümleyle içgörüler:** `features/analytics/insights.ts`, mevcut toplamlardan saf fonksiyonlar: en iyi kaynak → en çok tıklanan link, yoğun saat aralığı, düşen link ("*Portfolyo* tıklamaları geçen haftaya göre %40 az"). **Eşik:** örneklem yetersizse (ör. < 30 görüntülenme) içgörü gösterilmez (PRODUCT ilke 4). Birim testli, metinler i18n.
-- [ ] **Saat × gün ısı haritası:** 7×24 ızgara, `EXTRACT(dow/hour FROM "createdAt" AT TIME ZONE timezone)`. Renk `--info` opaklık ölçeği, bağımlılıksız SVG. Hücrede cam kart (dünya haritası kartıyla aynı bileşen).
+- [x] **Cümleyle içgörüler:** `features/analytics/insights.ts`, mevcut toplamlardan saf fonksiyonlar: en iyi kaynak → en çok tıklanan link, yoğun saat aralığı, düşen link ("*Portfolyo* tıklamaları geçen haftaya göre %40 az"). **Eşik:** örneklem yetersizse (ör. < 30 görüntülenme) içgörü gösterilmez (PRODUCT ilke 4). Birim testli, metinler i18n.
+- [x] **Saat × gün ısı haritası:** 7×24 ızgara, `EXTRACT(dow/hour FROM "createdAt" AT TIME ZONE timezone)`. Renk `--info` opaklık ölçeği, bağımlılıksız SVG. Hücrede cam kart (dünya haritası kartıyla aynı bileşen).
 
 **Haftalık özet maili**
-- [ ] Veri: `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?`, migration `weekly_digest`.
-- [ ] Zamanlama: tek günlük cron `app/api/cron/daily/route.ts` (`vercel.json` crons; Vercel Hobby planı günde bir çalışmaya izin verir). `Authorization: Bearer ${CRON_SECRET}` zorunlu. Pazartesi özet, her gün Faz 13'teki link kontrolü.
-- [ ] İçerik: geçen hafta görüntülenme/tıklama + trend, en iyi 3 link, bir içgörü. **Hiç ziyaret yoksa mail gönderilmez.** Cam mail şablonu, düz metin ikizi, TR/EN.
-- [ ] Çıkış: Ayarlar'da anahtar + mailde tek tıkla çıkış linki (HMAC imzalı token, oturumsuz çalışır) ve `List-Unsubscribe` başlığı.
-- [ ] Toplu gönderim: Resend batch API, çalıştırma başına sınır, `digestSentAt` ile idempotent (cron iki kez çalışsa da tek mail).
+- [x] Veri: `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?`, migration `weekly_digest`.
+- [x] Zamanlama: tek günlük cron `app/api/cron/daily/route.ts` (`vercel.json` crons; Vercel Hobby planı günde bir çalışmaya izin verir). `Authorization: Bearer ${CRON_SECRET}` zorunlu. Pazartesi özet, her gün Faz 13'teki link kontrolü.
+- [x] İçerik: geçen hafta görüntülenme/tıklama + trend, en iyi 3 link, bir içgörü. **Hiç ziyaret yoksa mail gönderilmez.** Cam mail şablonu, düz metin ikizi, TR/EN.
+- [x] Çıkış: Ayarlar'da anahtar + mailde tek tıkla çıkış linki (HMAC imzalı token, oturumsuz çalışır) ve `List-Unsubscribe` başlığı.
+- [x] Toplu gönderim: Resend batch API, çalıştırma başına sınır, `digestSentAt` ile idempotent (cron iki kez çalışsa da tek mail).
+
+*Uygulama notları (2026-09-27):* Özet `features/digest/` altında. Cron her gün 06:00 UTC çalışır; profil başına haftada (pazartesi 00:00 UTC'den itibaren) bir özet, 100'lük batch'e sığmayanlar sonraki günlerde gider. Her profil hesaplamadan önce koşullu `updateMany` ile sahiplenilir (eşzamanlı iki çalıştırma tek mail), batch reddedilirse sahiplenme geri alınır. Yalnızca doğrulanmış e-postalara gider. Çıkış: mailde onay sayfası `/unsubscribe` (GET hiçbir şey değiştirmez, tarayıcı/tarama botları linki açabilir) ve RFC 8058 tek tık `POST /api/digest/unsubscribe`; ikisi de HMAC imzalı token, oturumsuz. Ayarlar'da bölüm adı "Bildirimler" (hemen altındaki "E-posta" adres değiştirme bölümüyle karışmasın diye). Kart görselleri artık WebP (`sharp`, Faz 6'dan kalan Lighthouse işi). Kalan: komut paleti e2e senaryosu ve "3 saniyenin altında" ölçümü.
 
 **Kabul:** Komut paletiyle blok ekleme klavyeden 3 saniyenin altında. İçgörüler yalnızca eşik üstü veride görünüyor (test). Özet maili aynı hafta ikinci kez gitmiyor, çıkış linki oturumsuz çalışıyor (entegrasyon testi).
 

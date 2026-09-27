@@ -4,4 +4,5 @@ import { env } from "@/lib/env";
 export const features = {
   google: Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
   uploads: Boolean(env.BLOB_READ_WRITE_TOKEN),
+  cron: Boolean(env.CRON_SECRET),
 } as const;
