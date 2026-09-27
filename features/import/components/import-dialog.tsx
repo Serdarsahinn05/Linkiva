@@ -83,7 +83,7 @@ export function ImportDialog({ open, initialUrl = "", onClose, onImported }: Pro
                 autoCapitalize="none"
                 spellCheck={false}
                 required
-                autoFocus
+                data-autofocus
               />
             )}
           </Field>

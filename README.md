@@ -12,21 +12,28 @@ Rakiplerin premium katmanda sattığı özellikler (detaylı analitik, özel tem
 ## Özellikler
 
 **Sayfa ve editör**
-- Tipli bloklar: link, başlık, metin, ayırıcı, YouTube / Spotify / SoundCloud embed'i, e-posta toplama.
+- Tipli bloklar: link (önizleme kartıyla), başlık (katlanabilir grup), metin, ayırıcı, görsel, YouTube / Spotify / SoundCloud embed'i, e-posta toplama.
+- İletişim ve destek blokları: IBAN ile destek (kopyala), hazır mesajlı WhatsApp butonu, rehbere eklenen kartvizit, "İşbirliği" etiketli ürün kartı, geri sayım.
+- Hızlı başlangıç: Linktree sayfasından içe aktarma, başlangıç şablonları, yapıştırılan linkten doğru bloğu tahmin etme.
+- Komut paleti (Ctrl K / ⌘K) ve her blokta son 7 günün mini tıklama grafiği.
 - Satır içi düzenleme, otomatik kayıt, sürükle-bırak sıralama (klavyeyle de çalışır), geri alma.
 - Planlı bloklar: belirli bir tarihte yayına girer, süresi dolunca kalkar.
 - Öne çıkan link, sosyal hesaplar (yapıştırılan URL kullanıcı adına çevrilir), profil fotoğrafı.
+- Kullanıcı adı değiştirilebilir, eski adres 90 gün boyunca yeni adrese yönlenir.
 - Canlı önizleme: masaüstünde yanda telefon, mobilde alt çubuktan.
 - QR kod (SVG ve PNG), sayfa başına SEO başlığı/açıklaması ve OG görseli.
 
 **Görünüm**
 - Altı tema (Cam, Gece, Sade, Kum, Terminal, Afiş), açık/koyu mod, 5 font, buton stili, vurgu rengi, arka plan görseli.
-- Kontrast koruması: düşük kontrastlı seçimde uyarı verir, link butonları okunur kalır.
+- Kontrast koruması: link butonları her temada okunur kalır, arka plan görseli yüklenince karartma önerilir ("Okunur yap").
 
 **Analitik**
 - Çerezsiz ve bot filtreli. IP saklanmaz, ziyaretçi günlük tuzlu bir hash ile sayılır.
 - Görüntülenme, tıklama, CTR, kaynaklar ve UTM, ülke haritası, cihaz / işletim sistemi / tarayıcı (uygulama içi tarayıcılar dahil).
+- Cümleyle içgörüler (yeterli veri varsa) ve saat × gün ısı haritası.
+- Haftalık özet maili (ayarlardan ya da mailden tek tıkla kapatılır).
 - CSV dışa aktarma. E-posta toplama bloğu için kitle listesi ve CSV.
+- Kullanıcı verisi yapay zekâ eğitiminde kullanılmaz, üçüncü taraflarla paylaşılmaz.
 
 **Hesap**
 - E-posta + şifre (doğrulamalı) ya da Google ile giriş.

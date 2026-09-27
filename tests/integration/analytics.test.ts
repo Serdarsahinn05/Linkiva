@@ -84,7 +84,9 @@ describe("scale (docs/ROADMAP.md Phase 4 acceptance)", () => {
       device: (["MOBILE", "DESKTOP", "TABLET"] as const)[i % 3],
       createdAt: ago(i % 90, i % 24),
     }));
-    for (let i = 0; i < batch.length; i += 10_000) await db.event.createMany({ data: batch.slice(i, i + 10_000) });
+    // 4k rows × 7 columns stays under Postgres' bind-parameter limit; bigger chunks make Prisma split
+    // them into parallel queries on one transaction connection (pg deprecation warning).
+    for (let i = 0; i < batch.length; i += 4_000) await db.event.createMany({ data: batch.slice(i, i + 4_000) });
 
     await getAnalytics(profile, "30d", "tr"); // warm up the connection pool and plans
     const started = performance.now();

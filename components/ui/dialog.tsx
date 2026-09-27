@@ -25,7 +25,12 @@ export function Dialog({ open, onClose, title, closeLabel, children, variant = "
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() moves focus to the first focusable element (the close button), undoing React's autoFocus,
+      // which ran on mount while the dialog was still closed. Mark the field to focus with data-autofocus.
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

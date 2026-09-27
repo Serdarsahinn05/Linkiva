@@ -124,7 +124,7 @@ model Profile {
   displayName    String?
   bio            String?                     // ≤ 160
   avatarUrl      String?
-  theme          String   @default("etiket") // themes/ içindeki anahtar
+  theme          String   @default("cam")    // themes/ içindeki anahtar
   appearance     Json     @default("{}")     // { accent, font, buttonStyle, background: {type,value} } zod ile doğrulanır
   seoTitle       String?
   seoDescription String?
@@ -140,7 +140,7 @@ model Profile {
   updatedAt      DateTime @updatedAt
 }
 
-enum BlockType { LINK HEADER TEXT EMBED EMAIL_CAPTURE DIVIDER IMAGE }   // IMAGE: migration block_image
+enum BlockType { LINK HEADER TEXT EMBED EMAIL_CAPTURE DIVIDER IMAGE SUPPORT WHATSAPP CONTACT PRODUCT COUNTDOWN }   // IMAGE: block_image · son beşi: block_types_contact_support (Faz 8)
 
 model Block {
   id          String    @id @default(cuid())
@@ -210,13 +210,13 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 
 ### 5.1 Planlı model değişiklikleri (Faz 6–13, [ROADMAP](ROADMAP.md))
 
-Henüz uygulanmadı. Her biri kendi fazında, elle yazılmış migration + `migrate deploy` ile gelir (AGENTS.md → Veri).
+✅ işaretliler uygulandı, diğerleri planlı. Her biri kendi fazında, elle yazılmış migration + `migrate deploy` ile gelir (AGENTS.md → Veri).
 
 | Faz | Migration | Değişiklik |
 |---|---|---|
 | 6 ✅ | `username_history` | `UsernameHistory { username @id, profileId → Profile (cascade), createdAt, expiresAt }`. Müsaitlik kontrolü süresi dolmamış kayıtları dolu sayar. |
 | 8 ✅ | `block_types_contact_support` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
-| 9 | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
+| 9 ✅ | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
 | 10 | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
 | 11 | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
 | 12 | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
@@ -294,15 +294,15 @@ Henüz uygulanmadı. Her biri kendi fazında, elle yazılmış migration + `migr
 
 ```
 DATABASE_URL, DIRECT_URL
-AUTH_SECRET, AUTH_URL (=NEXT_PUBLIC_APP_URL)
+BETTER_AUTH_SECRET             # auth adresi NEXT_PUBLIC_APP_URL
 NEXT_PUBLIC_APP_URL            # https://linkiva.space, lokal: http://localhost:3000
 GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 RESEND_API_KEY, MAIL_FROM      # "Linkiva <hello@linkiva.space>"
 UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   # opsiyonel lokal
 BLOB_READ_WRITE_TOKEN
 TRACKING_SALT_SECRET
+CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer (yoksa uç 404); ayrıca özet maili çıkış token'ının HMAC anahtarı
 # Planlı (faz geldiğinde lib/env.ts + .env.example'a eklenir; yoksa özellik lib/features.ts ile gizlenir)
-CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer; ayrıca özet maili çıkış token'ının HMAC anahtarı
 VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı
 GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 ```
@@ -310,7 +310,7 @@ GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 
 ---
 
-## 10.1 Zamanlanmış işler ve dış getirme (planlı)
+## 10.1 Zamanlanmış işler ve dış getirme
 
 - **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, çalıştırma başına sınırlı parti), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İleride `DailyStat` toplaması da buraya gelir.
 - **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com`), kırık link kontrolü (Faz 13). Hepsi aynı SSRF korumasından geçer; yeni bir `fetch` yolu açılmaz.

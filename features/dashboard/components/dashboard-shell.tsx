@@ -108,7 +108,9 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
         </button>
       </header>
 
-      <div className="min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</div>
+      <main id="main" className="min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">
+        {children}
+      </main>
 
       {/* Mobile: Instagram-style floating glass tab bar with a liquid active indicator. */}
       <nav
