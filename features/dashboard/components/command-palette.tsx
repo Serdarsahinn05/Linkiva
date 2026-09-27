@@ -93,7 +93,7 @@ export function CommandPalette({ username, open, onOpenChange, onShare }: { user
         <div className="relative border-b border-glass-edge">
           <Search size={18} strokeWidth={1.75} className="pointer-events-none absolute top-1/2 left-5 -translate-y-1/2 text-ink-3" aria-hidden />
           <input
-            autoFocus
+            data-autofocus
             role="combobox"
             aria-expanded
             aria-controls="palette-list"

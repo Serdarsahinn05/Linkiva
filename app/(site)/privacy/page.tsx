@@ -108,7 +108,7 @@ export default async function PrivacyPage() {
           <Wordmark />
         </Link>
       </header>
-      <main className="glass mx-auto mt-8 flex max-w-2xl flex-col gap-8 rounded-[28px] p-6 sm:p-10">
+      <main id="main" className="glass mx-auto mt-8 flex max-w-2xl flex-col gap-8 rounded-[28px] p-6 sm:p-10">
         <div className="flex flex-col gap-2">
           <h1 className="text-[2.25rem] leading-tight font-semibold tracking-[-0.03em]">{doc.title}</h1>
           <p className="text-sm text-ink-3">{doc.updated}</p>

@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6 ve 7 canlıda, Faz 8 bitti (birleştirme bekliyor).** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6–9 canlıda, sıradaki Faz 10.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra
@@ -267,7 +267,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] Çıkış: Ayarlar'da anahtar + mailde tek tıkla çıkış linki (HMAC imzalı token, oturumsuz çalışır) ve `List-Unsubscribe` başlığı.
 - [x] Toplu gönderim: Resend batch API, çalıştırma başına sınır, `digestSentAt` ile idempotent (cron iki kez çalışsa da tek mail).
 
-*Uygulama notları (2026-09-27):* Özet `features/digest/` altında. Cron her gün 06:00 UTC çalışır; profil başına haftada (pazartesi 00:00 UTC'den itibaren) bir özet, 100'lük batch'e sığmayanlar sonraki günlerde gider. Her profil hesaplamadan önce koşullu `updateMany` ile sahiplenilir (eşzamanlı iki çalıştırma tek mail), batch reddedilirse sahiplenme geri alınır. Yalnızca doğrulanmış e-postalara gider. Çıkış: mailde onay sayfası `/unsubscribe` (GET hiçbir şey değiştirmez, tarayıcı/tarama botları linki açabilir) ve RFC 8058 tek tık `POST /api/digest/unsubscribe`; ikisi de HMAC imzalı token, oturumsuz. Ayarlar'da bölüm adı "Bildirimler" (hemen altındaki "E-posta" adres değiştirme bölümüyle karışmasın diye). Kart görselleri artık WebP (`sharp`, Faz 6'dan kalan Lighthouse işi). Kalan: komut paleti e2e senaryosu ve "3 saniyenin altında" ölçümü.
+*Uygulama notları (2026-09-27):* Özet `features/digest/` altında. Cron her gün 06:00 UTC çalışır; profil başına haftada (pazartesi 00:00 UTC'den itibaren) bir özet, 100'lük batch'e sığmayanlar sonraki günlerde gider. Her profil hesaplamadan önce koşullu `updateMany` ile sahiplenilir (eşzamanlı iki çalıştırma tek mail), batch reddedilirse sahiplenme geri alınır. Yalnızca doğrulanmış e-postalara gider. Çıkış: mailde onay sayfası `/unsubscribe` (GET hiçbir şey değiştirmez, tarayıcı/tarama botları linki açabilir) ve RFC 8058 tek tık `POST /api/digest/unsubscribe`; ikisi de HMAC imzalı token, oturumsuz. Ayarlar'da bölüm adı "Bildirimler" (hemen altındaki "E-posta" adres değiştirme bölümüyle karışmasın diye). Kart görselleri artık WebP (`sharp`, Faz 6'dan kalan Lighthouse işi). Komut paleti e2e'si `tests/e2e/phase9.spec.ts`: klavyeyle blok ekleme ısınmadan sonra ~0,3 sn (test 3 sn sınırını doğruluyor). Bu test, palet açılınca odağın arama kutusuna değil "Kapat" butonuna gittiğini yakaladı (`showModal()` React `autoFocus`'unu eziyordu); `Dialog` artık `data-autofocus` alanına odaklanıyor, içe aktarma diyaloğu da düzeldi.
 
 **Kabul:** Komut paletiyle blok ekleme klavyeden 3 saniyenin altında. İçgörüler yalnızca eşik üstü veride görünüyor (test). Özet maili aynı hafta ikinci kez gitmiyor, çıkış linki oturumsuz çalışıyor (entegrasyon testi).
 

@@ -78,7 +78,7 @@ export default async function HomePage() {
         </nav>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-28 pb-16">
+      <main id="main" className="mx-auto flex w-full max-w-6xl flex-col gap-28 pb-16">
         {/* First viewport: the promise, the claim bar, and the product at work. */}
         <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-12 pt-12 lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pt-0">
           <div className="flex flex-col items-center gap-7 text-center lg:items-start lg:text-left">

@@ -272,6 +272,26 @@
   @keyframes link-pending {
     from { opacity: 0; }
   }
+
+  /* "Skip to content": the first Tab stop on every site page; off-screen until focused (app/(site)/layout.tsx). */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 60;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 500;
+    color: var(--c-ink);
+  }
+  .skip-link:not(:focus) {
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }
 /* ─── Page transitions (React <ViewTransition>, see PageReveal) ───
    The shell stays still; only the page area changes, with a short cross-fade. Kept brief and blur-free:

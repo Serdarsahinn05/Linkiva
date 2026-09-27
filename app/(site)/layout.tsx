@@ -30,11 +30,16 @@ export const viewport: Viewport = {
 export default async function SiteRootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const theme = parseThemePreference((await cookies()).get(THEME_COOKIE)?.value);
+  const t = await getTranslations("common");
 
   return (
     <html lang={locale} data-theme={theme === "system" ? undefined : theme} className={fontVariables}>
       <body>
         <template dangerouslySetInnerHTML={{ __html: `<!--${DESIGN_CONTRACT}-->` }} />
+        {/* Every page in this branch renders its content in <main id="main">. */}
+        <a href="#main" className="skip-link glass-float">
+          {t("skipToContent")}
+        </a>
         <Ambient />
         <LiquidFilter />
         <Specular />
