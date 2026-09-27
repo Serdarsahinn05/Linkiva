@@ -9,6 +9,7 @@ import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Field, Input, inputClass } from "@/components/ui/field";
+import { ScrollRow } from "@/components/ui/scroll-row";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { liveBlocks } from "@/lib/schedule";
@@ -265,8 +266,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           <h2 id="blocks-heading" className="px-1 text-[0.9375rem] font-semibold text-ink-2">
             {t("editor.blocks")}
           </h2>
-          {/* Touch screens swipe the row; wider screens (mouse, no sideways wheel) wrap it instead. */}
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
+          <ScrollRow className="pb-1">
             {EDITABLE_BLOCK_TYPES.map((type) => {
               const Icon = BLOCK_ICON[type];
               return (
@@ -283,7 +283,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                 </button>
               );
             })}
-          </div>
+          </ScrollRow>
 
           <PasteField onDetected={addDetected} busy={pasting} />
 
