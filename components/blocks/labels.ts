@@ -6,6 +6,8 @@ export type ProfileLabels = {
   madeWith: string;
   embedPlay: string;
   embedListen: string;
+  /** Editor preview only: a "latest video" embed, whose video is picked when the page renders. */
+  embedLatest: string;
   subscribeTitle: string;
   subscribePlaceholder: string;
   subscribeButton: string;
@@ -37,6 +39,7 @@ export function profileLabels(translator: AnyTranslator): ProfileLabels {
     madeWith: t("profile.madeWith"),
     embedPlay: t("blocks.embedPlay"),
     embedListen: t("blocks.embedListen"),
+    embedLatest: t("blocks.embedLatest"),
     subscribeTitle: t("blocks.subscribeTitle"),
     subscribePlaceholder: t("blocks.subscribePlaceholder"),
     subscribeButton: t("blocks.subscribeButton"),

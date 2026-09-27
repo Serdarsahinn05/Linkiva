@@ -166,14 +166,17 @@ Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam geni
 - **Geri sayım:** Cam kart, başlık üstte, sayılar Geist Mono 600 büyük (`tabular-nums`, gün · saat · dakika · saniye), birimler `--ink-3` küçük. Saniye değişiminde animasyon yok (sayı zıplamaz). Reduced motion'da dakikada bir güncellenir.
 - **Link grubu:** `<details>`. Özet satırı başlık bloğu tipografisinde, sağda 16px chevron 160ms `--ease-out` ile döner. İçerik açılışta hareket yok (reduced motion'da da aynı), yalnızca yer açılır.
 
-### Izgara düzeni (planlı, Faz 10)
-- Profil genişliği aynı (max 560px). Mobil 2 sütun, ≥ 560px 4 sütun, aralık 12px. Karo köşesi 20px, cam malzeme aynı.
-- **SMALL (1×1):** kare karo. Ortada 28px ikon (link: favicon ya da tür ikonu), altında tek satır başlık (kesilir, tam başlık `title`/erişilebilir ad). **WIDE:** tam satır, normal link butonu görünümü. **LARGE (2×2):** görsel karo; görsel tam doldurur, başlık alt kenarda cam şerit üzerinde (görselin üstünde okunurluk için `glass-strong` şerit, gradient yazı yok).
+### Izgara düzeni (Faz 10, uygulandı)
+- Profil genişliği aynı (max 560px). 2 sütun; profil sütunu 560px'e ulaşınca 4 sütun (kapsayıcı sorgusu, editör önizlemesi telefonun sütunlarını gösterir), aralık 12px. Karo köşesi 20px, cam malzeme ve temanın buton stili aynı (`.p-btn.p-tile`).
+- **SMALL (1×1):** kare karo. Ortada 28px tür ikonu (favicon çekilmez), altında tek satır başlık (kesilir, tam başlık DOM'da ve `title`'da). Görsel bloğunda fotoğrafın kendisi, adı alt metninden. **WIDE:** tam satır, normal link butonu görünümü. **LARGE (2×2):** görsel karo; görsel tam doldurur, başlık alt kenarda cam şerit üzerinde (görselin üstünde okunurluk için `glass-strong` şerit, gradient yazı yok). Ürün fiyatı şeritte Geist Mono. Görseli olmayan blok 40px ikonlu büyük karo. "İşbirliği" rozeti her boyutta sağ üstte kalır.
+- İzinli boyutlar: LINK, IMAGE, PRODUCT S/W/L; WHATSAPP, CONTACT S/W; diğerleri (EMBED ve SUPPORT dahil) her zaman tam satır.
 - Görsel sıra DOM sırasıdır (`dense` yok). Boşluk kalırsa kalır; boşluğu kapatmak sahibin işidir (editör önizlemesi gösterir).
-- Liste ↔ ızgara geçişi Görünüm sayfasında iki tema kartı gibi gerçek CSS ile çizilmiş küçük önizlemeyle seçilir.
+- Liste ↔ ızgara geçişi Görünüm sayfasında, tema kartlarının üstünde, iki kartla seçilir; kartlar geçerli temanın gerçek CSS'iyle çizilir. Tema değiştirmek düzeni korur. Editörde boyut, satır menüsünde seçili işaretli radyo öğeleri olarak yalnızca ızgarada görünür; satır başlığı "· Küçük karo" gibi boyutu da yazar.
 
-### Hikâye kartı (planlı, Faz 10)
-- 1080×1920 PNG. Profil temasının zemini ve ortam ışığı, ortada avatar (240px, cam halka), ad (display 600), altında `linkiva.space/<ad>` Geist Mono, altta cam kart içinde QR (beyaz zemin, siyah modül; tarama güvenliği için temadan bağımsız). Üst ve alt 250px Instagram arayüzü için boş bırakılır (güvenli alan).
+### Hikâye kartı (Faz 10, uygulandı)
+- 1080×1920 PNG (`/<ad>/story`). Profil temasının zemini ve ortam ışığı (sistem modundaki profil koyu çizilir: hikâye koyu arayüzde görülür; arka plan görseli karartmasıyla), ortada avatar (240px, cam halka; yoksa adın baş harfi), ad (display 600), altında `linkiva.space/<ad>` Geist Mono, altta cam kart içinde QR (beyaz zemin, siyah modül; tarama güvenliği için temadan bağımsız). Üst ve alt 250px Instagram arayüzü için boş bırakılır (güvenli alan).
+- Panelde QR diyaloğunun altında ikincil hap "Hikâye görseli" ve tek satır açıklama; dokunmatik cihazda paylaşım sayfası, diğerlerinde indirme.
+- **Son video:** EMBED bir YouTube kanal adresiyse satırda "Kanalın son videosu" anahtarı. Önizlemede video yerine "YouTube · son video" düz butonu (hangi videonun geleceği yayında belli olur).
 
 ### Profil temaları (kullanıcıya açık, `themes/index.ts`)
 Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.

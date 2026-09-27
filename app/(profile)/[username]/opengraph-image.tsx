@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getPublicProfile } from "@/features/profile/public";
+import { loadGeist } from "@/lib/og-fonts";
 import { liveBlocks } from "@/lib/schedule";
 import { profileDisplayUrl } from "@/lib/site";
 import { parseBlock } from "@/lib/validation/blocks";
@@ -14,22 +15,13 @@ const INK_2 = "#B4B8C4";
 const GLASS = "rgba(255,255,255,0.07)";
 const EDGE = "rgba(255,255,255,0.14)";
 
-/** Geist as TTF: Satori cannot read woff2, and Google serves TTF to UA-less requests. */
-async function loadGeist(weight: 400 | 600): Promise<ArrayBuffer | null> {
-  try {
-    const css = await (await fetch(`https://fonts.googleapis.com/css2?family=Geist:wght@${weight}`)).text();
-    const src = css.match(/src: url\((.+?)\) format\('(?:truetype|opentype)'\)/)?.[1];
-    return src ? await (await fetch(src)).arrayBuffer() : null;
-  } catch {
-    return null;
-  }
-}
-
 /** The share card mirrors the "Cam" profile: dark ground, soft light, one glass card. */
 export default async function Image({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
-  const profile = await getPublicProfile(decodeURIComponent(username).toLowerCase());
-  const [regular, semibold] = await Promise.all([loadGeist(400), loadGeist(600)]);
+  const found = await getPublicProfile(decodeURIComponent(username).toLowerCase());
+  // An unpublished page shows nothing of its owner, not even in a share preview: the card falls back to the brand.
+  const profile = found?.isPublished ? found : null;
+  const [regular, semibold] = await Promise.all([loadGeist("Geist", 400), loadGeist("Geist", 600)]);
   const fonts = [
     ...(regular ? [{ name: "Geist", data: regular, weight: 400 as const, style: "normal" as const }] : []),
     ...(semibold ? [{ name: "Geist", data: semibold, weight: 600 as const, style: "normal" as const }] : []),

@@ -4,17 +4,19 @@ import { del, list, put } from "@vercel/blob";
 import { updateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
-import { BlockType, SocialPlatform } from "@/prisma/generated/enums";
+import { BlockSize, BlockType, SocialPlatform } from "@/prisma/generated/enums";
 import { toCardWebp } from "@/lib/card-image";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { requireUser, UnauthorizedError } from "@/lib/session";
 import { normalizeSocial } from "@/lib/socials";
-import { getLinkPreview } from "@/lib/link-preview";
+import { channelIdFromHtml, YOUTUBE_HOSTS, youtubeChannel } from "@/lib/embeds";
+import { fetchPage, getLinkPreview } from "@/lib/link-preview";
 import { allow } from "@/lib/ratelimit";
 import { blockImagePrefix, isOwnBlobUrl } from "@/lib/uploads";
 import { displayHost, normalizeUrl } from "@/lib/validation/url";
-import { blockDataSchemas, blockDefaults, DESC_MAX, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { allowedSizes, blockDataSchemas, blockDefaults, DESC_MAX, EDITABLE_BLOCK_TYPES, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { fetchLatestVideo } from "@/features/profile/latest-video";
 import { profileTag } from "@/features/profile/public";
 import { TEMPLATE_KEYS, TEMPLATES } from "./templates";
 import { toEditorBlock, type EditorBlock } from "./types";
@@ -124,6 +126,8 @@ const draftSchema = z.partialRecord(z.enum([
     "target",
     "after",
     "afterText",
+    "latest",
+    "channelId",
   ]), z.string().max(Math.max(TEXT_MAX, 2048)));
 
 /** Block images (Image block src, link card img) may only be files in the owner's own Blob folder. */
@@ -213,12 +217,50 @@ export async function fetchLinkCard(id: string, rawUrl: string): Promise<ActionR
   });
 }
 
+/**
+ * Turns an embed into "the channel's latest video": finds the channel id once, now (from the address, or by reading the
+ * channel page through the SSRF guard, YouTube hosts only), and checks the channel's feed has a video to show.
+ */
+export async function resolveLatestVideo(id: string, rawUrl: string): Promise<ActionResult<EditorBlock>> {
+  const channel = typeof rawUrl === "string" ? youtubeChannel(rawUrl) : null;
+  if (!channel) return fail("invalid");
+  return withProfile(async (profile) => {
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id, type: "EMBED" }, select: { id: true } });
+    if (!block) return fail("notFound");
+    if (!(await allow("latest-video", profile.userId, 10, 60))) return fail("tooMany");
+
+    let channelId = channel.channelId ?? null;
+    if (!channelId) {
+      // SOCS: past YouTube's EU consent screen, which would otherwise stand in for the channel page.
+      const page = await fetchPage(channel.url, { hosts: YOUTUBE_HOSTS, maxBytes: 1024 * 1024, cookie: "SOCS=CAI" });
+      channelId = page ? channelIdFromHtml(page.html) : null;
+    }
+    if (!channelId || !(await fetchLatestVideo(channelId, false))) return fail("unreachable");
+
+    const updated = await db.block.update({ where: { id }, data: { data: { url: channel.url, latest: "1", channelId } } });
+    return ok(toEditorBlock(updated));
+  });
+}
+
 export async function setBlockFlags(id: string, flags: { isVisible?: boolean; isHighlighted?: boolean }): Promise<ActionResult> {
   const parsed = z.object({ isVisible: z.boolean().optional(), isHighlighted: z.boolean().optional() }).strict().safeParse(flags);
   if (!parsed.success) return fail("invalid");
   return withProfile(async (profile) => {
     const { count } = await db.block.updateMany({ where: { id, profileId: profile.id }, data: parsed.data });
     return count ? ok(undefined) : fail("notFound");
+  });
+}
+
+/** Grid layout tile size; only sizes the block's type allows (lib/validation/blocks.ts → allowedSizes). */
+export async function setBlockSize(id: string, size: string): Promise<ActionResult> {
+  const parsed = z.enum(BlockSize).safeParse(size);
+  if (!parsed.success) return fail("invalid");
+  return withProfile(async (profile) => {
+    const block = await db.block.findFirst({ where: { id, profileId: profile.id }, select: { type: true } });
+    if (!block) return fail("notFound");
+    if (!allowedSizes(block.type).includes(parsed.data)) return fail("invalid");
+    await db.block.update({ where: { id }, data: { size: parsed.data } });
+    return ok(undefined);
   });
 }
 
@@ -238,14 +280,14 @@ export async function setBlockSchedule(id: string, schedule: { startsAt: string 
   });
 }
 
-export type DeletedBlock = { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean; startsAt: string | null; endsAt: string | null };
+export type DeletedBlock = { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean; size: BlockSize; startsAt: string | null; endsAt: string | null };
 
 export async function deleteBlock(id: string): Promise<ActionResult<DeletedBlock>> {
   return withProfile(async (profile) => {
     const block = await db.block.findFirst({ where: { id, profileId: profile.id } });
     if (!block) return fail("notFound");
     await db.block.delete({ where: { id } });
-    return ok({ id: block.id, type: block.type, data: block.data, position: block.position, isVisible: block.isVisible, isHighlighted: block.isHighlighted, startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
+    return ok({ id: block.id, type: block.type, data: block.data, position: block.position, isVisible: block.isVisible, isHighlighted: block.isHighlighted, size: block.size, startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
   });
 }
 
@@ -259,6 +301,7 @@ export async function restoreBlock(snapshot: DeletedBlock): Promise<ActionResult
       position: z.number().int(),
       isVisible: z.boolean(),
       isHighlighted: z.boolean(),
+      size: z.enum(BlockSize).default("WIDE"),
       startsAt: z.iso.datetime({ offset: true }).nullable(),
       endsAt: z.iso.datetime({ offset: true }).nullable(),
     })

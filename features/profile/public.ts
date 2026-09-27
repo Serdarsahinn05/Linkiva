@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import type { BlockType, SocialPlatform } from "@/prisma/generated/enums";
+import type { BlockSize, BlockType, SocialPlatform } from "@/prisma/generated/enums";
 import { db } from "@/lib/db";
 import { SOCIAL_ORDER } from "@/lib/socials";
 
@@ -30,6 +30,7 @@ export type PublicBlock = {
   type: BlockType;
   data: unknown;
   isHighlighted: boolean;
+  size: BlockSize;
   startsAt: string | null;
   endsAt: string | null;
 };
@@ -62,6 +63,7 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
       type: b.type,
       data: b.data,
       isHighlighted: b.isHighlighted,
+      size: b.size,
       startsAt: b.startsAt?.toISOString() ?? null,
       endsAt: b.endsAt?.toISOString() ?? null,
     })),

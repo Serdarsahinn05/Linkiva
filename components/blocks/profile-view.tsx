@@ -1,10 +1,10 @@
-import { ArrowUpRight, ChevronDown, Contact, User } from "lucide-react";
-import { SiWhatsapp } from "react-icons/si";
-import type { SocialPlatform } from "@/prisma/generated/enums";
+import { ArrowUpRight, ChevronDown, Contact, Link2, ShoppingBag, User, type LucideIcon } from "lucide-react";
+import { SiWhatsapp, SiYoutube } from "react-icons/si";
+import type { BlockSize, SocialPlatform } from "@/prisma/generated/enums";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 import { SOCIAL_PLATFORMS, socialUrl } from "@/lib/socials";
-import { parseBlock, type BlockData, type ParsedBlock } from "@/lib/validation/blocks";
+import { effectiveSize, parseBlock, type BlockData, type ParsedBlock } from "@/lib/validation/blocks";
 import { GROUND, inkOn, readableAccent, resolveAppearance, type ResolvedAppearance } from "@/themes";
 import { parseEmbed } from "@/lib/embeds";
 import { displayHost } from "@/lib/validation/url";
@@ -28,7 +28,8 @@ export type ProfileViewData = {
   showBranding: boolean;
   theme: string;
   appearance: unknown;
-  blocks: { id: string; type: ParsedBlock["type"]; data: unknown; isHighlighted: boolean }[];
+  /** size: tile size in the grid layout (absent = full row). */
+  blocks: { id: string; type: ParsedBlock["type"]; data: unknown; isHighlighted: boolean; size?: BlockSize }[];
   socials: { platform: SocialPlatform; handle: string }[];
 };
 
@@ -40,16 +41,21 @@ export type ProfileViewData = {
 export function ProfileView({ profile, mode = "public", labels }: { profile: ProfileViewData; mode?: "public" | "preview"; labels: ProfileLabels }) {
   const name = profile.displayName || profile.username;
   const blocks = profile.blocks
-    .map((b) => ({ id: b.id, highlighted: b.isHighlighted, parsed: parseBlock(b.type, b.data) }))
-    .filter((b): b is { id: string; highlighted: boolean; parsed: ParsedBlock } => b.parsed !== null);
+    .map((b) => ({ id: b.id, highlighted: b.isHighlighted, size: effectiveSize(b.type, b.size), parsed: parseBlock(b.type, b.data) }))
+    .filter((b): b is ParsedEntry => b.parsed !== null);
 
   const ctx: BlockContext = { profileId: mode === "public" ? profile.id : undefined, locale: profile.locale ?? "tr", timezone: profile.timezone };
   const look = resolveAppearance(profile.theme, profile.appearance);
   const sceneStyle = sceneVars(look);
+  const grid = look.layout === "grid";
+  // Grid: 2 columns, 4 once the profile column is 35rem wide. A container query, so the editor's phone preview gets
+  // the phone's columns. Visual order is DOM order (no grid-auto-flow: dense), for keyboard and screen readers.
+  const listClass = grid ? "grid w-full grid-cols-2 gap-3 @min-[35rem]:grid-cols-4" : "flex w-full flex-col gap-3";
+  const item = (b: RenderBlock) => (grid ? cn("flex justify-center", TILE_SPAN[b.size]) : "flex justify-center");
 
   return (
     <div
-      className="profile-scene flex min-h-full flex-col items-center px-5 pt-14 pb-10"
+      className="profile-scene flex min-h-full flex-1 flex-col items-center px-5 pt-14 pb-10"
       data-theme={look.mode === "system" ? undefined : look.mode}
       data-scene={look.scene}
       data-font={look.font}
@@ -64,7 +70,7 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
       ) : (
         <div className="scene-light" aria-hidden />
       )}
-      <div className="flex w-full max-w-[35rem] flex-1 flex-col items-center">
+      <div className="@container flex w-full max-w-[35rem] flex-1 flex-col items-center">
         <header className="flex flex-col items-center gap-3 text-center">
           <div className="glass mb-1 size-[104px] overflow-hidden rounded-full p-1">
             {profile.avatarUrl ? (
@@ -102,29 +108,34 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
           )}
         </header>
 
-        <ul className="mt-10 flex w-full flex-col gap-3">
+        <ul className={cn("mt-10", listClass)}>
           {groupBlocks(blocks).map((entry) => {
-            const view = (b: RenderBlock) => (
-              <BlockView id={b.id} block={b.parsed} highlighted={b.highlighted} mode={mode} labels={labels} ctx={ctx} loading={b.index < EAGER_BLOCKS ? "eager" : "lazy"} />
-            );
+            const view = (b: RenderBlock) => {
+              const loading = b.index < EAGER_BLOCKS ? "eager" : "lazy";
+              return grid && b.size !== "WIDE" ? (
+                <BlockTile id={b.id} block={b.parsed} size={b.size} highlighted={b.highlighted} mode={mode} labels={labels} loading={loading} />
+              ) : (
+                <BlockView id={b.id} block={b.parsed} highlighted={b.highlighted} mode={mode} labels={labels} ctx={ctx} loading={loading} />
+              );
+            };
             if (!("items" in entry)) {
               return (
-                <li key={entry.id} className="flex justify-center">
+                <li key={entry.id} className={item(entry)}>
                   {view(entry)}
                 </li>
               );
             }
             // A foldable header: native <details>, so it opens without JS and with the keyboard.
             return (
-              <li key={entry.header.id} className="w-full">
+              <li key={entry.header.id} className="col-span-full w-full">
                 <details className="group/fold w-full">
                   <summary className="mx-auto flex min-h-11 w-fit cursor-pointer list-none items-center gap-1.5 rounded-full px-4 text-[0.8125rem] font-semibold text-ink-2 hover:text-ink [&::-webkit-details-marker]:hidden">
                     {entry.header.text}
                     <ChevronDown size={16} strokeWidth={1.75} aria-hidden className="transition-transform duration-150 group-open/fold:rotate-180" />
                   </summary>
-                  <ul className="mt-2 flex w-full flex-col gap-3">
+                  <ul className={cn("mt-2", listClass)}>
                     {entry.items.map((b) => (
-                      <li key={b.id} className="flex justify-center">
+                      <li key={b.id} className={item(b)}>
                         {view(b)}
                       </li>
                     ))}
@@ -177,11 +188,12 @@ function sceneVars(look: ResolvedAppearance): React.CSSProperties {
 const linkClass = "p-btn glass-interactive group";
 
 type BlockContext = { profileId?: string; locale: string; timezone?: string };
-type RenderBlock = { id: string; highlighted: boolean; parsed: ParsedBlock; index: number };
+type ParsedEntry = { id: string; highlighted: boolean; size: BlockSize; parsed: ParsedBlock };
+type RenderBlock = ParsedEntry & { index: number };
 type Fold = { header: { id: string; text: string }; items: RenderBlock[] };
 
 /** A foldable header takes the blocks after it, up to the next header or divider, under a <details>. */
-function groupBlocks(blocks: { id: string; highlighted: boolean; parsed: ParsedBlock }[]): (RenderBlock | Fold)[] {
+function groupBlocks(blocks: ParsedEntry[]): (RenderBlock | Fold)[] {
   const out: (RenderBlock | Fold)[] = [];
   let fold: Fold | null = null;
   blocks.forEach((b, index) => {
@@ -236,6 +248,123 @@ function ProductCard({ id, data, mode, loading, sponsoredLabel }: { id: string; 
     </a>
   ) : (
     <span className={cn(className, "cursor-default")}>{body}</span>
+  );
+}
+
+/** Grid cell per tile size: SMALL 1×1, LARGE 2×2 (both square), WIDE a full row. */
+const TILE_SPAN: Record<BlockSize, string> = {
+  SMALL: "aspect-square",
+  WIDE: "col-span-full",
+  LARGE: "col-span-2 row-span-2 aspect-square",
+};
+
+/**
+ * A block drawn as a grid tile (only the types and sizes lib/validation/blocks.ts → allowedSizes permits). SMALL: the
+ * type's icon over a one-line title (an Image block: the photo). LARGE: the block's image filling the tile, the title on
+ * a glass strip over it; without an image, a bigger icon tile. A truncated title stays whole in the DOM and in `title`.
+ */
+function BlockTile({
+  id,
+  block,
+  size,
+  highlighted,
+  mode,
+  labels,
+  loading,
+}: {
+  id: string;
+  block: ParsedBlock;
+  size: BlockSize;
+  highlighted: boolean;
+  mode: "public" | "preview";
+  labels: ProfileLabels;
+  loading: ImageLoading;
+}) {
+  let title: string;
+  let image: { src: string; alt: string } | null = null;
+  let Icon: LucideIcon | typeof SiWhatsapp = Link2;
+  let linked = true;
+  let detail: string | undefined;
+  switch (block.type) {
+    case "LINK":
+      title = block.data.title;
+      if (block.data.img) image = { src: block.data.img, alt: "" };
+      break;
+    case "PRODUCT":
+      title = block.data.title;
+      Icon = ShoppingBag;
+      detail = block.data.price;
+      if (block.data.img) image = { src: block.data.img, alt: "" };
+      break;
+    case "IMAGE":
+      title = block.data.title ?? "";
+      image = { src: block.data.src, alt: block.data.alt ?? "" };
+      linked = Boolean(block.data.url);
+      break;
+    case "WHATSAPP":
+      title = block.data.title || labels.whatsappDefault;
+      Icon = SiWhatsapp;
+      break;
+    case "CONTACT":
+      title = labels.contactAdd;
+      Icon = Contact;
+      break;
+    default:
+      return null;
+  }
+  const sponsored = block.type === "PRODUCT" && block.data.sponsored === "1";
+  // Paid content keeps its label on every size (Reklam Kurulu guidance, like the product card).
+  const badge = sponsored && <span className="glass absolute top-2.5 right-2.5 z-10 rounded-full px-2 py-0.5 text-xs font-normal text-ink-2">{labels.sponsored}</span>;
+  const photo = size === "LARGE" || block.type === "IMAGE" ? image : null;
+
+  const className = photo
+    ? cn(
+        "glass relative block size-full overflow-hidden rounded-[var(--radius-card)] p-1.5",
+        linked && "glass-interactive",
+        highlighted && "shadow-[0_0_0_1.5px_var(--c-ink)]",
+      )
+    : "p-btn p-tile glass-interactive group";
+  const body = photo ? (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element -- owner upload or card image copied to our Blob store */}
+      <img src={photo.src} alt={photo.alt} loading={loading} decoding="async" className="size-full rounded-[14px] bg-glass-strong object-cover" />
+      {badge}
+      {size === "LARGE" && (title || detail) && (
+        <span className="absolute inset-x-3 bottom-3 flex items-baseline gap-2 rounded-[var(--radius-control)] bg-glass-strong px-3 py-2 text-left shadow-[inset_0_1px_0_var(--c-glass-shine)] backdrop-blur-xl">
+          <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">{title}</span>
+          {detail && <span className="shrink-0 font-mono text-[0.875rem] font-medium tabular-nums">{detail}</span>}
+        </span>
+      )}
+    </>
+  ) : (
+    <>
+      {badge}
+      <Icon size={size === "LARGE" ? 40 : 28} strokeWidth={1.5} aria-hidden className="shrink-0" />
+      <span className="w-full truncate">{title}</span>
+      {detail && <span className="font-mono text-[0.8125rem] tabular-nums opacity-70">{detail}</span>}
+    </>
+  );
+
+  if (!linked) return <div className={className}>{body}</div>;
+  const hl = highlighted ? "" : undefined;
+  // A small photo tile has no visible text: its name is the photo's alt text, else its caption.
+  const label = photo && size === "SMALL" ? photo.alt || title || undefined : undefined;
+  return mode === "public" ? (
+    <a
+      href={`/l/${id}`}
+      className={className}
+      data-highlight={hl}
+      aria-label={label}
+      title={title || undefined}
+      rel={sponsored ? "noopener sponsored" : "noopener"}
+      download={block.type === "CONTACT" || undefined}
+    >
+      {body}
+    </a>
+  ) : (
+    <span className={cn(className, "cursor-default")} data-highlight={hl}>
+      {body}
+    </span>
   );
 }
 
@@ -326,7 +455,17 @@ function BlockView({
       return <hr className="my-3 w-12 border-0 border-t border-glass-edge" />;
     case "EMBED": {
       const embed = parseEmbed(block.data.url);
-      return embed ? <EmbedCard embed={embed} labels={{ play: labels.embedPlay, listen: labels.embedListen }} inert={mode === "preview"} /> : null;
+      if (embed) return <EmbedCard embed={embed} labels={{ play: labels.embedPlay, listen: labels.embedListen }} inert={mode === "preview"} />;
+      // "Latest video": the public page swaps in the newest video (features/profile/latest-video.ts); the preview says so.
+      if (mode === "preview" && block.data.latest === "1") {
+        return (
+          <span className="p-btn cursor-default gap-3">
+            <SiYoutube size={20} aria-hidden />
+            {labels.embedLatest}
+          </span>
+        );
+      }
+      return null;
     }
     case "EMAIL_CAPTURE":
       return <SubscribeForm blockId={id} title={block.data.title} labels={labels} inert={mode === "preview"} />;

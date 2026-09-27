@@ -62,7 +62,7 @@
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
     "privacy": "Privacy",
-    "sampleName": "Serdar Şahin",
+    "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Computer engineer · Ankara",
     "sampleHeader": "Projects",
     "sampleLinks": ["Linkiva", "GitHub", "Résumé"],
@@ -260,6 +260,11 @@
       "PRODUCT": "Product",
       "COUNTDOWN": "Countdown"
     },
+    "sizes": {
+      "SMALL": "Small tile",
+      "WIDE": "Full row",
+      "LARGE": "Large tile"
+    },
     "fields": {
       "title": "Title",
       "url": "Address",
@@ -326,6 +331,14 @@
       "unreachable": "Couldn't read this page. The link stays a plain button.",
       "tooMany": "Too many tries. Try again in a minute.",
       "failed": "Couldn't get the preview. Try again."
+    },
+    "latest": {
+      "label": "Channel's latest video",
+      "hint": "Your page always shows your newest video, refreshed hourly.",
+      "loading": "Reading the channel…",
+      "unreachable": "Couldn't find the channel or a video on it. Try pasting its youtube.com/channel/… address.",
+      "tooMany": "Too many tries. Try again in a minute.",
+      "failed": "Couldn't read the channel. Try again."
     },
     "embedUrl": "Video or music link",
     "embedPlaceholder": "youtube.com/watch?v=… or open.spotify.com/…",
@@ -494,6 +507,9 @@
     "qrBody": "Anyone who scans it lands on your page.",
     "downloadPng": "Download PNG",
     "downloadSvg": "Download SVG",
+    "story": "Story image",
+    "storyHint": "For your Instagram story, with the QR code (1080×1920).",
+    "storyFailed": "Couldn't make the image. Try again.",
     "close": "Close",
     "share": "Share"
   },
@@ -529,6 +545,15 @@
   },
   "appearance": {
     "title": "Appearance",
+    "layout": "Layout",
+    "layouts": {
+      "list": "List",
+      "grid": "Grid"
+    },
+    "layoutHints": {
+      "list": "One column, top to bottom",
+      "grid": "Tiles; size them from the block menu"
+    },
     "theme": "Theme",
     "themes": {
       "cam": "Glass",
@@ -586,6 +611,7 @@
   "blocks": {
     "embedPlay": "Play",
     "embedListen": "Listen",
+    "embedLatest": "YouTube · latest video",
     "subscribeTitle": "Stay in the loop",
     "subscribePlaceholder": "Your email address",
     "subscribeButton": "Subscribe",

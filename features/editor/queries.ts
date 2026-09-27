@@ -1,6 +1,6 @@
 import { getBlockSparklines } from "@/features/analytics/queries";
 import { db } from "@/lib/db";
-import type { EditorBlock, EditorProfile, EditorSocials } from "./types";
+import { toEditorBlock, type EditorBlock, type EditorProfile, type EditorSocials } from "./types";
 
 export async function getEditorData(
   userId: string,
@@ -22,15 +22,7 @@ export async function getEditorData(
       appearance: profile.appearance,
       showBranding: profile.showBranding,
     },
-    blocks: profile.blocks.map((b) => ({
-      id: b.id,
-      type: b.type,
-      data: (b.data ?? {}) as Record<string, string>,
-      isVisible: b.isVisible,
-      isHighlighted: b.isHighlighted,
-      startsAt: b.startsAt?.toISOString() ?? null,
-      endsAt: b.endsAt?.toISOString() ?? null,
-    })),
+    blocks: profile.blocks.map(toEditorBlock),
     socials: Object.fromEntries(profile.socials.map((s) => [s.platform, s.handle])),
   };
 }

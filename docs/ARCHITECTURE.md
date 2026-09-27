@@ -33,7 +33,7 @@
 | Sürükle-bırak | @dnd-kit (mevcut) | |
 | Grafik | **recharts** (zaten kurulu) | chart.js kaldırılır |
 | İkon | lucide-react (arayüz) + react-icons (yalnızca marka ikonları) | tabler kaldırılır |
-| QR | qrcode.react (mevcut) | |
+| QR | qrcode.react (panel) + **uqr** (sunucu: hikâye görseli, Faz 10) | qrcode.react hook kullandığı için Satori'de çizilemiyor |
 | Test | Vitest (birim) + Playwright (kritik akışlar) (onaylandı) | |
 
 **Kaldırılacaklar:** `chart.js`, `react-chartjs-2`, `react-simple-maps`, `react-calendar-heatmap`, `d3-scale`, `uploadthing`, `@uploadthing/react`, `@tabler/icons-react`, `@vercel/og`, `@next-auth/prisma-adapter` ve `@auth/prisma-adapter` (auth kararına göre), `uuid`, `@types/uuid`, `@types/bcrypt`, `next-themes` (tema, token + `prefers-color-scheme` + tek bir çerezle yönetilir).
@@ -217,7 +217,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 | 6 ✅ | `username_history` | `UsernameHistory { username @id, profileId → Profile (cascade), createdAt, expiresAt }`. Müsaitlik kontrolü süresi dolmamış kayıtları dolu sayar. |
 | 8 ✅ | `block_types_contact_support` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
 | 9 ✅ | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
-| 10 | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
+| 10 ✅ | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
 | 11 | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
 | 12 | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
 | 13 | `link_check`, `two_factor` | `LinkCheck { blockId @unique → Block (cascade), status, failCount, checkedAt }`; Better Auth `twoFactor` tabloları (CLI ile üretilir). LINK `data`'ya `gate`. |
@@ -237,7 +237,8 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 - Render sırasında **hiçbir yazma işlemi yapılmaz** (eski `visit.create` kaldırılır).
 - `generateMetadata` ve sayfa aynı önbellekli sorguyu paylaşır (`React.cache`).
 - Kullanıcı bulunamazsa `notFound()` çağrılır ve HTTP 404 döner. *(Faz 6'dan sonra:* önce `UsernameHistory`'ye bakılır; süresi dolmamış eski ad `permanentRedirect` (308) ile yeni ada gider.)*
-- *(Faz 10)* Profil render'ı dış kaynak okuyabilir (YouTube RSS) ama yalnızca `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile; okunamazsa blok gizlenir. DB'ye yazma kuralı değişmez.
+- *(Faz 10)* Profil render'ı dış kaynak okuyabilir (YouTube RSS, `features/profile/latest-video.ts`) ama yalnızca `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile; okunamazsa blok gizlenir. DB'ye yazma kuralı değişmez.
+- *(Faz 10)* Hikâye görseli `app/(profile)/[username]/story/route.tsx`: `ImageResponse`, yalnızca yayındaki profil (değilse 404), QR `uqr` ile SVG. OG ve hikâye aynı font yükleyicisini kullanır (`lib/og-fonts.ts`).
 - *(Faz 11)* Özel alan adında `proxy.ts` host'u doğrulanmış `CustomDomain` kaydına göre `/<username>` yoluna rewrite eder. Kanonik URL `lib/site.ts` → `profileUrl(profile)` üzerinden gelir.
 - OG görseli `opengraph-image.tsx` ile üretilir. Aynı etiketi kullanır, `?v=Date.now()` kullanılmaz.
 
@@ -313,7 +314,7 @@ GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 ## 10.1 Zamanlanmış işler ve dış getirme
 
 - **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, çalıştırma başına sınırlı parti), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İleride `DailyStat` toplaması da buraya gelir.
-- **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com`), kırık link kontrolü (Faz 13). Hepsi aynı SSRF korumasından geçer; yeni bir `fetch` yolu açılmaz.
+- **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com` host'ları; AB onay ekranı için yalnızca bu host'lara `SOCS` çerezi), kırık link kontrolü (Faz 13). Kullanıcının verdiği her URL bu korumadan geçer. Tek istisna kullanıcı URL'i olmayan, sabit host'a doğrulanmış kimlikle kurulan YouTube beslemesi (`channelFeedUrl`).
 - **Vercel Domains API** (Faz 11) düz `fetch` ile `lib/vercel-domains.ts`'ten çağrılır. Kullanıcı girdisi yalnızca doğrulanmış hostname olarak gider.
 
 ---

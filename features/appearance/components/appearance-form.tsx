@@ -26,6 +26,7 @@ import {
   DIM_MAX,
   FONT_KEYS,
   GROUND,
+  LAYOUT_KEYS,
   isThemeKey,
   minDim,
   readableAccent,
@@ -33,6 +34,7 @@ import {
   suggestForBackground,
   THEME_KEYS,
   type AppearanceOverrides,
+  type LayoutKey,
   type ThemeKey,
 } from "@/themes";
 import { updateAppearance } from "../actions";
@@ -65,9 +67,9 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
   }
 
   function pickTheme(key: ThemeKey) {
-    // A new theme starts clean; only the owner's background image (and how it is dimmed) is kept.
-    const { backgroundUrl, backgroundDim, backgroundTone } = overrides;
-    const next: AppearanceOverrides = backgroundUrl ? { backgroundUrl, backgroundDim, backgroundTone } : {};
+    // A new theme starts clean; only the layout and the owner's background image (and how it is dimmed) are kept.
+    const { layout, backgroundUrl, backgroundDim, backgroundTone } = overrides;
+    const next: AppearanceOverrides = { ...(layout && { layout }), ...(backgroundUrl && { backgroundUrl, backgroundDim, backgroundTone }) };
     setTheme(key);
     setOverrides(next);
     save({ theme: key, overrides: next });
@@ -133,6 +135,36 @@ export function AppearanceForm({ userId, uploadsEnabled, profile, blocks, social
         <PageHeader title={t("appearance.title")}>
           <SaveIndicator state={saveState} />
         </PageHeader>
+
+        <Section title={t("appearance.layout")}>
+          <div role="radiogroup" aria-label={t("appearance.layout")} className="grid grid-cols-2 gap-3">
+            {LAYOUT_KEYS.map((key) => {
+              const selected = key === look.layout;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => override({ layout: key })}
+                  className={cn(
+                    "group flex flex-col gap-2 rounded-[var(--radius-card)] p-1.5 text-left transition-shadow",
+                    selected ? "shadow-[0_0_0_2px_var(--c-ink)]" : "hover:shadow-[0_0_0_1px_var(--c-glass-edge)]",
+                  )}
+                >
+                  <LayoutSwatch look={look} layout={key} />
+                  <span className="flex items-center justify-between px-1.5 pb-1">
+                    <span>
+                      <span className="block text-sm font-semibold">{t(`appearance.layouts.${key}`)}</span>
+                      <span className="block text-xs text-ink-3">{t(`appearance.layoutHints.${key}`)}</span>
+                    </span>
+                    {selected && <Check size={16} strokeWidth={2} aria-hidden />}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Section>
 
         <Section title={t("appearance.theme")}>
           <div role="radiogroup" aria-label={t("appearance.theme")} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -337,6 +369,41 @@ function Option({ label, hint, children }: { label: string; hint?: string; child
         {hint && <p className="text-sm text-ink-3">{hint}</p>}
       </div>
       {children}
+    </div>
+  );
+}
+
+/** A miniature of a layout in the current theme, drawn with the real theme CSS (bars, or tiles of every size). */
+function LayoutSwatch({ look, layout }: { look: ReturnType<typeof resolveAppearance>; layout: LayoutKey }) {
+  const bar = "p-btn !min-h-0 !rounded-[6px] !p-0";
+  return (
+    <div
+      aria-hidden
+      className="profile-scene flex h-32 !min-h-0 shrink-0 flex-col items-center justify-center overflow-hidden rounded-[14px] border border-glass-edge px-6"
+      data-theme={look.mode === "system" ? undefined : look.mode}
+      data-scene={look.scene}
+      data-font={look.font}
+      data-button={look.button}
+      style={(look.accent ? { "--p-accent": look.accent, "--p-accent-ink": "#fff" } : {}) as React.CSSProperties}
+    >
+      <div className="scene-light" />
+      {layout === "list" ? (
+        <div className="flex w-full max-w-28 flex-col gap-1.5">
+          <span className={cn(bar, "h-4")} />
+          <span className={cn(bar, "h-4")} />
+          <span className={cn(bar, "h-4")} />
+          <span className={cn(bar, "h-4 opacity-80")} />
+        </div>
+      ) : (
+        <div className="grid w-full max-w-28 grid-cols-4 gap-1.5">
+          <span className={cn(bar, "col-span-2 row-span-2 aspect-square h-auto")} />
+          <span className={cn(bar, "aspect-square h-auto")} />
+          <span className={cn(bar, "aspect-square h-auto")} />
+          <span className={cn(bar, "aspect-square h-auto")} />
+          <span className={cn(bar, "aspect-square h-auto opacity-80")} />
+          <span className={cn(bar, "col-span-4 h-4")} />
+        </div>
+      )}
     </div>
   );
 }

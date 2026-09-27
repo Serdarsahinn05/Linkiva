@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Download, ExternalLink, QrCode } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, QrCode, Smartphone } from "lucide-react";
 import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,7 @@ export function SharePanel({ username }: { username: string }) {
   const t = useTranslations("share");
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [story, setStory] = useState<"idle" | "busy" | "failed">("idle");
   const qrWrap = useRef<HTMLDivElement>(null);
   const url = profileUrl(username);
 
@@ -38,6 +39,34 @@ export function SharePanel({ username }: { username: string }) {
       a.href = URL.createObjectURL(new Blob([svg.outerHTML], { type: "image/svg+xml" }));
     }
     a.click();
+  }
+
+  /**
+   * The 1080×1920 story image (app/(profile)/[username]/story): handed to the share sheet on touch devices (straight into
+   * Instagram), downloaded elsewhere. Desktop Chrome can share files too, but a download is what people expect there.
+   */
+  async function shareStory() {
+    setStory("busy");
+    try {
+      const res = await fetch(`/${username}/story`);
+      if (!res.ok) throw new Error(String(res.status));
+      const file = new File([await res.blob()], `linkiva-${username}-story.png`, { type: "image/png" });
+      if (matchMedia("(pointer: coarse)").matches && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] }).catch((error: unknown) => {
+          // Closing the share sheet is not a failure.
+          if (!(error instanceof DOMException && error.name === "AbortError")) throw error;
+        });
+      } else {
+        const a = document.createElement("a");
+        a.download = file.name;
+        a.href = URL.createObjectURL(file);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      setStory("idle");
+    } catch {
+      setStory("failed");
+    }
   }
 
   return (
@@ -79,6 +108,15 @@ export function SharePanel({ username }: { username: string }) {
             <button type="button" onClick={() => download("svg")} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md)}>
               {t("downloadSvg")}
             </button>
+          </div>
+          <div className="flex w-full flex-col items-center gap-2 border-t border-glass-edge pt-5">
+            <button type="button" onClick={shareStory} disabled={story === "busy"} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md)}>
+              {story === "busy" ? <span className="dots" aria-hidden /> : <Smartphone size={16} aria-hidden />}
+              {t("story")}
+            </button>
+            <p className={cn("text-center text-sm", story === "failed" ? "text-negative" : "text-ink-3")} role={story === "failed" ? "alert" : undefined}>
+              {story === "failed" ? t("storyFailed") : t("storyHint")}
+            </p>
           </div>
         </div>
       </Dialog>

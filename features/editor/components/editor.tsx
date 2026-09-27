@@ -5,7 +5,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { SocialPlatform } from "@/prisma/generated/enums";
+import type { BlockSize, SocialPlatform } from "@/prisma/generated/enums";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
@@ -16,9 +16,10 @@ import { cn } from "@/lib/cn";
 import { liveBlocks } from "@/lib/schedule";
 import { EDITABLE_BLOCK_TYPES, type EditableBlockType } from "@/lib/validation/blocks";
 import { displayHost } from "@/lib/validation/url";
+import { resolveAppearance } from "@/themes";
 import type { AppliedImport } from "@/features/import/actions";
 import { ImportDialog } from "@/features/import/components/import-dialog";
-import { addBlock, applyTemplate, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setSocial, updateBlock, updateProfileBasics } from "../actions";
+import { addBlock, applyTemplate, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setBlockSize, setSocial, updateBlock, updateProfileBasics } from "../actions";
 import { detectBlock, type Detected } from "../detect-block";
 import type { TemplateKey } from "../templates";
 import type { EditorBlock, EditorProfile, EditorSocials } from "../types";
@@ -56,6 +57,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   const [templating, setTemplating] = useState<TemplateKey | null>(null);
   // null: closed; a string: open, prefilled with that address.
   const [importUrl, setImportUrl] = useState<string | null>(null);
+  // Tile sizes are only offered while the page uses the grid layout (Appearance → Layout).
+  const grid = resolveAppearance(profile.theme, profile.appearance).layout === "grid";
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -184,6 +187,11 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   function flagBlock(id: string, flags: { isVisible?: boolean; isHighlighted?: boolean }) {
     setBlocks((list) => list.map((b) => (b.id === id ? { ...b, ...flags } : b)));
     schedule(`flags:${id}`, async () => (await setBlockFlags(id, flags)).ok, true);
+  }
+
+  function sizeBlock(id: string, size: BlockSize) {
+    setBlocks((list) => list.map((b) => (b.id === id ? { ...b, size } : b)));
+    schedule(`size:${id}`, async () => (await setBlockSize(id, size)).ok, true);
   }
 
   function scheduleBlock(id: string, sched: { startsAt: string | null; endsAt: string | null }) {
@@ -358,6 +366,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                       onMove={(direction) => move(block.id, direction)}
                       onDelete={() => remove(block.id)}
                       onSchedule={(sched) => scheduleBlock(block.id, sched)}
+                      grid={grid}
+                      onSize={(size) => sizeBlock(block.id, size)}
                     />
                   ))}
                 </ul>

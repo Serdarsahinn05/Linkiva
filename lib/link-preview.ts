@@ -64,7 +64,7 @@ function checkTarget(url: URL) {
 }
 
 /** One GET with the guards above. Bodies beyond maxBytes are cut off (truncated: true). */
-function getOnce(url: URL, accept: string, maxBytes: number, signal: AbortSignal): Promise<Fetched | { redirect: URL }> {
+function getOnce(url: URL, accept: string, maxBytes: number, signal: AbortSignal, cookie?: string): Promise<Fetched | { redirect: URL }> {
   checkTarget(url);
   const client = url.protocol === "https:" ? https : http;
   return new Promise((resolve, reject) => {
@@ -73,7 +73,7 @@ function getOnce(url: URL, accept: string, maxBytes: number, signal: AbortSignal
       {
         lookup: guardedLookup,
         signal,
-        headers: { "user-agent": `LinkivaBot/1.0 (+${site.url})`, accept, "accept-language": "tr,en;q=0.8" },
+        headers: { "user-agent": `LinkivaBot/1.0 (+${site.url})`, accept, "accept-language": "tr,en;q=0.8", ...(cookie && { cookie }) },
       },
       (response) => {
         const status = response.statusCode ?? 0;
@@ -107,11 +107,11 @@ function getOnce(url: URL, accept: string, maxBytes: number, signal: AbortSignal
   });
 }
 
-async function safeGet(url: URL, accept: string, maxBytes: number): Promise<Fetched> {
+async function safeGet(url: URL, accept: string, maxBytes: number, cookie?: string): Promise<Fetched> {
   const signal = AbortSignal.timeout(TIMEOUT_MS);
   let current = url;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    const result = await getOnce(current, accept, maxBytes, signal);
+    const result = await getOnce(current, accept, maxBytes, signal, cookie);
     if (!("redirect" in result)) return result;
     current = result.redirect;
   }
@@ -188,11 +188,12 @@ export type LinkPreview = PreviewText & { imageFile?: { bytes: Buffer; type: str
 /**
  * Fetches an HTML page through the guards above and decodes it. null when it cannot be read (unreachable, blocked,
  * not HTML, or, with `hosts`, when the final address is not one of them). A page cut at maxBytes is `truncated`.
+ * `cookie` is only for hosts in `hosts` that gate pages behind a consent screen (YouTube in the EU).
  */
-export async function fetchPage(pageUrl: string, { maxBytes = HTML_MAX_BYTES, hosts }: { maxBytes?: number; hosts?: string[] } = {}) {
+export async function fetchPage(pageUrl: string, { maxBytes = HTML_MAX_BYTES, hosts, cookie }: { maxBytes?: number; hosts?: string[]; cookie?: string } = {}) {
   let page: Fetched;
   try {
-    page = await safeGet(new URL(pageUrl), "text/html,application/xhtml+xml", maxBytes);
+    page = await safeGet(new URL(pageUrl), "text/html,application/xhtml+xml", maxBytes, hosts ? cookie : undefined);
   } catch {
     return null;
   }

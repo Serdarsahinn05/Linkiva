@@ -9,6 +9,7 @@ import {
   CalendarClock,
   CircleAlert,
   Contact,
+  Grid2x2,
   GripVertical,
   HandCoins,
   Heading,
@@ -18,7 +19,9 @@ import {
   MessageCircle,
   Minus,
   PlayCircle,
+  RectangleHorizontal,
   ShoppingBag,
+  Square,
   Star,
   StarOff,
   Timer,
@@ -32,10 +35,12 @@ import { Input, inputClass } from "@/components/ui/field";
 import { Menu } from "@/components/ui/menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/cn";
-import { ALT_MAX, parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
-import { parseEmbed } from "@/lib/embeds";
+import type { BlockSize } from "@/prisma/generated/enums";
+import { allowedSizes, ALT_MAX, effectiveSize, parseBlock, TEXT_MAX, TITLE_MAX } from "@/lib/validation/blocks";
+import { parseEmbed, youtubeChannel } from "@/lib/embeds";
 import { normalizeUrl } from "@/lib/validation/url";
 import { ImageField } from "./image-field";
+import { LatestVideoField } from "./latest-video-field";
 import { LinkCardFields } from "./link-card-fields";
 import { ScheduleDialog } from "./schedule-dialog";
 import { Sparkline } from "./sparkline";
@@ -58,6 +63,8 @@ export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
   COUNTDOWN: Timer,
 };
 
+const SIZE_ICON: Record<BlockSize, LucideIcon> = { SMALL: Square, WIDE: RectangleHorizontal, LARGE: Grid2x2 };
+
 /** Blocks whose taps are counted (the /l route and support copies). */
 const TAPPABLE = new Set<EditorBlock["type"]>(["LINK", "IMAGE", "PRODUCT", "WHATSAPP", "CONTACT", "SUPPORT"]);
 
@@ -77,9 +84,12 @@ type RowProps = {
   onMove: (direction: -1 | 1) => void;
   onDelete: () => void;
   onSchedule: (schedule: { startsAt: string | null; endsAt: string | null }) => void;
+  /** Grid layout on: the menu offers the tile sizes the type allows. */
+  grid: boolean;
+  onSize: (size: BlockSize) => void;
 };
 
-export function BlockRow({ block, nested, clicks, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
+export function BlockRow({ block, nested, clicks, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule, grid, onSize }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
@@ -96,13 +106,17 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
         : block.endsAt
           ? { tone: "text-ink-2", text: t("activeUntil", { date: when(block.endsAt) }) }
           : null;
-  const embedInvalid = block.type === "EMBED" && urlTouched && Boolean(block.data.url) && parseEmbed(block.data.url ?? "") === null;
+  // A channel address is not an error: it can become "the channel's latest video" (LatestVideoField).
+  const embedInvalid =
+    block.type === "EMBED" && urlTouched && Boolean(block.data.url) && parseEmbed(block.data.url ?? "") === null && !youtubeChannel(block.data.url ?? "");
 
   const complete = parseBlock(block.type, block.data) !== null;
   const urlInvalid = (block.type === "LINK" || block.type === "IMAGE") && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
   const TypeIcon = BLOCK_ICON[block.type];
   const field = (key: string) => block.data[key] ?? "";
   const set = (key: string, value: string) => onChange({ ...block.data, [key]: value });
+  const sizes = grid ? allowedSizes(block.type) : [];
+  const size = effectiveSize(block.type, block.size);
 
   return (
     <li
@@ -133,6 +147,7 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
             <span className="flex items-center gap-1.5 text-sm font-medium text-ink-2">
               <TypeIcon size={16} strokeWidth={1.75} aria-hidden />
               {t(`types.${block.type}`)}
+              {sizes.length > 1 && size !== "WIDE" && <span className="font-normal text-ink-3">· {t(`sizes.${size}`)}</span>}
             </span>
             {block.isHighlighted && <Star size={14} className="fill-ink text-ink" aria-label={t("highlight")} />}
             <div className="-my-2 ml-auto flex shrink-0 items-center">
@@ -153,6 +168,12 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
                           onSelect: () => onFlags({ isHighlighted: !block.isHighlighted }),
                         },
                       ]
+                    : []),
+                  ...(sizes.length > 1
+                    ? sizes.map((s) => {
+                        const SizeIcon = SIZE_ICON[s];
+                        return { label: t(`sizes.${s}`), icon: <SizeIcon size={18} strokeWidth={1.75} />, onSelect: () => onSize(s), checked: s === size };
+                      })
                     : []),
                   { label: t("schedule"), icon: <CalendarClock size={18} strokeWidth={1.75} />, onSelect: () => setScheduling(true) },
               { label: t("moveUp"), icon: <ArrowUp size={18} strokeWidth={1.75} />, onSelect: () => onMove(-1), disabled: index === 0 },
@@ -264,10 +285,12 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
                 maxLength={2048}
                 autoFocus={autoFocus}
                 aria-invalid={embedInvalid}
-                onChange={(e) => set("url", e.target.value)}
+                // A new address is a new choice: it no longer follows the channel found for the old one.
+                onChange={(e) => onChange({ url: e.target.value })}
                 onBlur={() => setUrlTouched(true)}
               />
               {embedInvalid && <p className="text-sm text-negative">{t("embedInvalid")}</p>}
+              <LatestVideoField block={block} onChange={onChange} />
             </>
           )}
           {block.type === "EMAIL_CAPTURE" && (
