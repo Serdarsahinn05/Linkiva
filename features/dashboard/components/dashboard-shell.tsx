@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Eye, Link2, Palette, Settings, Share2, Users, type LucideIcon } from "lucide-react";
+import { BarChart3, Eye, Link2, Palette, Search, Settings, Share2, Users, type LucideIcon } from "lucide-react";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
@@ -10,6 +10,7 @@ import { Wordmark } from "@/components/ui/surface";
 import { ToastProvider } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/account/components/logout-button";
+import { CommandPalette } from "./command-palette";
 import { PreviewProvider, usePreview } from "./preview-context";
 import { SharePanel } from "./share-panel";
 
@@ -41,6 +42,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
   const pathname = usePathname();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const livePreview = usePreview();
   const activeIndex = NAV.findIndex((item) => item.href === pathname);
 
@@ -52,6 +54,15 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
           <Link href="/dashboard" className="self-start">
             <Wordmark />
           </Link>
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="glass-flat -mt-3 flex h-10 items-center gap-2 rounded-full px-4 text-sm text-ink-3 transition-colors hover:text-ink"
+          >
+            <Search size={16} strokeWidth={1.75} aria-hidden />
+            {t("palette.search")}
+            <kbd className="ml-auto font-mono text-xs">Ctrl K</kbd>
+          </button>
           <nav aria-label={t("nav.main")}>
             <ul className="flex flex-col gap-1">
               {SIDEBAR.map(({ href, key, icon: Icon }) => {
@@ -136,6 +147,7 @@ function ShellFrame({ username, children }: { username: string; children: ReactN
           {livePreview ?? <iframe src={`/${username}`} title={t("editor.previewTitle")} className="size-full border-0" />}
         </div>
       </Dialog>
+      <CommandPalette username={username} open={paletteOpen} onOpenChange={setPaletteOpen} onShare={() => setShareOpen(true)} />
       <Dialog open={shareOpen} onClose={() => setShareOpen(false)} title={t("share.share")} closeLabel={t("share.close")} variant="sheet">
         <div className="p-5">
           <SharePanel username={username} />

@@ -38,6 +38,7 @@ import { normalizeUrl } from "@/lib/validation/url";
 import { ImageField } from "./image-field";
 import { LinkCardFields } from "./link-card-fields";
 import { ScheduleDialog } from "./schedule-dialog";
+import { Sparkline } from "./sparkline";
 import { ContactSupportFields } from "./contact-support-fields";
 import type { EditorBlock } from "../types";
 
@@ -57,10 +58,15 @@ export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
   COUNTDOWN: Timer,
 };
 
+/** Blocks whose taps are counted (the /l route and support copies). */
+const TAPPABLE = new Set<EditorBlock["type"]>(["LINK", "IMAGE", "PRODUCT", "WHATSAPP", "CONTACT", "SUPPORT"]);
+
 type RowProps = {
   block: EditorBlock;
   /** Folds under a collapsible header on the page: indented, with a guide line. */
   nested?: boolean;
+  /** Clicks per day for the last 7 days (tappable blocks only). */
+  clicks?: number[];
   index: number;
   count: number;
   autoFocus: boolean;
@@ -73,7 +79,7 @@ type RowProps = {
   onSchedule: (schedule: { startsAt: string | null; endsAt: string | null }) => void;
 };
 
-export function BlockRow({ block, nested, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
+export function BlockRow({ block, nested, clicks, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
@@ -130,6 +136,11 @@ export function BlockRow({ block, nested, index, count, autoFocus, userId, uploa
             </span>
             {block.isHighlighted && <Star size={14} className="fill-ink text-ink" aria-label={t("highlight")} />}
             <div className="-my-2 ml-auto flex shrink-0 items-center">
+              {TAPPABLE.has(block.type) && (
+                <span className="mr-2 hidden sm:flex">
+                  <Sparkline values={clicks} label={t("sparkline", { count: clicks?.reduce((a, b) => a + b, 0) ?? 0 })} />
+                </span>
+              )}
               <Switch checked={block.isVisible} onChange={(isVisible) => onFlags({ isVisible })} label={t("visible")} />
               <Menu
                 label={t("more")}

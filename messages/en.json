@@ -206,6 +206,18 @@
       "body": "As requested, your Linkiva account, page, stats and subscriber list were permanently deleted. Your address is now free for others.",
       "cta": "",
       "security": "If this wasn't you, write to us right away: hello@linkiva.space"
+    },
+    "digest": {
+      "subject": "Linkiva: your page's last week",
+      "preheader": "{views} views, {clicks} clicks.",
+      "heading": "Your page's last week",
+      "views": "Views",
+      "clicks": "Clicks",
+      "vsLastWeek": "vs the week before",
+      "topLinks": "Most clicked",
+      "cta": "Open my stats",
+      "footer": "You got this mail because the weekly summary is on.",
+      "unsubscribe": "Turn off the summary"
     }
   },
   "profile": {
@@ -332,6 +344,7 @@
     "scheduledFor": "Goes live {date}",
     "activeUntil": "Live until {date}",
     "expired": "Expired, not shown on your page",
+    "sparkline": "{count} clicks in the last 7 days",
     "collapsible": "Fold what's below",
     "collapsibleHint": "Blocks up to the next header or divider open under this header.",
     "support": {
@@ -461,6 +474,16 @@
     "importOffer": "That's a Linktree page. Want to move your links over?",
     "invalid": "We can't open that address. Try a link starting with https://."
   },
+  "palette": {
+    "title": "Commands",
+    "search": "Search",
+    "placeholder": "What do you want to do? (e.g. add link, theme)",
+    "empty": "No matching command.",
+    "openPage": "Open my page",
+    "copyAddress": "Copy my address",
+    "copied": "Address copied.",
+    "share": "QR code and sharing"
+  },
   "share": {
     "address": "Your address",
     "copy": "Copy",
@@ -489,7 +512,20 @@
       "en": "English"
     },
     "account": "Account",
-    "signedInAs": "Signed in as {email}."
+    "signedInAs": "Signed in as {email}.",
+    "notifications": "Notifications",
+    "digest": "Weekly summary",
+    "digestHint": "Every Monday, last week's views and clicks. Not sent when the week had no visits."
+  },
+  "unsubscribe": {
+    "title": "Turn off the weekly summary",
+    "body": "The Monday summary mail will no longer be sent. Important account mail (password, security) still arrives.",
+    "confirm": "Turn off",
+    "done": "Summary turned off",
+    "doneBody": "Changed your mind? Turn it back on in Settings → Notifications.",
+    "invalid": "This link isn't valid",
+    "invalidBody": "The link may be broken. Sign in and turn the summary off in Settings → Notifications.",
+    "error": "Something went wrong, try again."
   },
   "appearance": {
     "title": "Appearance",
@@ -633,7 +669,17 @@
     "privacyLink": "How we measure",
     "map": "Visitor map",
     "mapViews": "views",
-    "mapNone": "No visits yet"
+    "mapNone": "No visits yet",
+    "insightsTitle": "Highlights",
+    "insight": {
+      "sourceLink": "Visitors from {source} mostly clicked “{link}” (<n>{share}</n>).",
+      "peakHours": "Your busiest hours are <n>{from}–{to}</n> (<n>{share}</n> of visits).",
+      "linkUp": "“{link}” got <n>{change}</n> more clicks than the previous period.",
+      "linkDown": "“{link}” got <n>{change}</n> fewer clicks than the previous period."
+    },
+    "heatmapTitle": "Visiting hours",
+    "heatmapLabel": "Views by day of the week and hour",
+    "heatmapCell": "{day} {hours} · {views} views"
   },
   "account": {
     "email": "Email",

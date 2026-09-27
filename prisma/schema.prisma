@@ -99,6 +99,10 @@ model Profile {
   isPublished    Boolean      @default(true)
   locale         String       @default("tr")
   timezone       String       @default("Europe/Istanbul")
+  /// Weekly summary mail (opt-out in settings or via the signed link in the mail).
+  weeklyDigest   Boolean      @default(true)
+  /// Last weekly summary claimed for this profile; guards against double sends.
+  digestSentAt   DateTime?
   blocks         Block[]
   socials        SocialLink[]
   events         Event[]

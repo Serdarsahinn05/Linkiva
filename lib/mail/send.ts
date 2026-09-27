@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Resend } from "resend";
 import type { Locale } from "@/i18n/config";
 import { env, isE2E } from "@/lib/env";
-import { renderMail, type MailKind, type MailParams } from "./templates";
+import { renderMail, type MailKind, type MailParams, type RenderedMail } from "./templates";
 
 const resend = env.RESEND_API_KEY ? new Resend(env.RESEND_API_KEY) : null;
 
@@ -23,6 +23,25 @@ export async function sendMail({ to, kind, locale, url, newEmail }: { to: string
 
   const { error } = await resend.emails.send({ from: env.MAIL_FROM, to, subject, html, text });
   if (error) throw new Error(`Mail delivery failed: ${error.message}`);
+}
+
+export type OutgoingMail = RenderedMail & { to: string; headers?: Record<string, string> };
+
+/** Bulk mail (the weekly summary): up to 100 per call through Resend's batch API. Throws when the batch is refused. */
+export async function sendBatch(kind: string, mails: OutgoingMail[]) {
+  if (mails.length === 0) return;
+  if (mails.length > 100) throw new Error("A batch holds at most 100 mails");
+  if (!resend) {
+    if (env.NODE_ENV === "production" && !isE2E) throw new Error("RESEND_API_KEY is not configured");
+    await mkdir(DEV_MAILBOX, { recursive: true });
+    for (const { to, subject, text, headers } of mails) {
+      await writeFile(join(DEV_MAILBOX, `${to.toLowerCase()}.json`), JSON.stringify({ to, kind, subject, text, headers, sentAt: new Date().toISOString() }, null, 2));
+    }
+    console.info(`[mail:${kind}] ${mails.length} to dev mailbox`);
+    return;
+  }
+  const { error } = await resend.batch.send(mails.map(({ to, subject, html, text, headers }) => ({ from: env.MAIL_FROM, to, subject, html, text, headers })));
+  if (error) throw new Error(`Batch delivery failed: ${error.message}`);
 }
 
 /** Notifications must never break the action that triggered them (a deleted account stays deleted). */

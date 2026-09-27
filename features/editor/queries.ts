@@ -1,13 +1,18 @@
+import { getBlockSparklines } from "@/features/analytics/queries";
 import { db } from "@/lib/db";
 import type { EditorBlock, EditorProfile, EditorSocials } from "./types";
 
-export async function getEditorData(userId: string): Promise<{ profile: EditorProfile; blocks: EditorBlock[]; socials: EditorSocials } | null> {
+export async function getEditorData(
+  userId: string,
+): Promise<{ profile: EditorProfile; blocks: EditorBlock[]; socials: EditorSocials; sparklines: Record<string, number[]> } | null> {
   const profile = await db.profile.findUnique({
     where: { userId },
     include: { blocks: { orderBy: { position: "asc" } }, socials: true },
   });
   if (!profile) return null;
+  const sparklines = await getBlockSparklines(profile);
   return {
+    sparklines,
     profile: {
       username: profile.username,
       displayName: profile.displayName ?? "",

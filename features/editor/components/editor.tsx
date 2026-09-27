@@ -2,7 +2,8 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useEffect, useEffectEvent, useId, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { SocialPlatform } from "@/prisma/generated/enums";
 import { profileLabels } from "@/components/blocks/labels";
@@ -31,9 +32,16 @@ import { StartOptions } from "./start-options";
 import { SaveIndicator } from "./save-indicator";
 import { useAutosave } from "./use-autosave";
 
-type Props = { profile: EditorProfile; blocks: EditorBlock[]; socials: EditorSocials; userId: string; uploadsEnabled: boolean };
+type Props = {
+  profile: EditorProfile;
+  blocks: EditorBlock[];
+  socials: EditorSocials;
+  sparklines: Record<string, number[]>;
+  userId: string;
+  uploadsEnabled: boolean;
+};
 
-export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, userId, uploadsEnabled }: Props) {
+export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, sparklines, userId, uploadsEnabled }: Props) {
   const t = useTranslations();
   const toast = useToast();
   const { state: saveState, schedule } = useAutosave();
@@ -118,9 +126,38 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     return () => document.removeEventListener("paste", onPaste);
   }, []);
 
+  // ─── Command palette: /dashboard?add=<type> and ?import=1 (features/dashboard/components/command-palette.tsx) ───
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  // The import dialog opened from the palette is derived from the address, not copied into state.
+  const importRequested = searchParams.get("import") === "1";
+  const requestedAdd = EDITABLE_BLOCK_TYPES.find((type) => type === searchParams.get("add")) ?? null;
+  const handledAdd = useRef<string | null>(null);
+  const onPaletteAdd = useEffectEvent(async (type: EditableBlockType) => {
+    router.replace("/dashboard", { scroll: false });
+    const result = await addBlock(type);
+    if (!result.ok) return saveError();
+    setBlocks((list) => [result.data, ...list]);
+    setFocusId(result.data.id);
+  });
+  useEffect(() => {
+    // Once per request: StrictMode runs effects twice in development.
+    if (!requestedAdd) {
+      handledAdd.current = null;
+      return;
+    }
+    if (handledAdd.current === requestedAdd) return;
+    handledAdd.current = requestedAdd;
+    void onPaletteAdd(requestedAdd);
+  }, [requestedAdd]);
+  function closeImport() {
+    setImportUrl(null);
+    if (importRequested) router.replace("/dashboard", { scroll: false });
+  }
+
   // ─── Import and templates ───
   function imported(result: AppliedImport) {
-    setImportUrl(null);
+    closeImport();
     setBlocks((list) => [...list, ...result.blocks]);
     setSocials((s) => ({ ...s, ...result.socials }));
     setProfile((p) => ({ ...p, displayName: result.displayName ?? p.displayName, bio: result.bio ?? p.bio }));
@@ -310,6 +347,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                       key={block.id}
                       block={block}
                       nested={folded.has(block.id)}
+                      clicks={sparklines[block.id]}
                       index={index}
                       count={blocks.length}
                       autoFocus={block.id === focusId}
@@ -329,7 +367,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
         </section>
       </div>
 
-      {importUrl !== null && <ImportDialog open initialUrl={importUrl} onClose={() => setImportUrl(null)} onImported={imported} />}
+      {(importUrl !== null || importRequested) && <ImportDialog open initialUrl={importUrl ?? ""} onClose={closeImport} onImported={imported} />}
 
       {/* Desktop live preview: a glass phone. On mobile the tab bar's Preview opens it. */}
       <aside aria-label={t("editor.previewTitle")} className="hidden lg:block">
