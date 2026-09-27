@@ -4,13 +4,10 @@
     "description": "Gather your links, social accounts and content on one page. What others charge for is free here."
   },
   "common": {
-    "appName": "Linkiva",
     "login": "Log in",
     "logout": "Log out",
     "startFree": "Start free",
     "skipToContent": "Skip to content",
-    "continue": "Continue",
-    "back": "Go back",
     "or": "or",
     "loading": "Loading…",
     "genericError": "Something went wrong. Try again in a moment."
@@ -57,7 +54,10 @@
         "QR code",
         "Download your address as an SVG or PNG QR code."
       ],
-      "noSale": ["Your data is not for sale", "No AI training, no ads, no sharing with third parties."]
+      "noSale": [
+        "Your data is not for sale",
+        "No AI training, no ads, no sharing with third parties."
+      ]
     },
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
@@ -88,7 +88,6 @@
       "invalid": "Wrong email or password.",
       "unverified": "Verify your email first. We just sent a fresh verification link to your inbox.",
       "tooMany": "Too many attempts. Try again in a minute.",
-      "verified": "Your email is verified. You can log in now.",
       "passwordReset": "Your password is updated. Log in with the new one."
     },
     "register": {
@@ -150,9 +149,7 @@
     }
   },
   "dashboard": {
-    "welcome": "Your page is live.",
-    "liveAt": "Your address",
-    "comingSoon": "The editor arrives in the next step."
+    "welcome": "Your page is live."
   },
   "mail": {
     "footer": "You received this because something happened on your linkiva.space account.",
@@ -236,7 +233,6 @@
     "socialsHint": "Paste your username or profile link.",
     "socialInvalid": "We could not read this {platform} account.",
     "blocks": "Blocks",
-    "add": "Add",
     "addBlock": "Add {type}",
     "types": {
       "LINK": "Link",
@@ -332,6 +328,82 @@
     "activeUntil": "Live until {date}",
     "expired": "Expired, not shown on your page"
   },
+  "templates": {
+    "title": "Or start from a template",
+    "hint": "Blocks are added; you fill in the addresses. A link without an address stays off your page.",
+    "applied": "Template added. Links appear on your page once you fill in their addresses.",
+    "names": {
+      "student": "Student",
+      "musician": "Musician",
+      "freelancer": "Freelancer",
+      "creator": "Creator"
+    },
+    "blocks": {
+      "student": [
+        "My résumé",
+        "GitHub",
+        "LinkedIn",
+        "Projects",
+        "Latest project"
+      ],
+      "musician": [
+        "Listen on Spotify",
+        "Watch on YouTube",
+        "Shows",
+        "Get tickets",
+        "Hear about new songs"
+      ],
+      "freelancer": [
+        "What I do and who I work with, in a sentence or two.",
+        "Portfolio",
+        "Services and rates",
+        "Get in touch"
+      ],
+      "creator": [
+        "Latest video",
+        "Instagram",
+        "Collaborations",
+        "Media kit",
+        "Join my newsletter"
+      ]
+    }
+  },
+  "import": {
+    "close": "Close",
+    "open": "Move from Linktree",
+    "title": "Bring your links over",
+    "hint": "Paste your Linktree address. We read your links and show them to you first; nothing is added until you confirm.",
+    "urlLabel": "Your Linktree address",
+    "urlPlaceholder": "linktr.ee/yourname",
+    "read": "Read page",
+    "reading": "Reading",
+    "found": "Found {items} blocks and {socials} social accounts.",
+    "nameAndBio": "Name and bio (used if yours are empty)",
+    "socials": "Social accounts (added where empty)",
+    "apply": "Add selected",
+    "applying": "Adding",
+    "done": "Added {count} blocks.",
+    "skipped": "Skipped {count} invalid items.",
+    "back": "Another address",
+    "errors": {
+      "unsupported": "For now we can only move linktr.ee pages.",
+      "unreachable": "Couldn't reach that page. Check the address.",
+      "unreadable": "We couldn't read that page.",
+      "empty": "We found no links to move on that page.",
+      "tooMany": "Too many attempts. Try again in a few minutes.",
+      "invalid": "We couldn't understand that address."
+    }
+  },
+  "paste": {
+    "label": "Paste a link",
+    "placeholder": "Paste a link, we'll work out the type",
+    "add": "Add",
+    "addedEmbed": "Added as a player.",
+    "addedLink": "Link added.",
+    "asLink": "Add as a link",
+    "importOffer": "That's a Linktree page. Want to move your links over?",
+    "invalid": "We can't open that address. Try a link starting with https://."
+  },
   "share": {
     "address": "Your address",
     "copy": "Copy",
@@ -361,11 +433,6 @@
     },
     "account": "Account",
     "signedInAs": "Signed in as {email}."
-  },
-  "soon": {
-    "appearance": "Themes and customisation arrive in the next step.",
-    "analytics": "Your stats appear here once your page gets visits.",
-    "back": "Back to links"
   },
   "appearance": {
     "title": "Appearance",
@@ -426,7 +493,6 @@
   "blocks": {
     "embedPlay": "Play",
     "embedListen": "Listen",
-    "embedOn": "on {provider}",
     "subscribeTitle": "Stay in the loop",
     "subscribePlaceholder": "Your email address",
     "subscribeButton": "Subscribe",
@@ -441,7 +507,6 @@
     "empty": "Add an Email block to your page; subscribers are listed here.",
     "export": "Download CSV",
     "email": "Email",
-    "date": "Date",
     "remove": "Remove",
     "removed": "Subscriber removed."
   },

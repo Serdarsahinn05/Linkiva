@@ -23,3 +23,14 @@ export type EditorProfile = {
 };
 
 export type EditorSocials = Partial<Record<SocialPlatform, string>>;
+
+/** A stored block row in the editor's shape. */
+export const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
+  id: b.id,
+  type: b.type,
+  data: (b.data ?? {}) as Record<string, string>,
+  isVisible: b.isVisible,
+  isHighlighted: b.isHighlighted,
+  startsAt: b.startsAt?.toISOString() ?? null,
+  endsAt: b.endsAt?.toISOString() ?? null,
+});

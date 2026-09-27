@@ -185,22 +185,32 @@ export function imageType(bytes: Buffer): "image/jpeg" | "image/png" | "image/we
 
 export type LinkPreview = PreviewText & { imageFile?: { bytes: Buffer; type: string } };
 
-/** Fetches and parses a page; null when it cannot be read (unreachable, blocked, not HTML). */
-export async function getLinkPreview(pageUrl: string): Promise<LinkPreview | null> {
+/**
+ * Fetches an HTML page through the guards above and decodes it. null when it cannot be read (unreachable, blocked,
+ * not HTML, or, with `hosts`, when the final address is not one of them). A page cut at maxBytes is `truncated`.
+ */
+export async function fetchPage(pageUrl: string, { maxBytes = HTML_MAX_BYTES, hosts }: { maxBytes?: number; hosts?: string[] } = {}) {
   let page: Fetched;
   try {
-    page = await safeGet(new URL(pageUrl), "text/html,application/xhtml+xml", HTML_MAX_BYTES);
+    page = await safeGet(new URL(pageUrl), "text/html,application/xhtml+xml", maxBytes);
   } catch {
     return null;
   }
+  if (hosts && !hosts.includes(page.url.hostname.toLowerCase())) return null;
   if (!/text\/html|application\/xhtml\+xml/i.test(page.contentType)) return null;
   const charset = page.contentType.match(/charset=["']?([\w-]+)/i)?.[1] ?? "utf-8";
-  let html: string;
   try {
-    html = new TextDecoder(charset).decode(page.body);
+    return { url: page.url, truncated: page.truncated, html: new TextDecoder(charset).decode(page.body) };
   } catch {
-    html = page.body.toString("utf8");
+    return { url: page.url, truncated: page.truncated, html: page.body.toString("utf8") };
   }
+}
+
+/** Fetches and parses a page; null when it cannot be read (unreachable, blocked, not HTML). */
+export async function getLinkPreview(pageUrl: string): Promise<LinkPreview | null> {
+  const page = await fetchPage(pageUrl);
+  if (!page) return null;
+  const html = page.html;
   const text = parsePreview(html, page.url.toString());
   if (!text.image) return text;
 

@@ -99,7 +99,7 @@ Resend yalnızca **gönderir**. Gelen mail ImprovMX ile yönlendiriliyor (Zoho'n
 **Geçiş tamamlandı.** v2 `https://linkiva.space` adresinde canlı (Production env'leri Frankfurt Supabase'i gösteriyor, `master` = v2).
 v1 Supabase projesinin ve eski Blob dosyalarının silinmesi kullanıcıda; yapılınca bu satır güncellenir.
 
-Bundan sonra: her faz (ROADMAP Faz 6–13) kendi dalında geliştirilir, Vercel dal için preview üretir, preview'da denenir,
-kullanıcı onayıyla `master`'a birleşir. Şema değişikliği olan fazlarda birleştirmeden **önce** production DB'ye
+Bundan sonra (kullanıcı kararı, 2026-09-27): her faz kendi dalında geliştirilir, yerelde `npm run check` + production
+e2e yeşil olunca kullanıcı onayıyla doğrudan `master`'a birleştirilip push edilir; preview adımı yok, kullanıcı canlıda bakar. Şema değişikliği olan fazlarda birleştirmeden **önce** production DB'ye
 `npm run db:deploy` (yalnızca eksik migration'lar, veri silmez) uygulanır; migration'lar geriye uyumlu yazılır
 (yeni kolon varsayılanlı ya da boş olabilir), böylece eski kod yeni şemayla da çalışır.
