@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createUser, uid } from "./helpers";
+import { createUser, uid, visitorIp } from "./helpers";
 
 test.skip(({ isMobile }) => isMobile, "runs once on desktop");
 test.use({ locale: "tr-TR" });
@@ -64,6 +64,7 @@ test("themes, embeds, email capture, scheduling and publishing", async ({ page, 
 
   // Email capture: subscribe, then the same address again looks identical.
   const email = `fan-${uid()}@example.com`;
+  await page.setExtraHTTPHeaders({ "x-forwarded-for": visitorIp() });
   for (let i = 0; i < 2; i++) {
     await page.goto(`/${username}`);
     await expect(page.getByText("Bültenime katıl")).toBeVisible();

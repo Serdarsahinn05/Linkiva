@@ -10,6 +10,7 @@
 
 - **v1:** bağıran `italic uppercase font-black` başlıklar, `text-[9px] tracking-widest` mikro etiketler, `rounded-[2.5rem]` şişkin kartlar, zemine rastgele serpiştirilmiş neon blob'lar, gradient yazı, emoji ikonlar, "Live Now / Rank #01" süsleri.
 - **Etiket (v2 ilk yön):** çok renkli bantlar, dar büyük harf, eğik şeritler. "Oyuncak gibi."
+- **Sticker panoları ve süs katmanları** (2026-09-27, rakiplerde yeni): aynı "oyuncak" hissi; cam tezine aykırı.
 
 v1 de cam kullanıyordu. Fark **disiplinde**: tek bir ışık kaynağı, tek bir cam malzemesi, monokrom vurgu. Renk yalnızca anlam taşıdığında kullanılır.
 
@@ -132,6 +133,9 @@ Başlık üstüne eyebrow/kicker konmaz. Vurgu, ağırlık ve boyutla yapılır.
 | **Blok satırı (editör)** | 20px köşeli satır. Solda tutamaç, blok tipi küçük ikonla (lucide) belirtilir, renk yok. Sağ üstte anahtar + menü. Alanlar tam genişlik. |
 | **Menü / Diyalog / Toast** | `glass-float`. Diyalog mobilde alttan açılan sheet. Toast alt sekme çubuğunun hemen üstünde, cam hap. |
 | **Boş durum** | Ortada tek cümle + tek birincil eylem. İllüstrasyon yok. |
+| **Komut paleti** *(Faz 9, yalnızca masaüstü)* | ⌘K / Ctrl+K. Ortada `glass-float` diyalog, en üstte 48px arama input'u, altta gruplu komut satırları (lucide ikon + etiket + sağda kısayol `--ink-3`, Geist Mono). Seçili satır `glass-strong`. Mevcut Dialog + Menu primitive'leri. |
+| **Mini grafik** *(Faz 9)* | Editör satırında sağda 56×16px satır içi SVG çizgisi, `--positive`, 1.5px, dolgu yok, eksen yok. Veri yoksa `--ink-3` "—". |
+| **Durum rozeti** | Hap, 12px metin. Anlam taşıdığı için renkli: "Ulaşılamıyor" `--negative` (Faz 13), "Taslak" `--ink-3` (Faz 7), "İşbirliği" `--ink-2` çizgi (Faz 8, renk yok: bilgi, uyarı değil). |
 
 ---
 
@@ -153,6 +157,24 @@ Başlık üstüne eyebrow/kicker konmaz. Vurgu, ağırlık ve boyutla yapılır.
 - **Link butonları:** tam genişlik, 60px, 20px köşe, `glass-interactive` (specular). Başlık ortada 500 ağırlık, sağda küçük ok. Öne çıkan link: `glass-strong` + yumuşak beyaz dış parlama (monokrom). Başlık bloğu: küçük, `--ink-2`, 600. Metin bloğu: `--ink-2`. Ayraç: kısa 1px çizgi.
 - Sistem temasına uyar (profil sahibi sabitleyebilir, aşağıda).
 
+### Yeni profil blokları (planlı, Faz 8)
+Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam genişlik) ve temanın buton stilini kullanır. Marka renkleri (WhatsApp yeşili vb.) **kullanılmaz**; marka ikonu monokrom, `currentColor`.
+- **Destek (IBAN):** Cam kart. Üstte ad (500), altında IBAN Geist Mono `tabular-nums`, 4'lü gruplar. Sağda ikincil hap "Kopyala"; kopyalanınca ikon onaya döner ve toast "IBAN kopyalandı" (`--positive` nokta). Altında isteğe bağlı destek linkleri normal link butonu olarak.
+- **WhatsApp:** Normal link butonu, solda monokrom marka ikonu. Başlık varsayılanı "WhatsApp'tan yaz".
+- **Kartvizit:** Link butonu, solda `contact` ikonu, başlık "Rehbere ekle". Ad ve unvan butonun altında değil, butonun içinde ikinci satır `--ink-2`.
+- **Ürün kartı:** Link önizleme kartıyla aynı yapı (görsel solda ya da üstte), başlık, fiyat Geist Mono 500, mağaza adı `--ink-3`. `sponsored` ise sağ üstte "İşbirliği" çizgi rozeti. Fiyat vurgusu renkle değil ağırlıkla.
+- **Geri sayım:** Cam kart, başlık üstte, sayılar Geist Mono 600 büyük (`tabular-nums`, gün · saat · dakika · saniye), birimler `--ink-3` küçük. Saniye değişiminde animasyon yok (sayı zıplamaz). Reduced motion'da dakikada bir güncellenir.
+- **Link grubu:** `<details>`. Özet satırı başlık bloğu tipografisinde, sağda 16px chevron 160ms `--ease-out` ile döner. İçerik açılışta hareket yok (reduced motion'da da aynı), yalnızca yer açılır.
+
+### Izgara düzeni (planlı, Faz 10)
+- Profil genişliği aynı (max 560px). Mobil 2 sütun, ≥ 560px 4 sütun, aralık 12px. Karo köşesi 20px, cam malzeme aynı.
+- **SMALL (1×1):** kare karo. Ortada 28px ikon (link: favicon ya da tür ikonu), altında tek satır başlık (kesilir, tam başlık `title`/erişilebilir ad). **WIDE:** tam satır, normal link butonu görünümü. **LARGE (2×2):** görsel karo; görsel tam doldurur, başlık alt kenarda cam şerit üzerinde (görselin üstünde okunurluk için `glass-strong` şerit, gradient yazı yok).
+- Görsel sıra DOM sırasıdır (`dense` yok). Boşluk kalırsa kalır; boşluğu kapatmak sahibin işidir (editör önizlemesi gösterir).
+- Liste ↔ ızgara geçişi Görünüm sayfasında iki tema kartı gibi gerçek CSS ile çizilmiş küçük önizlemeyle seçilir.
+
+### Hikâye kartı (planlı, Faz 10)
+- 1080×1920 PNG. Profil temasının zemini ve ortam ışığı, ortada avatar (240px, cam halka), ad (display 600), altında `linkiva.space/<ad>` Geist Mono, altta cam kart içinde QR (beyaz zemin, siyah modül; tarama güvenliği için temadan bağımsız). Üst ve alt 250px Instagram arayüzü için boş bırakılır (güvenli alan).
+
 ### Profil temaları (kullanıcıya açık, `themes/index.ts`)
 Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
@@ -173,10 +195,13 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 ### Landing (Persuade)
 - İlk ekran: ortam ışığı, display başlık "Her şeyin, tek bir adreste.", alt metin ve **cam bir adres çubuğu**: `linkiva.space/` + kullanıcı adı girişi + birincil hap buton. Yanında (mobilde altında) örnek bir profil (sentetik, "Örnek" etiketli) cam telefon içinde durur.
 - "Ücretsiz" bölümü: rakiplerde ücretli olan özellikler **tek bir cam panelde satır listesi** olarak durur. Her satırda özellik adı, açıklama ve sağda yeşil (semantik: "var") onay.
+- *(Faz 6)* Aynı listeye "Verin satılmaz" satırı: yapay zekâ eğitimi yok, üçüncü tarafla paylaşım yok, reklam yok. Ayrı bir bölüm ya da rozet değil, listenin bir satırı. Rakip adı geçmez.
 
 ### Analitik (Operate + semantik neon)
 - Dört ana sayı cam bir şeritte yan yana durur (kart şablonu değil). Her birinin altında trend rozeti: artış `--positive`, düşüş `--negative`, değişim yoksa `--ink-3`. Koyu temada hafif neon parlamayla.
 - Grafik: görüntülenme `--info` alan grafiği (degrade dolgu → şeffaf), tıklama `--positive` çizgi. Izgara `--glass-edge`.
+- *(Faz 9)* **İçgörüler:** veri şeridinin altında en fazla 3 cümle, düz gövde metni, cam panel içinde satır listesi. Sayılar Geist Mono. Yön rengi yalnızca sayıda (artış `--positive`, düşüş `--negative`), cümlenin tamamı renklenmez. Eşik altı veride bölüm hiç görünmez (boş durum yazısı da yok).
+- *(Faz 9)* **Saat × gün ısı haritası:** 7 satır × 24 sütun, köşesiz kare hücreler (radius skalası dışında değer yazılmaz), 2px aralık, `--info` opaklık ölçeği (%6 → %100, karekök), sıfır hücre `--glass`. Üzerine gelince dünya haritasındaki cam kart. Mobilde yatay kaydırma yerine 24 saat 6'lı kovalara (4 saatlik) iner.
 
 ---
 
@@ -217,4 +242,6 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - **impeccable detector (URL taraması):** çalıştırılamadı, `puppeteer` gerektiriyor ve onaylı bağımlılık değil.
 - **Kontrast:** açık temada `ink-3`, `positive`, `info` 4.5:1 altındaydı, koyulaştırıldı. Artık testle korunuyor.
 - **Mobil taşma:** landing hero'su 390px'te yatay taşıyordu, düzeltildi. `tests/e2e/layout.spec.ts` beş sayfayı koruyor.
-- **Açık kalan:** Lighthouse ölçümü (yerelde Lighthouse yok; ilk preview dağıtımında ölçülecek). `ponytail-review` (fazlalık denetimi) henüz çalıştırılmadı.
+- **Lighthouse (Faz 6, canlı, mobil):** landing 95 · giriş 97 · profil 89 performans; erişilebilirlik, en iyi uygulamalar ve SEO hepsinde 100. Profil düzeltmesi (ilk ekran görselleri hemen yüklenir) ROADMAP Faz 6'da.
+- **Fazlalık denetimi (`ponytail-audit`, Faz 6):** yalın. Silinecekler: `ComingSoon` + `soon` metinleri, 10 kullanılmayan çeviri anahtarı. `DESIGN_CONTRACT` HTML yorumu §10 gereği kalır. `lib/link-preview.ts`'in düşük seviye `http` kullanımı SSRF için bilinçli (IP sabitleme `fetch` ile yapılamaz).
+- **Ayrı incelemeye:** `common.skipToContent` metni var ama "içeriğe geç" linki hiçbir sayfada yok (erişilebilirlik, klavye kullanıcıları).

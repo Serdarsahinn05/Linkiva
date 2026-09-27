@@ -208,6 +208,24 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 
 **Rezerve kullanıcı adları** (`lib/validation/username.ts`): `dashboard, login, register, api, l, e, admin, linkiva, settings, help, about, privacy, terms, blog, app, www, mail, support, static, _next` ve route listesiyle senkron bir test.
 
+### 5.1 Planlı model değişiklikleri (Faz 6–13, [ROADMAP](ROADMAP.md))
+
+Henüz uygulanmadı. Her biri kendi fazında, elle yazılmış migration + `migrate deploy` ile gelir (AGENTS.md → Veri).
+
+| Faz | Migration | Değişiklik |
+|---|---|---|
+| 6 ✅ | `username_history` | `UsernameHistory { username @id, profileId → Profile (cascade), createdAt, expiresAt }`. Müsaitlik kontrolü süresi dolmamış kayıtları dolu sayar. |
+| 8 | `block_types_tr` | `BlockType` += `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN`. HEADER'a `collapsible` (yalnızca `data`, migration yok). |
+| 9 | `weekly_digest` | `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?` |
+| 10 | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
+| 11 | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
+| 12 | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
+| 13 | `link_check`, `two_factor` | `LinkCheck { blockId @unique → Block (cascade), status, failCount, checkedAt }`; Better Auth `twoFactor` tabloları (CLI ile üretilir). LINK `data`'ya `gate`. |
+
+**Taslak link (Faz 7):** LINK'te boş `url` yalnızca `isVisible = false` iken geçerlidir. Kural `parseBlock`'ta değil, yazma eylemlerinde (`updateBlock`, `setVisibility`) uygulanır. Böylece public okuma yolu hiçbir zaman URL'siz link görmez.
+
+**Tür başına sunucuda kurulan hedefler:** WHATSAPP hedefi (`wa.me`) ve CONTACT çıktısı (`.vcf`) kullanıcıdan URL olarak alınmaz, doğrulanmış alanlardan sunucuda üretilir (`lib/vcard.ts`, `lib/validation/iban.ts`, telefon E.164 normalizasyonu).
+
 ---
 
 ## 6. Profil Sayfası ve Önbellek
@@ -218,7 +236,9 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 - Planlı bloklar (`startsAt`/`endsAt`) için `revalidate` en yakın zaman sınırına göre ayarlanır.
 - Render sırasında **hiçbir yazma işlemi yapılmaz** (eski `visit.create` kaldırılır).
 - `generateMetadata` ve sayfa aynı önbellekli sorguyu paylaşır (`React.cache`).
-- Kullanıcı bulunamazsa `notFound()` çağrılır ve HTTP 404 döner.
+- Kullanıcı bulunamazsa `notFound()` çağrılır ve HTTP 404 döner. *(Faz 6'dan sonra:* önce `UsernameHistory`'ye bakılır; süresi dolmamış eski ad `permanentRedirect` (308) ile yeni ada gider.)*
+- *(Faz 10)* Profil render'ı dış kaynak okuyabilir (YouTube RSS) ama yalnızca `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile; okunamazsa blok gizlenir. DB'ye yazma kuralı değişmez.
+- *(Faz 11)* Özel alan adında `proxy.ts` host'u doğrulanmış `CustomDomain` kaydına göre `/<username>` yoluna rewrite eder. Kanonik URL `lib/site.ts` → `profileUrl(profile)` üzerinden gelir.
 - OG görseli `opengraph-image.tsx` ile üretilir. Aynı etiketi kullanır, `?v=Date.now()` kullanılmaz.
 
 ---
@@ -239,6 +259,8 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 - `/l/[blockId]` blok görünür ve yayındaysa bir `CLICK` olayı yazar, ardından `302` ile hedefe gönderir. `Purpose: prefetch`, `Sec-Purpose` ve `Next-Router-Prefetch` başlıklı istekleri ve botları yazmadan yönlendirir.
 - Yazma işlemi `after()` (Next) ile yanıt gönderildikten sonra yapılır, yönlendirme beklemez.
 - Hedef URL kayıt sırasında zod ile doğrulanır (`http:`/`https:`/`mailto:`/`tel:` dışındaki şemalar reddedilir).
+- *(Faz 8)* `/l/[blockId]` tür başına davranır: LINK, IMAGE, PRODUCT, WHATSAPP → 302; CONTACT → `text/vcard` ek dosyası. *(Faz 13)* `gate` alanlı LINK önce sunucuda çizilen bir onay sayfası gösterir, tıklama yalnızca `?ok=1` ile gelen istekte yazılır.
+- *(Faz 8)* Kopyalama (IBAN, ad): `/api/e` `{ p, b, k: "copy" }` kabul eder ve `record.ts` üzerinden CLICK yazar. Filtreler ve tekrar kilidi tıklamayla aynıdır. Tek yazma noktası kuralı korunur.
 
 ### Gizlilik
 - Çerez yok, IP saklanmaz. `visitorHash` her gün değişen bir tuzla üretilir, bu yüzden günler arası kullanıcı izlenemez. Gizlilik politikası sayfası bunu açıkça yazar (KVKK).
@@ -279,8 +301,20 @@ RESEND_API_KEY, MAIL_FROM      # "Linkiva <hello@linkiva.space>"
 UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   # opsiyonel lokal
 BLOB_READ_WRITE_TOKEN
 TRACKING_SALT_SECRET
+# Planlı (faz geldiğinde lib/env.ts + .env.example'a eklenir; yoksa özellik lib/features.ts ile gizlenir)
+CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer; ayrıca özet maili çıkış token'ının HMAC anahtarı
+VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı
+GITHUB_TOKEN                   # Faz 12, opsiyonel: pinned repolar için GraphQL
 ```
 `.env.example` depoya eklenir, `.env` asla eklenmez.
+
+---
+
+## 10.1 Zamanlanmış işler ve dış getirme (planlı)
+
+- **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, çalıştırma başına sınırlı parti), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İleride `DailyStat` toplaması da buraya gelir.
+- **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com`), kırık link kontrolü (Faz 13). Hepsi aynı SSRF korumasından geçer; yeni bir `fetch` yolu açılmaz.
+- **Vercel Domains API** (Faz 11) düz `fetch` ile `lib/vercel-domains.ts`'ten çağrılır. Kullanıcı girdisi yalnızca doğrulanmış hostname olarak gider.
 
 ---
 
@@ -292,4 +326,6 @@ TRACKING_SALT_SECRET
 - [ ] Hassas uç rate limit'li (auth, beacon, abone ol, upload)
 - [ ] Kullanıcı varlığı hata mesajıyla sızdırılmıyor
 - [ ] Yeni route rezerve kullanıcı adı listesine eklendi
+- [ ] Cron ve oturumsuz linkler (özet çıkışı) imzalı ya da `CRON_SECRET` korumalı; imza sabit zamanlı karşılaştırılıyor
+- [ ] Kullanıcı verisi hiçbir LLM sağlayıcısına, reklam ağına ya da üçüncü tarafa gitmiyor (PRODUCT ilke 6)
 - [ ] Sunucu kullanıcının verdiği bir URL'e istek atıyorsa `lib/link-preview.ts` korumasından geçiyor (SSRF: bağlantı anında IP kontrolü, özel ağ yasak, elle yönlendirme, süre/boyut sınırı)

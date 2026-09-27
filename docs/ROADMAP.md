@@ -135,7 +135,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - ⚠️ `account.spec.ts` production'da 3 çalışanla ara sıra (6 tam koşuda 2) bir `toHaveURL` adımında düşüyor, tek başına hep geçiyor. Kök nedeni bulunmadı.
 - [x] Panel geçişleri: her sayfaya kendi düzeninde cam iskelet (`loading.tsx`, `components/ui/skeleton.tsx`). Tek ışık süzmesi tüm iskelette ortak akar, iskelet 150 ms gecikmeyle belirir (hızlı geçişte görünmez). Sayfa React `<ViewTransition>` ile buğusu çözülerek gelir (`PageReveal`). Destek yoksa ya da `prefers-reduced-motion` açıksa anında geçer.
 - [x] `docs/DEPLOY.md`: Supabase, Vercel env, Blob, Resend alan adı, Google Branding/redirect, `hello@` yönlendirme, preview → birleştirme sırası.
-- [ ] **Yayın (kullanıcı adımları, `docs/DEPLOY.md`):** kullanıcı önce preview'da deneyecek, sonra `master`'a birleştirilecek. Eski DB geçişten sonra silinecek. Lighthouse ölçümü preview'da.
+- [x] **Yayın:** preview'da denendi, `master`'a birleştirildi, `linkiva.space` v2'de canlı (kullanıcı, 2026-09-27'den önce). Lighthouse ölçümü Faz 6'ya taşındı.
 - [x] `DESIGN.md` build'den yeniden kaydedildi (gerçek token değerleri, köşeler, hareket, denetim kaydı).
 
 **Kabul:** Tüm Playwright senaryoları production URL'inde geçiyor. Lighthouse (landing, profil, panel) ≥ 90/100/100. Açık kritik bulgu yok.
@@ -148,21 +148,206 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] Link önizleme kartı (`fetchLinkCard`, `lib/link-preview.ts`): sunucu OG başlık/açıklama/görselini sahibin isteğiyle bir kez okur (SSRF: bağlantı anında IP kontrolü, özel/metadata ağları yasak, elle en fazla 3 yönlendirme, 6 sn, HTML 512 KB / görsel 5 MB, görsel türü baytlardan). Görsel sahibin Blob klasörüne kopyalanır, dakikada 10 deneme. Açıklama editörde düzenlenir. Görselli yol yalnızca Blob açık ortamda (preview) denenecek.
 - [x] Okunabilirlik: arka plan görseli yüklenince parlaklık ölçülüp mod + karartma önerilir, karartma kaydırıcısı ve "Okunur yap". Çizgi butonda vurgu her zemin için okunur tona çekilir (uyarı yerine düzeltme). İç içe temada renk sınıfları kökten değil elemandan çözülür (`@theme inline`; önizlemedeki beyaz ikon hatası). Önizlemede abone butonu artık soluk görünmüyor.
 
-## Sonraki aşama (v2 sonrası backlog)
+## v2 sonrası yol haritası (Faz 6–13)
 
-**Portfolyo modu (PRODUCT.md ikinci aşama)**
-- `PROJECT` (görsel, başlık, açıklama, teknoloji etiketleri, link), `EXPERIENCE` ve `SKILLS` blokları. GitHub bağlantısı ile pinned repoların otomatik çekilmesi. `terminal` ve yeni `portfolyo` temaları.
+> Durum: **Onaylandı 2026-09-27, Faz 6 sürüyor.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
-**Diğer fikirler (öncelik sırasıyla)**
-1. Kullanıcı adı değişince eski adresten yeni adrese 90 günlük yönlendirme (`UsernameHistory`).
-2. Linktree/Bio.link içe aktarma (public sayfa URL'inden linkleri çekme).
-3. Link başına QR ve UTM oluşturucu.
-4. Gerçek link sağlık kontrolü: Vercel Cron ile günlük HEAD isteği, kırık link bildirimi (e-posta).
-5. Hassas içerik uyarısı (link başına "18+ / spoiler" kapısı).
-6. Kısa link (`linkiva.space/l/abc`), paylaşım kartı (Instagram story için 1080×1920 görsel).
-7. Özel domain (Vercel Domains API).
-8. İletişim formu bloğu (mail yönlendirme), Calendly/Cal.com bloğu, harita (konum) bloğu.
-9. Doğrulanmış rozet, admin paneli (`role: ADMIN`, kötüye kullanım raporları, kullanıcı askıya alma).
-10. PWA (panel için ana ekrana ekle), 2FA (TOTP).
-11. Herkese açık API + webhooks (yeni abone, günlük özet).
-12. `DailyStat` özet tablosu + gece cron'u (analitik ölçeği büyüyünce).
+### Neden bu sıra
+
+1. **Güven ve kırılmayan linkler önce (Faz 6).** Gerçek kullanıcı geldikten sonra kullanıcı adı değiştirme ve yönlendirme sonradan eklenirse biyografilerdeki linkler kırılır. Kapanmamış denetimler de geçişten önce biter.
+2. **Kayıt engelini kaldır (Faz 7).** İçe aktarma, şablon ve akıllı yapıştırma "ilk 60 saniye" hedefine doğrudan hizmet eder.
+3. **Türkiye'ye özel, ucuz ve ayırt edici bloklar (Faz 8).** Blok modeli bunları neredeyse bedava taşır.
+4. **Geri dönüş sebebi (Faz 9).** Editör hızlandırıcıları, anlaşılır analitik ve haftalık özet.
+5. **Büyük görsel fark (Faz 10).** Izgara düzeni, hikâye kartı, son videoyu otomatik gösterme.
+6. **Altyapı isteyen işler (Faz 11–13).** Özel alan adı, portfolyo, bakım ve güvenlik.
+
+### Pazar bağlamı (2026-09-27)
+
+- **Bento.me 2026-02-13'te kapandı** (Linktree satın almıştı; veriler silindi, eski adresler Linktree'ye yönleniyor). Izgara düzenli, "tasarlanmış" sayfa isteyen kitle açıkta. Bento verisi artık yok, bu yüzden Bento'dan içe aktarma yapılamaz; o kitleye Faz 10'daki ızgara düzeniyle ulaşılır.
+- **Linktree'nin 2026-07-05 kullanım şartları:** OpenAI entegrasyonu, verinin yapay zekâ sağlayıcılarıyla paylaşımı ve içerik üreticilerinin verisiyle algoritma eğitimi. Linkiva'nın çerezsiz, IP saklamayan yapısı bu noktada doğal bir cevap (Faz 6 taahhüdü).
+- **Kategori para kazanmaya kaydı** (Beacons, Stan, Linktree mağaza + %9–12 komisyon). Stripe Türkiye'de bireylere açık değil. Linkiva ödemeye aracılık etmez, ihtiyacı "hafif" yollarla (IBAN, affiliate kartı) karşılar (Faz 8).
+
+---
+
+## Faz 6: Güven, kırılmayan linkler, geçiş öncesi temizlik
+
+**Amaç:** Geçiş gününden önce açık denetimleri kapatmak, kullanıcı adını değiştirilebilir ama linkleri kırılmaz yapmak, gizlilik farkını yazıya dökmek.
+
+**Kapanmamış işler (Faz 5'ten)**
+- [x] Lighthouse (canlı site, mobil, 2026-09-27): landing 95/100/100/100, giriş 97/100/100/100, profil **89**/100/100/100. Profilin LCP'si ilk ekrandaki link kartı görseliydi ve `loading="lazy"` idi; ilk 3 bloğun görselleri artık hemen yükleniyor (`EAGER_BLOCKS`). Yeniden ölçüm bu dal canlıya çıkınca. Kalan: kart görselleri kaynaktaki biçimde (PNG) saklanıyor, WebP'ye çevirmek ~50 KB kazandırır (sunucuda görüntü işleme gerektiriyor, ayrı karar).
+- [x] `account.spec.ts` kararsızlığı yeniden üretilemedi: tam paket 6 kez (132/132) ve `account` tek başına 9 eşzamanlı kopya geçti. Kök neden bulunmadı; tekrar görülürse iz (`trace`) saklanıyor. Aynı koşularda bulunan gerçek sorun: abone testleri aynı IP'den geldiği için tekrarlı koşuda abone rate limit'ine takılıyordu (limit doğru çalışıyor); e2e ziyaretçilerine ayrı belgeleme IP'si verildi (`visitorIp`).
+- [x] Abone formu JS kapalıyken e2e testi (`tests/e2e/phase6.spec.ts`).
+- [x] `ponytail-audit` (tüm depo, 2026-09-27): bağımlılıkların hepsinin gerçek kullanımı var, büyük fazlalık yok. Bulunan küçük ölü kod: kullanılmayan `ComingSoon` bileşeni ve "yakında" metinleri, 10 kullanılmayan çeviri anahtarı (≈45 satır). Temizlik Faz 7'nin ilk commit'ine bırakıldı. Sonuç DESIGN.md §11'de.
+
+**Kullanıcı adı değiştirme + 90 günlük yönlendirme** (eski backlog #1)
+- [x] Veri: `UsernameHistory { username @id, profileId, createdAt, expiresAt }`, migration `username_history`. Profil silinince cascade.
+- [x] Eylem: `features/profile/actions.ts` → `changeUsername`. `withProfile` → `usernameSchema` → müsaitlik (canlı `Profile.username` **ve** süresi dolmamış `UsernameHistory` kayıtları dolu sayılır, sahibinin kendi eski adı hariç) → tek transaction: eski adı geçmişe yaz, yenisini ata. İki etiket de geçersiz kılınır (`profileTag(eski)`, `profileTag(yeni)`).
+- [x] Sınır: 30 günde en fazla 2 değişiklik (DB'deki geçmişten sayılır, ek tablo yok).
+- [x] Yönlendirme: `app/(profile)/[username]/page.tsx` profil bulunamayınca geçmişe bakar, süresi dolmamışsa `permanentRedirect("/" + yeni)` (308). `/l/` ve `/api/e` blok/profil kimliğiyle çalıştığı için etkilenmez. OG ve sitemap yalnızca yeni adı kullanır.
+- [x] Arayüz: Ayarlar → Profil'de kullanıcı adı alanı; onboarding ile ortak `features/profile/components/username-field.tsx`. Uyarı: "Eski adresin 90 gün yeni adrese yönlenir, sonra başkası alabilir."
+- [x] Onboarding ve müsaitlik kontrolü (`isTaken`) geçmişteki adları da dolu sayar. Yeni profil açılınca adının önbellekteki "yok" kaydı da temizlenir (`updateTag`).
+- [x] Test: `tests/integration/username.test.ts` 8 senaryo (başkasının adını alamama, geçmişteki adı 90 gün alamama, kendi eski adına geri dönebilme, 30 gün sınırı), e2e (eski adres 308 → yeni adres).
+
+**"Verin satılmaz" taahhüdü**
+- [x] PRODUCT.md ilke 6. Landing'deki "ücretsiz" listesine bir satır: yapay zekâ eğitimi yok, üçüncü tarafla paylaşım yok, reklam yok. Rakip adı yazılmaz (DESIGN §7 Landing).
+- [x] `/privacy` sayfasına aynı taahhüt bölümü (TR/EN). Metin kodun gerçekten yaptığını anlatır: Linkiva hiçbir LLM sağlayıcısına kullanıcı verisi göndermez.
+
+**Kabul:** Eski kullanıcı adı 308 ile yeni adrese gidiyor, 90 gün sonra 404 veriyor ve başkası alabiliyor (zaman taklitli entegrasyon testi). Lighthouse sonuçları kayıtlı. Tüm e2e 6 ardışık production koşusunda kararlı.
+
+---
+
+## Faz 7: Hızlı başlangıç (içe aktarma, şablonlar, akıllı yapıştırma)
+
+**Amaç:** "Kayıttan sonra 60 saniyede yayında sayfa" hedefini, başka platformdan gelen ya da ne yazacağını bilmeyen kullanıcı için de tutturmak.
+
+**Linktree'den içe aktarma** (eski backlog #2)
+- [ ] `features/import/`: `importers.ts` host → ayrıştırıcı haritası. İlk ayrıştırıcı `linktree.ts`: sayfadaki `__NEXT_DATA__` JSON'undan görünen ad, bio, linkler (başlık + URL) ve sosyal hesaplar. Yapı değişirse "okunamadı" hatası döner, tahmin yapılmaz. Harita ileride bio.link / Beacons için genişler.
+- [ ] Getirme: `lib/link-preview.ts` içindeki güvenli getirme (`safeGet`) dışa açılır ve yeniden kullanılır. Ek olarak **host beyaz listesi** (`linktr.ee`), bu yüzden SSRF yüzeyi büyümez. HTML ≤ 1 MB, 6 sn.
+- [ ] Eylem `importProfile(url)`: `withProfile` → zod → getir → ayrıştır → her link `blockDataSchemas.LINK` ile doğrulanır (geçemeyen atlanır, sayısı raporlanır) → bloklar sona eklenir, sosyal hesaplar yalnızca boş platformlara yazılır, ad/bio yalnızca boşsa doldurulur. Rate limit: 10 dakikada 3.
+- [ ] Önizleme adımı: "12 link, 4 sosyal hesap bulundu" listesi, kullanıcı işaretleyip onaylar. Hiçbir şey onaysız yazılmaz.
+- [ ] Giriş noktaları: onboarding'in son adımı ("Başka yerde sayfan var mı?"), boş editör durumu, Ayarlar → Veri.
+- [ ] Test: kayıtlı HTML fikstürüyle birim testi (`tests/fixtures/linktree.html`), host dışı URL'nin reddi, sahiplik (içe aktarma yalnızca kendi profiline yazar).
+
+**Başlangıç şablonları**
+- [ ] `features/onboarding/templates.ts`: Öğrenci, Müzisyen, Freelancer, İçerik üreticisi. Her biri blok dizisi (başlık, metin, link başlıkları) + tema önerisi. Metinler `messages/*.json` → `templates.*`.
+- [ ] URL'si henüz olmayan link **taslak** olarak gizli eklenir. Kural `lib/validation/blocks.ts`'te: LINK'te boş URL yalnızca `isVisible = false` iken kabul edilir. Editör satırında "Adres ekle" gösterilir, görünürlük anahtarı URL geçerli olana kadar kapalı kalır. `/l/` taslak bloğu zaten çözmez (görünür değil).
+- [ ] Onboarding'e "Şablonla başla / Boş başla" adımı. Adım atlanabilir, 60 saniye hedefini uzatmaz.
+
+**Akıllı yapıştırma**
+- [ ] `lib/detect-block.ts` → `detectBlock(url)`: `parseEmbed` tutarsa EMBED, `wa.me` / `api.whatsapp.com` WHATSAPP (Faz 8), `linktr.ee` ise içe aktarmayı öner, diğerleri LINK. Saf fonksiyon, birim testli.
+- [ ] Editörde "Link yapıştır" alanı ve boşta `paste` dinleyicisi (bir input odakta değilken). Algılanan tür toast ile söylenir, "Link olarak ekle" ile geri alınabilir.
+
+**Kabul:** Linktree URL'si veren yeni kullanıcı 60 saniye içinde linkleri taşınmış, yayında bir sayfaya sahip (e2e, fikstür sunucusuyla). Şablon seçimi yayında boş/kırık link bırakmıyor.
+
+---
+
+## Faz 8: Türkiye blokları
+
+**Amaç:** Türkiye'deki içerik üreticisi, freelancer ve küçük işletmenin gerçek ihtiyaçları. Ödemeye aracılık yok.
+
+**Ortak altyapı**
+- [ ] Tek migration `block_types_tr`: `BlockType` enum'una `SUPPORT, WHATSAPP, CONTACT, PRODUCT, COUNTDOWN` eklenir. Veri `Block.data` içinde; her tür için `blockDataSchemas` şeması ve `components/blocks/` altında render'cı (önizleme ve profil aynı bileşen).
+- [ ] `/l/[blockId]` tür başına davranış kazanır: LINK/IMAGE/PRODUCT/WHATSAPP → 302, CONTACT → `.vcf` dosyası. Hepsi tıklama olarak sayılır.
+- [ ] Kopyalama olayı: `/api/e` beacon'ı `{ p, b, k: "copy" }` kabul eder ve `record.ts` üzerinden CLICK yazar (tek yazma noktası korunur, tekrar kilidi aynı). İstatistikte kopyalama link tıklaması gibi görünür.
+- [ ] Editör "Blok ekle" menüsü gruplanır: İçerik · Bağlantı · İletişim ve destek · Kitle.
+
+**Bloklar**
+- [ ] **SUPPORT (IBAN / destek):** `{ name, iban?, note?, links?: [{ label, url }] }`. IBAN `TR` + 24 hane, mod-97 sağlaması sunucuda (`lib/validation/iban.ts`, birim testli), 4'lü gruplarla gösterilir. "IBAN'ı kopyala" ve "Adı kopyala" butonları (Clipboard API; JS yoksa metin seçilebilir). Papara / Buy Me a Coffee gibi linkler şema beyaz listesinden geçer. Editörde uyarı: "IBAN sayfanda herkese açık görünür."
+- [ ] **WHATSAPP:** `{ phone, message? }`. Telefon E.164'e normalize edilir (`+90` varsayılan), URL her zaman `https://wa.me/<phone>?text=` olarak **sunucuda kurulur** (kullanıcıdan URL alınmaz). İkon react-icons marka ikonu, monokrom.
+- [ ] **CONTACT (kartvizit):** `{ name, title?, org?, phone?, email?, website? }`. `/l/<id>` `text/vcard; charset=utf-8` + `Content-Disposition: attachment` döner. vCard 3.0 alanları kaçışlı (`,;\` ve satır sonu), `lib/vcard.ts` birim testli. Buton: "Rehbere ekle".
+- [ ] **PRODUCT (ürün / affiliate kartı):** `{ title, url, price?, img?, store?, sponsored? }`. Görsel ve başlık v2.1'deki link önizleme hattıyla alınır (`fetchLinkCard`). Fiyat serbest metin (≤ 20 karakter, ör. "₺249"); kur/stok iddiası yok. `sponsored: "1"` ise kartta "İşbirliği" etiketi görünür (Reklam Kurulu'nun sosyal medya etkileyicisi kılavuzu açık reklam beyanı ister). Mağaza adı URL host'undan türetilir.
+- [ ] **COUNTDOWN:** `{ title, target, after: "hide" | "text", afterText? }`. Sunucu hedef tarihi profil saat diliminde `Intl` ile yazar (JS'siz çalışır), küçük bir istemci bileşeni geri sayar. `after: "hide"` ise bloğun `endsAt`'i hedefe eşitlenir; planlı blok kuralı ve ISR `revalidate` mevcut hattı kullanır.
+- [ ] **Link grubu (açılır başlık):** Yeni tür değil. HEADER'a `collapsible: "1"` alanı eklenir. Sonraki HEADER ya da DIVIDER'a kadarki bloklar `<details>/<summary>` içinde render edilir (JS'siz, erişilebilir). Editörde grup içeriği girintili gösterilir.
+
+**Test:** Her tür için şema birim testi, sahiplik entegrasyon testi (başkasının SUPPORT/CONTACT bloğunu güncelleyememe), e2e (vCard indirilip ayrıştırılıyor, WhatsApp 302 hedefi, kopyalama sayılıyor, geri sayım JS kapalıyken tarih gösteriyor, grup açılıp kapanıyor).
+
+**Kabul:** Her yeni blok altı temada kontrast testinden geçiyor ve 390px'te taşmıyor. Hiçbir blok kullanıcıdan ham URL alıp doğrulamadan yönlendirmiyor.
+
+---
+
+## Faz 9: Editör hızı ve anlaşılır analitik
+
+**Amaç:** Kullanıcının panele geri dönmesi için sebep, döndüğünde işini hızlı bitirmesi.
+
+**Editör**
+- [ ] **Komut paleti (⌘K / Ctrl+K):** `features/dashboard/components/command-palette.tsx`, mevcut `Dialog` + `Menu` primitive'leriyle (ek paket yok). Komutlar: blok ekle (tür başına), sayfaya git, temayı değiştir, QR indir, adresi kopyala, içe aktar. Klavyeyle tam kullanılır. Yalnızca masaüstü (mobilde alt çubuk var).
+- [ ] **Satır içi mini grafik:** Editördeki her tıklanabilir blokta son 7 günün tıklaması. Tek SQL sorgusu (`features/analytics/queries.ts` → `getBlockSparklines(profileId)`, blok × gün `GROUP BY`), satır başına satır içi SVG `polyline` (recharts değil). Renk `--positive`. Veri yoksa çizgi yok, "—" yazar.
+
+**Analitik**
+- [ ] **Cümleyle içgörüler:** `features/analytics/insights.ts`, mevcut toplamlardan saf fonksiyonlar: en iyi kaynak → en çok tıklanan link, yoğun saat aralığı, düşen link ("*Portfolyo* tıklamaları geçen haftaya göre %40 az"). **Eşik:** örneklem yetersizse (ör. < 30 görüntülenme) içgörü gösterilmez (PRODUCT ilke 4). Birim testli, metinler i18n.
+- [ ] **Saat × gün ısı haritası:** 7×24 ızgara, `EXTRACT(dow/hour FROM "createdAt" AT TIME ZONE timezone)`. Renk `--info` opaklık ölçeği, bağımlılıksız SVG. Hücrede cam kart (dünya haritası kartıyla aynı bileşen).
+
+**Haftalık özet maili**
+- [ ] Veri: `Profile.weeklyDigest Boolean @default(true)`, `Profile.digestSentAt DateTime?`, migration `weekly_digest`.
+- [ ] Zamanlama: tek günlük cron `app/api/cron/daily/route.ts` (`vercel.json` crons; Vercel Hobby planı günde bir çalışmaya izin verir). `Authorization: Bearer ${CRON_SECRET}` zorunlu. Pazartesi özet, her gün Faz 13'teki link kontrolü.
+- [ ] İçerik: geçen hafta görüntülenme/tıklama + trend, en iyi 3 link, bir içgörü. **Hiç ziyaret yoksa mail gönderilmez.** Cam mail şablonu, düz metin ikizi, TR/EN.
+- [ ] Çıkış: Ayarlar'da anahtar + mailde tek tıkla çıkış linki (HMAC imzalı token, oturumsuz çalışır) ve `List-Unsubscribe` başlığı.
+- [ ] Toplu gönderim: Resend batch API, çalıştırma başına sınır, `digestSentAt` ile idempotent (cron iki kez çalışsa da tek mail).
+
+**Kabul:** Komut paletiyle blok ekleme klavyeden 3 saniyenin altında. İçgörüler yalnızca eşik üstü veride görünüyor (test). Özet maili aynı hafta ikinci kez gitmiyor, çıkış linki oturumsuz çalışıyor (entegrasyon testi).
+
+---
+
+## Faz 10: Izgara düzeni, hikâye kartı, canlı içerik
+
+**Amaç:** Görsel olarak en belirgin fark. Bento'dan açıkta kalan "tasarlanmış sayfa" kitlesine cevap.
+
+**Izgara (bento) düzeni**
+- [ ] Veri: `appearanceSchema`'ya `layout: "list" | "grid"` (varsayılan `list`, migration gerekmez). `Block.size` kolonu: `enum BlockSize { SMALL WIDE LARGE }`, varsayılan `WIDE`, migration `block_size`. Liste düzeninde yok sayılır.
+- [ ] Render: `profile-view.tsx` düzen moduna göre liste ya da CSS grid (mobil 2 sütun, ≥ 560px 4 sütun). SMALL 1×1, WIDE tam satır, LARGE 2×2. **`grid-auto-flow: dense` kullanılmaz:** görsel sıra DOM sırasıyla aynı kalır (klavye ve ekran okuyucu).
+- [ ] Tür başına izinli boyutlar `lib/validation/blocks.ts`'te: LINK (S: ikon + başlık, W, L: önizleme kartıyla), IMAGE (S/W/L), EMBED (W/L), PRODUCT (S/L), SUPPORT/CONTACT/WHATSAPP (S/W). HEADER/TEXT/DIVIDER/EMAIL_CAPTURE/COUNTDOWN her zaman tam satır.
+- [ ] Editör: satır menüsünde "Boyut" seçimi (yalnızca ızgara modunda), önizleme gerçek ızgarayı gösterir. Sıralama listede dnd-kit ile aynen devam eder.
+- [ ] Görünüm sayfasında "Düzen: Liste / Izgara" seçimi, tema kartlarının üstünde.
+
+**Hikâye paylaşım kartı** (eski backlog #6'nın yarısı)
+- [ ] `app/(profile)/[username]/story/route.ts`: 1080×1920 `ImageResponse` (OG hattıyla aynı), avatar, ad, adres ve QR. İlk iş: QR SVG'sinin `ImageResponse` içinde doğru çizildiğini doğrula; çizilmezse QR matrisini `<rect>`lere çeviren küçük bir yardımcı yazılır (yeni paket yok).
+- [ ] Panelde QR diyaloğuna "Hikâye görseli" butonu. Mobilde `navigator.share({ files })`, destek yoksa indirme.
+
+**Son videoyu otomatik gösterme**
+- [ ] EMBED'e `latest: "1"` + `channelId`. Kanal kimliği **kayıt anında** kanal sayfasından güvenli getirmeyle bulunur (`youtube.com` host beyaz listesi).
+- [ ] Render: `https://www.youtube.com/feeds/videos.xml?channel_id=` `fetch(..., { next: { revalidate: 3600, tags: [profileTag] } })` ile okunur. DB'ye yazılmaz. Besleme okunamazsa blok gizlenir, eski bir video uydurulmaz. Hafif gömme davranışı aynı kalır.
+
+**Kabul:** Izgara profilde Lighthouse erişilebilirlik 100, 390px'te taşma yok (layout testi ızgara profiliyle genişler). Hikâye görseli 1080×1920 keskin. Son video en geç bir saat içinde güncelleniyor.
+
+---
+
+## Faz 11: Özel alan adı
+
+**Amaç:** Rakiplerde her zaman ücretli olan özelliği ücretsiz vermek (PRODUCT ilke 1'in en güçlü kanıtı).
+
+- [ ] Veri: `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }`, migration `custom_domain`.
+- [ ] Vercel Domains API (`lib/vercel-domains.ts`, düz `fetch`, paket yok): ekle, doğrulama durumunu sorgula, kaldır. Env: `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID` (`lib/env.ts` + `.env.example`; yoksa özellik gizlenir, `lib/features.ts`).
+- [ ] Yönlendirme: `proxy.ts` gelen host ana host değilse ve doğrulanmış bir `CustomDomain` ise isteği `/<username>` yoluna rewrite eder. Host → kullanıcı adı eşlemesi önbellekli (etiketli). Özel alan adında panel ve auth yolları 404 döner.
+- [ ] `lib/site.ts` → `profileUrl(profile)` özel alan adı varsa onu döndürür. QR, OG, kanonik URL ve paylaşım kartı bunu kullanır. `/l/` ve `/api/e` göreli adreslerle özel alan adında da çalışır.
+- [ ] Arayüz: Ayarlar → Alan adı. Hostname zod ile doğrulanır (yalnızca alan adı; ana alan adının alt alanları ve IP yasak). Eklenince gereken DNS kaydı (CNAME/A) gösterilir, "Doğrula" düğmesi durumu yeniler. Kaldırma ve hesap silmede Vercel'den de silinir.
+- [ ] Güvenlik: profil başına bir alan adı, ekleme rate limit'i, başka profilde kayıtlı host reddedilir (aynı cevap, sızıntı yok). Sahiplik testi.
+- [ ] `docs/DEPLOY.md`'ye Vercel token'ı oluşturma adımları (adım adım, tıklanacak yerle).
+
+**Kabul:** Test alan adı preview'da profili açıyor, tıklama ve görüntülenme doğru profile sayılıyor, alan adı kaldırılınca 404.
+
+---
+
+## Faz 12: Portfolyo modu (PRODUCT ikinci aşama)
+
+**Amaç:** Geliştirici ve tasarımcılar için proje odaklı sayfa. Izgara düzeni (Faz 10) üzerine kurulur.
+
+- [ ] Bloklar (migration `block_types_portfolio`): `PROJECT { title, desc?, img?, tags[], url? }`, `EXPERIENCE { role, org, start, end?, desc? }`, `SKILLS { items[] }`.
+- [ ] GitHub: kullanıcı adından pinned repolar (token varsa GraphQL, yoksa REST'te son güncellenen repolar). Kayıt anında çekilir, `PROJECT` bloklarına dönüştürülür, istenirse yenilenir. Render'da dış istek yok.
+- [ ] Tema: `portfolyo` (DESIGN §7 tablosuna eklenir, monokrom, Geist Mono vurgulu). `terminal` teması portfolyo bloklarıyla uyumlu hale getirilir.
+- [ ] Onboarding şablonlarına "Geliştirici / Tasarımcı" eklenir (Faz 7 altyapısı).
+
+**Kabul:** GitHub kullanıcı adından 60 saniyede portfolyo sayfası. PROJECT kartları ızgarada S/W/L boyutlarında düzgün.
+
+---
+
+## Faz 13: Bakım ve güvenlik
+
+- [ ] **Kırık link kontrolü** (eski backlog #4): `LinkCheck { blockId @unique, status, failCount, checkedAt }`, migration `link_check`. Faz 9'daki günlük cron her çalıştırmada en eski kontrol edilen N bloğu (ör. 200) `HEAD` (desteklenmezse `GET` ilk baytlar) ile dener, `lib/link-preview.ts` SSRF korumasıyla. **Art arda 2 başarısızlıktan sonra** editör satırında `--negative` "Ulaşılamıyor" rozeti ve sahibine tek mail. Yalnızca gerçekten denenmiş sonuç gösterilir.
+- [ ] **Hassas içerik kapısı** (eski backlog #5): LINK'e `gate: "adult" | "spoiler"`. `/l/<id>` kapılı blokta önce sunucuda çizilen bir ara sayfa gösterir ("Devam et" → `/l/<id>?ok=1`). JS gerektirmez; tıklama yalnızca onaydan sonra sayılır.
+- [ ] **2FA (TOTP):** Better Auth `twoFactor` eklentisi (ayrı paket değil), migration `two_factor`, yedek kodlar, Ayarlar → Güvenlik. QR `qrcode.react` ile.
+- [ ] **PWA:** `app/manifest.ts`, ikonlar, `display: standalone`, `start_url: /dashboard`. Çevrimdışı önbellek yok (service worker gerekmiyor).
+
+**Kabul:** Kırık link kontrolü özel ağ adreslerine hiç istek atmıyor (test). 2FA açık hesaba kod olmadan girilemiyor (e2e).
+
+---
+
+## Bilinçli olarak yapılmayanlar
+
+Karar 2026-09-27. Kullanıcı açıkça istemedikçe yeniden önerilmez.
+
+- **Ödeme alma, mağaza, komisyon.** Türkiye'de ödeme aracılığı yasal ve vergisel yük getirir, para kazanma modeli de belirlenmedi. İhtiyacın büyük kısmını SUPPORT (IBAN) ve PRODUCT (affiliate) blokları karşılar.
+- **Yapay zekâ ile içerik/caption üretimi.** Gizlilik taahhüdüyle çelişir (veri bir LLM sağlayıcısına gider) ve maliyet getirir. İçgörüler (Faz 9) LLM'siz, SQL ile üretilir.
+- **Sticker panoları ve süs katmanları.** "Sessiz cam" teziyle ve reddedilen "oyuncak" hissiyle çelişir (DESIGN §0).
+
+## Backlog (fazlara alınmamış fikirler)
+
+Faz 6–13'e taşınanlar: kullanıcı adı yönlendirmesi (6), Linktree içe aktarma (7), paylaşım kartı (10), özel domain (11), portfolyo (12), kırık link kontrolü, hassas içerik kapısı, PWA ve 2FA (13).
+
+1. Link başına QR ve UTM oluşturucu.
+2. Kısa link (`linkiva.space/l/abc`).
+3. İletişim formu bloğu (mail yönlendirme), Cal.com bloğu, harita (konum) bloğu.
+4. Doğrulanmış rozet, admin paneli (`role: ADMIN`, kötüye kullanım raporları, kullanıcı askıya alma). Kullanıcı sayısı büyüyünce kötüye kullanım yönetimi öne çekilir.
+5. Herkese açık API + webhooks (yeni abone, günlük özet).
+6. `DailyStat` özet tablosu (analitik ölçeği büyüyünce; Faz 9'un cron'u kullanılır).
+7. bio.link / Beacons içe aktarıcıları (Faz 7'deki `importers.ts` haritasına).

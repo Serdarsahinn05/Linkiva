@@ -56,7 +56,8 @@
       "qr": [
         "QR code",
         "Download your address as an SVG or PNG QR code."
-      ]
+      ],
+      "noSale": ["Your data is not for sale", "No AI training, no ads, no sharing with third parties."]
     },
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
@@ -452,6 +453,15 @@
     "seoTitleHint": "Leave empty to use your name and username. Up to 70 characters.",
     "seoDescription": "Search description",
     "seoDescriptionHint": "Leave empty to use your bio. Up to 160 characters."
+  },
+  "username": {
+    "hint": "Your old address redirects to the new one for {days} days, then anyone can take it.",
+    "save": "Change address",
+    "saving": "Changing",
+    "cancel": "Cancel",
+    "changed": "Your address is now {address}.",
+    "limit": "You can change your address at most twice in 30 days. Try again later.",
+    "invalid": "This name can't be used. Use lowercase letters, digits and . _ -"
   },
   "analytics": {
     "title": "Analytics",

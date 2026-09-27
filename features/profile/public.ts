@@ -76,3 +76,19 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
 export const getPublicProfile = cache((username: string) =>
   unstable_cache(() => loadProfile(username), ["public-profile", username], { tags: [profileTag(username)] })(),
 );
+
+/**
+ * Where a past username now lives, while its redirect is still valid (UsernameHistory). Cached under the old name's tag,
+ * which changeUsername invalidates; the expiry is checked per request so a cached row cannot outlive its 90 days.
+ */
+export async function getUsernameRedirect(username: string): Promise<string | null> {
+  const past = await unstable_cache(
+    async () => {
+      const row = await db.usernameHistory.findUnique({ where: { username }, select: { expiresAt: true, profile: { select: { username: true } } } });
+      return row ? { to: row.profile.username, expiresAt: row.expiresAt.toISOString() } : null;
+    },
+    ["username-redirect", username],
+    { tags: [profileTag(username)] },
+  )();
+  return past && new Date(past.expiresAt) > new Date() ? past.to : null;
+}
