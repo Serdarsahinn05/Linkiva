@@ -175,7 +175,8 @@ Hepsi link butonuyla aynı malzemeyi (`glass-interactive`, 20px köşe, tam geni
 
 ### Hikâye kartı (Faz 10, uygulandı)
 - 1080×1920 PNG (`/<ad>/story`). Profil temasının zemini ve ortam ışığı (sistem modundaki profil koyu çizilir: hikâye koyu arayüzde görülür; arka plan görseli karartmasıyla), ortada avatar (240px, cam halka; yoksa adın baş harfi), ad (display 600), altında `linkiva.space/<ad>` Geist Mono, altta cam kart içinde QR (beyaz zemin, siyah modül; tarama güvenliği için temadan bağımsız). Üst ve alt 250px Instagram arayüzü için boş bırakılır (güvenli alan).
-- Panelde QR diyaloğunun altında ikincil hap "Hikâye görseli" ve tek satır açıklama; dokunmatik cihazda paylaşım sayfası, diğerlerinde indirme.
+- Panelde QR diyaloğunun altında tam genişlik segmentli seçim **Profilim / Koyu / Açık** (Profilim: tema + arka plan fotoğrafı; Koyu/Açık: temanın zemini, fotoğrafsız), altında gerçek görselin 9:16 küçük önizlemesi, yanında ikincil hap "Hikâye görseli" ve tek satır açıklama; dokunmatik cihazda paylaşım sayfası, diğerlerinde indirme.
+- Işıklar kendi renginin saydamına söner (Satori `transparent`'ı saydam siyah sayar, açık zeminde gri şerit bırakıyordu).
 - **Son video:** EMBED bir YouTube kanal adresiyse satırda "Kanalın son videosu" anahtarı. Önizlemede video yerine "YouTube · son video" düz butonu (hangi videonun geleceği yayında belli olur).
 
 ### Profil temaları (kullanıcıya açık, `themes/index.ts`)

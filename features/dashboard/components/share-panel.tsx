@@ -6,8 +6,10 @@ import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { Segmented } from "@/components/ui/segmented";
 import { cn } from "@/lib/cn";
 import { profileDisplayUrl, profileUrl } from "@/lib/site";
+import { STORY_LOOKS, storyPath, type StoryLook } from "@/lib/story";
 
 const iconButton = "flex size-10 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-glass-strong hover:text-ink";
 
@@ -17,6 +19,7 @@ export function SharePanel({ username }: { username: string }) {
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [story, setStory] = useState<"idle" | "busy" | "failed">("idle");
+  const [look, setLook] = useState<StoryLook>("profile");
   const qrWrap = useRef<HTMLDivElement>(null);
   const url = profileUrl(username);
 
@@ -48,7 +51,7 @@ export function SharePanel({ username }: { username: string }) {
   async function shareStory() {
     setStory("busy");
     try {
-      const res = await fetch(`/${username}/story`);
+      const res = await fetch(storyPath(username, look));
       if (!res.ok) throw new Error(String(res.status));
       const file = new File([await res.blob()], `linkiva-${username}-story.png`, { type: "image/png" });
       if (matchMedia("(pointer: coarse)").matches && navigator.canShare?.({ files: [file] })) {
@@ -109,14 +112,35 @@ export function SharePanel({ username }: { username: string }) {
               {t("downloadSvg")}
             </button>
           </div>
-          <div className="flex w-full flex-col items-center gap-2 border-t border-glass-edge pt-5">
-            <button type="button" onClick={shareStory} disabled={story === "busy"} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md)}>
-              {story === "busy" ? <span className="dots" aria-hidden /> : <Smartphone size={16} aria-hidden />}
-              {t("story")}
-            </button>
-            <p className={cn("text-center text-sm", story === "failed" ? "text-negative" : "text-ink-3")} role={story === "failed" ? "alert" : undefined}>
-              {story === "failed" ? t("storyFailed") : t("storyHint")}
-            </p>
+          <div className="flex w-full flex-col gap-4 border-t border-glass-edge pt-5">
+            <Segmented
+              label={t("storyLook")}
+              value={look}
+              onChange={setLook}
+              options={STORY_LOOKS.map((value) => ({ value, label: t(`storyLooks.${value}`) }))}
+              className="w-full"
+            />
+            <div className="flex items-center gap-4">
+              {/* The real image, so what is shared is what is seen; it reloads when the look changes. */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- generated PNG of our own route */}
+              <img
+                key={look}
+                src={storyPath(username, look)}
+                alt={t("storyPreview")}
+                width={1080}
+                height={1920}
+                className="aspect-[9/16] h-auto w-20 shrink-0 rounded-[var(--radius-control)] border border-glass-edge bg-glass-strong object-cover"
+              />
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+                <button type="button" onClick={shareStory} disabled={story === "busy"} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md)}>
+                  {story === "busy" ? <span className="dots" aria-hidden /> : <Smartphone size={16} aria-hidden />}
+                  {t("story")}
+                </button>
+                <p className={cn("text-sm", story === "failed" ? "text-negative" : "text-ink-3")} role={story === "failed" ? "alert" : undefined}>
+                  {story === "failed" ? t("storyFailed") : t("storyHint")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </Dialog>

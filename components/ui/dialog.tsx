@@ -41,19 +41,20 @@ export function Dialog({ open, onClose, title, closeLabel, children, variant = "
       onClick={(e) => e.target === ref.current && onClose()}
       aria-label={title}
       className={cn(
-        "glass-float sheet-in m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-[var(--radius-card)] p-0 text-ink backdrop:bg-black/35 backdrop:backdrop-blur-[2px]",
+        "glass-float sheet-in m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md flex-col overflow-hidden rounded-[var(--radius-card)] p-0 text-ink open:flex backdrop:bg-black/35 backdrop:backdrop-blur-[2px]",
         variant === "sheet" && "max-sm:mb-0 max-sm:max-h-[94dvh] max-sm:w-full max-sm:max-w-none max-sm:rounded-b-none",
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-4 border-b border-glass-edge px-5 py-3">
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-glass-edge px-5 py-3">
         <h2 className="text-lg font-semibold tracking-[-0.01em]">{title}</h2>
         <button type="button" onClick={onClose} aria-label={closeLabel} className="-mr-2 flex size-11 items-center justify-center rounded-full hover:bg-glass-strong">
           <X size={20} strokeWidth={1.75} aria-hidden />
         </button>
       </div>
       {/* Content mounts only while open: a closed dialog stays out of the DOM and accessibility tree. */}
-      {open && children}
+      {/* The title bar stays; content taller than the screen scrolls under it instead of being cut off. */}
+      {open && <div className="min-h-0 overflow-y-auto overscroll-contain">{children}</div>}
     </dialog>
   );
 }

@@ -508,8 +508,15 @@
     "downloadPng": "PNG indir",
     "downloadSvg": "SVG indir",
     "story": "Hikâye görseli",
-    "storyHint": "Instagram hikâyen için, QR kodlu (1080×1920).",
+    "storyHint": "Instagram hikâyen için, QR kodlu.",
     "storyFailed": "Görsel hazırlanamadı. Tekrar dene.",
+    "storyLook": "Hikâye arka planı",
+    "storyLooks": {
+      "profile": "Profilim",
+      "dark": "Koyu",
+      "light": "Açık"
+    },
+    "storyPreview": "Hikâye görselinin önizlemesi",
     "close": "Kapat",
     "share": "Paylaş"
   },
