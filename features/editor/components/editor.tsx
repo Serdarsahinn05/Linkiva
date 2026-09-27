@@ -266,7 +266,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           <h2 id="blocks-heading" className="px-1 text-[0.9375rem] font-semibold text-ink-2">
             {t("editor.blocks")}
           </h2>
-          <ScrollRow className="pb-1">
+          <ScrollRow>
             {EDITABLE_BLOCK_TYPES.map((type) => {
               const Icon = BLOCK_ICON[type];
               return (

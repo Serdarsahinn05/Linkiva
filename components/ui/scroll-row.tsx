@@ -39,7 +39,9 @@ export function ScrollRow({ children, className }: { children: ReactNode; classN
 
   return (
     <div className="relative">
-      <div ref={ref} className={cn("flex gap-2 overflow-x-auto [scrollbar-width:none]", className)}>
+      {/* A sideways-scrolling box clips vertically too: equal padding keeps focus rings whole, the negative margin
+          keeps the layout (and the arrows' centre line) where the buttons are. */}
+      <div ref={ref} className={cn("-m-1.5 flex gap-2 overflow-x-auto p-1.5 [scrollbar-width:none]", className)}>
         {children}
       </div>
       {more.before && (
