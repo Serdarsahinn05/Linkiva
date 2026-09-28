@@ -59,7 +59,7 @@ test.describe("site pages have a fixed language by address", () => {
   test("the global 404 speaks the visitor's language too", async ({ page }) => {
     const res = await page.goto("/nope/nothing/here");
     expect(res?.status()).toBe(404);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("This page does not exist.");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("This link is broken.");
   });
 });
 

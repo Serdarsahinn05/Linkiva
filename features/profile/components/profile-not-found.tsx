@@ -1,9 +1,11 @@
 "use client";
 
+import { House } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { StatusPage } from "@/components/ui/status-page";
+import { LostMascot } from "@/features/errors/components/lost-mascot";
 import type { Locale } from "@/i18n/config";
 import { useVisitorLocale } from "@/i18n/use-visitor-locale";
 import { cn } from "@/lib/cn";
@@ -18,7 +20,9 @@ export type ProfileNotFoundCopy = { title: string; claimable: string; claim: str
  * Client-side so the cached profile route stays static: the address and language are read in the browser.
  */
 export function ProfileNotFound({ copy }: { copy: Record<Locale, ProfileNotFoundCopy> }) {
-  const t = copy[useVisitorLocale()];
+  const locale = useVisitorLocale();
+  const t = copy[locale];
+  const home = locale === "en" ? "/en" : "/";
   const segment = usePathname().split("/")[1] ?? "";
   let candidate = "";
   try {
@@ -31,12 +35,16 @@ export function ProfileNotFound({ copy }: { copy: Record<Locale, ProfileNotFound
   return (
     <StatusPage
       code="404"
+      home={home}
+      figure={<LostMascot />}
       title={t.title}
       body={claimable ? t.claimable.replace("{username}", claimable) : ""}
       actions={
         <>
           <ClaimForm id="claim-404" label={t.label} placeholder={t.placeholder} cta={t.claim} defaultValue={claimable} compact />
-          <Link href="/" className={cn(buttonBase, buttonVariants.ghost, buttonSizes.md)}>
+          {/* The claim bar is this page's primary action; the way home is the next clearest thing. */}
+          <Link href={home} className={cn(buttonBase, buttonVariants.secondary, buttonSizes.lg)}>
+            <House size={18} aria-hidden />
             {t.home}
           </Link>
         </>
