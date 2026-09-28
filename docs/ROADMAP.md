@@ -393,10 +393,16 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ### Faz 15: Dil ve arama motoru (`faz-15-dil`)
 
-- [ ] Vitrin sayfalarına `/en` öneki (`/en`, `/en/privacy`, `/en/terms`). Kullanıcı adı en az 3 karakter olduğu için çakışmaz, yine de rezerve listeye girer. Türkçe `/`'de kalır; panel ve profil bugünkü gibi (çerez / sahibin dili).
-- [ ] `hreflang`: metadata `alternates.languages` (tr, en, x-default) ve sitemap'te `alternates`. Sitemap'e yasal sayfalar da girer.
-- [ ] Landing ve yasal sayfalarda dil seçici (link + çerez). Accept-Language'e göre otomatik yönlendirme yok.
-- [ ] 404'ler: ziyaretçinin dilinde; profil 404'ünde denenen ad hazır dolu adres çubuğu ("Bu ad boşta"), durum kodu 404 kalır.
+- [x] Vitrin sayfalarına `/en` öneki (`/en`, `/en/privacy`, `/en/terms`), `en` ve `tr` rezerve. Türkçe `/`'de sabit; panel ve profil bugünkü gibi (çerez / sahibin dili). Dil adresten gelir: proxy `x-linkiva-locale` başlığını koyar, ziyaretçinin gönderdiğini siler.
+- [x] `hreflang`: metadata `alternates` (canonical + tr, en, x-default) ve sitemap'te `alternates`. Sitemap'e yasal sayfalar girdi (her sayfa iki dilde).
+- [x] Dil seçici: alt bilgide her zaman ("English" / "Türkçe"), tercihi diğer dil olan ziyaretçiye sayfanın üstünde öneri hapı ("This page is also in English."). JS'siz form + sunucu eylemi: çerezi yazar (kayıt ve panel de o dilde açılır), aynı sayfanın diğer diline gider. Otomatik yönlendirme yok.
+- [x] 404'ler ziyaretçinin dilinde (statik kalmak için dil tarayıcıda seçilir); profil 404'ünde adresteki ad hazır dolu adres çubuğu ("… henüz kimsenin değilse senin olabilir"; kesin "boşta" denmez, yayında olmayan ya da yönlendirmedeki ad olabilir), durum kodu 404.
+
+*Uygulama notları (2026-09-28):*
+- **Davranış değişikliği:** `/` artık İngilizce tarayıcıda da Türkçe (eskiden Accept-Language'e göre İngilizce açılıyordu); İngilizce sürüm `/en`'de, öneri hapı yönlendiriyor. Arama motoru her adreste tek dil görür.
+- Profil 404'ü ve `global-not-found` çerez okumaz: iki dilin metni gönderilir, `useVisitorLocale` seçer ve `<html lang>`'ı günceller. Production build'de `/[username]` hâlâ ● (SSG/ISR).
+- Durum kartı (`StatusPage`) tam genişlik: adres çubuğu 390px'te kartı taşırıyordu. 404 kartında adres çubuğu yalnızca ok düğmesiyle (`compact`).
+- Test: `tests/unit/i18n.test.ts` (adres eşlemesi, hreflang), `tests/e2e/phase15.spec.ts` (İngilizce tarayıcıda `/` Türkçe + öneri + çerez kayda taşınıyor, canonical/hreflang, sitemap, sahte başlık etkisiz, profil 404 ön dolgu, global 404 İngilizce, JS'siz dil anahtarı), `layout.spec.ts` `/en` ve `/en/terms` ile genişledi.
 
 ### Faz 16: Yükleme hissi (`faz-16-yukleme`)
 

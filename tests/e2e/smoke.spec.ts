@@ -13,8 +13,8 @@ test.describe("Turkish visitor", () => {
 
 test.describe("English visitor", () => {
   test.use({ locale: "en-US" });
-  test("home falls back to English from Accept-Language", async ({ page }) => {
-    await page.goto("/");
+  test("the English home lives at /en", async ({ page }) => {
+    await page.goto("/en");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("one address");
   });

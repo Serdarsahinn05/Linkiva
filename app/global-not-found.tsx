@@ -1,35 +1,26 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
-import { StatusPage } from "@/components/ui/status-page";
+import { LocalizedNotFound } from "@/components/ui/localized-status";
 import { Ambient } from "@/components/ui/surface";
 import { defaultLocale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
 import { fontVariables } from "@/lib/fonts";
+import en from "@/messages/en.json";
 import tr from "@/messages/tr.json";
 import "./globals.css";
 
 export const metadata: Metadata = { title: "404 · Linkiva" };
 
+const copy = (m: typeof tr) => ({ title: m.errors.notFoundTitle, body: m.errors.notFoundBody, home: m.errors.home });
+
 /**
- * 404 for URLs that match no route at all (e.g. /a/b). It renders outside every root layout, so it
- * brings its own document and uses the default language.
+ * 404 for URLs that match no route at all (e.g. /a/b). It renders outside every root layout, so it brings its own
+ * document; the text is switched to the visitor's language in the browser.
  */
 export default function GlobalNotFound() {
   return (
     <html lang={defaultLocale} className={fontVariables}>
       <body>
         <Ambient />
-        <StatusPage
-          code="404"
-          title={tr.errors.notFoundTitle}
-          body={tr.errors.notFoundBody}
-          actions={
-            <Link href="/" className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}>
-              {tr.errors.home}
-            </Link>
-          }
-        />
+        <LocalizedNotFound copy={{ tr: copy(tr), en: copy(en) }} />
       </body>
     </html>
   );

@@ -1,40 +1,22 @@
-import { ArrowRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView, type ProfileViewData } from "@/components/blocks/profile-view";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/surface";
 import { SiteFooter } from "@/features/legal/components/site-footer";
+import { ClaimForm } from "@/features/profile/components/claim-form";
+import { LanguageSuggestion } from "@/features/locale/components/language-switch";
+import { marketingAlternates, pageLocale } from "@/i18n/marketing";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
 const FREE_KEYS = ["analytics", "themes", "schedule", "highlight", "capture", "embed", "branding", "qr", "noSale"] as const;
 
-/** "linkiva.space/ [username] →": a plain GET form, works without JavaScript. */
-function ClaimForm({ id, label, placeholder, cta }: { id: string; label: string; placeholder: string; cta: string }) {
-  return (
-    <form action="/register" method="get" className="glass-float liquid flex w-full max-w-xl items-center gap-1 rounded-full p-1.5 pl-5">
-      <label htmlFor={id} lang="en" translate="no" className="min-w-0 truncate text-[0.9375rem] text-ink-3 sm:text-base">
-        {site.host}/
-      </label>
-      <input
-        id={id}
-        name="username"
-        aria-label={label}
-        placeholder={placeholder}
-        autoCapitalize="none"
-        autoComplete="off"
-        spellCheck={false}
-        maxLength={30}
-        className="h-12 min-w-28 flex-1 bg-transparent text-[0.9375rem] font-medium text-ink placeholder:text-ink-3 focus-visible:outline-none sm:text-base"
-      />
-      <button type="submit" className={cn(buttonBase, buttonVariants.primary, buttonSizes.lg, "shrink-0 px-5")}>
-        <span className="max-sm:sr-only">{cta}</span>
-        <ArrowRight size={18} aria-hidden />
-      </button>
-    </form>
-  );
+export async function generateMetadata(): Promise<Metadata> {
+  return { alternates: marketingAlternates("/", pageLocale(await getLocale())) };
 }
 
 export default async function HomePage() {
@@ -67,6 +49,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-dvh flex-col px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-8">
+      <LanguageSuggestion page="/" />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between py-2">
         <Wordmark />
         <nav className="flex items-center gap-1">
@@ -132,7 +115,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter page="/" />
     </div>
   );
 }

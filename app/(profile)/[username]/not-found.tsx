@@ -1,28 +1,22 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
-import { StatusPage } from "@/components/ui/status-page";
-import { defaultLocale } from "@/i18n/config";
-import { cn } from "@/lib/cn";
+import { ProfileNotFound, type ProfileNotFoundCopy } from "@/features/profile/components/profile-not-found";
+import type { Locale } from "@/i18n/config";
 
-// A free username is an invitation, not an error.
-export default async function ProfileNotFound() {
-  const t = await getTranslations({ locale: defaultLocale, namespace: "profile" });
-  return (
-    <StatusPage
-      code="404"
-      title={t("notFoundTitle")}
-      body=""
-      actions={
-        <>
-          <Link href="/register" className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}>
-            {t("claim")}
-          </Link>
-          <Link href="/" className={cn(buttonBase, buttonVariants.ghost, buttonSizes.md)}>
-            {t("home")}
-          </Link>
-        </>
-      }
-    />
-  );
+// Both languages are sent and the visitor's is picked in the browser: reading cookies here would make every profile
+// page dynamic (docs/ARCHITECTURE.md §6).
+async function copyFor(locale: Locale): Promise<ProfileNotFoundCopy> {
+  const t = await getTranslations({ locale });
+  return {
+    title: t("profile.notFoundTitle"),
+    claimable: t.raw("profile.claimable"),
+    claim: t("profile.claim"),
+    home: t("profile.home"),
+    label: t("landing.usernameLabel"),
+    placeholder: t("landing.usernamePlaceholder"),
+  };
+}
+
+export default async function ProfileNotFoundPage() {
+  const [tr, en] = await Promise.all([copyFor("tr"), copyFor("en")]);
+  return <ProfileNotFound copy={{ tr, en }} />;
 }

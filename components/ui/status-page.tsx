@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 export function StatusPage({ code, title, body, actions }: { code: string; title: string; body: string; actions: ReactNode }) {
   return (
     <main id="main" className="flex min-h-dvh items-center justify-center px-4">
-      <div className="glass flex max-w-md flex-col items-center gap-4 rounded-[28px] px-8 py-12 text-center">
+      <div className="glass flex w-full max-w-md flex-col items-center gap-4 rounded-[28px] px-6 py-12 text-center sm:px-8">
         <span className="font-mono text-sm text-ink-3">{code}</span>
         <h1 className="text-3xl font-semibold tracking-[-0.03em] text-balance">{title}</h1>
         {body && <p className="text-ink-2">{body}</p>}
-        <div className="mt-2 flex flex-wrap justify-center gap-2">{actions}</div>
+        <div className="mt-2 flex w-full flex-wrap justify-center gap-2">{actions}</div>
       </div>
     </main>
   );

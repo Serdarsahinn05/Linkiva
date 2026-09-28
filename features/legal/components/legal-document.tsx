@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/ui/surface";
+import { LanguageSuggestion } from "@/features/locale/components/language-switch";
+import { localizedPath, pageLocale, type MarketingPage } from "@/i18n/marketing";
 import { site } from "@/lib/site";
 import type { LegalBlock, LegalDoc } from "../types";
 import { SiteFooter } from "./site-footer";
@@ -39,12 +41,14 @@ function Block({ block }: { block: LegalBlock }) {
 }
 
 /** /privacy and /terms: one glass sheet with a table of contents, in the visitor's language. */
-export async function LegalDocument({ doc }: { doc: LegalDoc }) {
+export async function LegalDocument({ doc, page }: { doc: LegalDoc; page: MarketingPage }) {
   const t = await getTranslations("legal");
+  const locale = pageLocale(await getLocale());
   return (
     <div className="flex min-h-dvh flex-col px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-8">
+      <LanguageSuggestion page={page} />
       <header className="mx-auto w-full max-w-2xl py-2">
-        <Link href="/" className="inline-block rounded-full">
+        <Link href={localizedPath("/", locale)} className="inline-block rounded-full">
           <Wordmark />
         </Link>
       </header>
@@ -83,7 +87,7 @@ export async function LegalDocument({ doc }: { doc: LegalDoc }) {
           </section>
         ))}
       </main>
-      <SiteFooter />
+      <SiteFooter page={page} />
     </div>
   );
 }

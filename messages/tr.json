@@ -13,6 +13,12 @@
     "continue": "Devam et",
     "genericError": "Bir şeyler ters gitti. Birazdan tekrar dene."
   },
+  "languageSwitch": {
+    "name": "English",
+    "title": "Bu sayfayı İngilizce aç",
+    "suggest": "Bu sayfa Türkçe de var.",
+    "switch": "Türkçe'ye geç"
+  },
   "legal": {
     "footerNav": "Site bilgileri",
     "contact": "Bize yaz",
@@ -273,6 +279,7 @@
     "madeWith": "Linkiva ile yapıldı",
     "notFoundTitle": "Bu adreste kimse yok.",
     "claim": "Bu adresi al",
+    "claimable": "{username} adı henüz kimsenin değilse senin olabilir.",
     "home": "Ana sayfaya dön"
   },
   "nav": {
