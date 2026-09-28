@@ -10,6 +10,7 @@
     "skipToContent": "İçeriğe geç",
     "or": "veya",
     "loading": "Yükleniyor…",
+    "continue": "Devam et",
     "genericError": "Bir şeyler ters gitti. Birazdan tekrar dene."
   },
   "landing": {
@@ -78,6 +79,21 @@
       "hidePassword": "Şifreyi gizle"
     },
     "google": "Google ile devam et",
+    "twoFactor": {
+      "title": "Doğrulama kodu",
+      "hint": "Kimlik doğrulama uygulamandaki 6 haneli kodu yaz.",
+      "backupHint": "Kaydettiğin yedek kodlardan birini yaz. Her kod bir kez kullanılır.",
+      "code": "6 haneli kod",
+      "backupCode": "Yedek kod",
+      "trust": "Bu cihazda 30 gün kod sorma",
+      "submit": "Doğrula",
+      "pending": "Doğrulanıyor…",
+      "useBackup": "Uygulamana ulaşamıyor musun? Yedek kod kullan",
+      "useApp": "Uygulamadaki kodu kullan",
+      "badCode": "Kod hatalı. Uygulamadaki güncel kodu yaz.",
+      "expired": "Kodu girme süresi doldu. Yeniden giriş yap.",
+      "locked": "Art arda çok fazla hatalı kod girildi. Güvenliğin için giriş 15 dakika kilitlendi."
+    },
     "login": {
       "title": "Tekrar hoş geldin.",
       "submit": "Giriş yap",
@@ -207,6 +223,30 @@
       "cta": "",
       "security": "Bunu sen yapmadıysan hemen bize yaz: hello@linkiva.space"
     },
+    "twoFactorOff": {
+      "subject": "Linkiva: iki adımlı doğrulama kapatıldı",
+      "preheader": "Hesabın girişte artık kod istemiyor.",
+      "heading": "İki adımlı doğrulama kapatıldı",
+      "body": "Linkiva hesabında iki adımlı doğrulama az önce kapatıldı. Giriş için artık yalnızca şifren yetiyor.",
+      "cta": "Ben kapatmadım, şifremi sıfırla",
+      "security": "Bunu sen yaptıysan başka bir şey yapmana gerek yok. Ayarlar'dan yeniden açabilirsin."
+    },
+    "twoFactorLocked": {
+      "subject": "Linkiva: hesabına giriş denendi",
+      "preheader": "Şifren doğru girildi ama doğrulama kodu art arda hatalıydı.",
+      "heading": "Hesabına giriş denendi",
+      "body": "Linkiva hesabına şifrenle giriş yapıldı ama iki adımlı doğrulama kodu art arda 10 kez hatalı girildi. Güvenliğin için girişi 15 dakika kilitledik. Bu sen değilsen şifren başkasının elinde olabilir.",
+      "cta": "Şifremi değiştir",
+      "security": "Bu sendin ve kodu karıştırdıysan 15 dakika sonra yeniden deneyebilirsin. Uygulamana ulaşamıyorsan yedek kodlarından birini kullan."
+    },
+    "brokenLinks": {
+      "subject": "Linkiva: sayfandaki bir link açılmıyor",
+      "preheader": "{count} link günlük kontrolde art arda iki kez açılmadı.",
+      "heading": "Sayfandaki bir link açılmıyor",
+      "body": "Sayfandaki linkleri günde bir kez deniyoruz. Bunlar art arda iki kez açılmadı ({count}). Ziyaretçilerin bir hata sayfasına düşüyor olabilir. Adresi kontrol et ya da bloğu gizle.",
+      "cta": "Editörümü aç",
+      "footer": "Bu maili her kırık link için bir kez alırsın. Link yeniden açılınca ya da değiştirince kontrol baştan başlar."
+    },
     "digest": {
       "subject": "Linkiva: sayfanın geçen haftası",
       "preheader": "{views} görüntülenme, {clicks} tıklama.",
@@ -282,6 +322,13 @@
     },
     "urlInvalid": "Bu adresi açamayız. https:// ile başlayan bir link dene.",
     "incomplete": "Tamamlanmadı, sayfanda görünmüyor.",
+    "gate": {
+      "adult": "18+ uyarısı",
+      "spoiler": "Spoiler uyarısı",
+      "tag": { "adult": "18+ uyarısı", "spoiler": "spoiler uyarısı" }
+    },
+    "unreachable": "Ulaşılamıyor",
+    "unreachableHint": "Bu adres günlük kontrolde art arda iki kez açılmadı (son kontrol {date}). Adresi kontrol et ya da bloğu gizle.",
     "visible": "Sayfada göster",
     "highlight": "Öne çıkar",
     "unhighlight": "Öne çıkarmayı kaldır",
@@ -632,6 +679,20 @@
     "invalidBody": "Link bozulmuş olabilir. Özeti giriş yapıp Ayarlar → Bildirimler'den kapatabilirsin.",
     "error": "Bir sorun oldu, tekrar dene."
   },
+  "gate": {
+    "metaTitle": "Uyarı",
+    "adult": {
+      "title": "Bu link yetişkinlere yönelik içerik içerebilir",
+      "body": "{owner} bu linki yalnızca 18 yaşından büyükler için olarak işaretledi. Devam edersen başka bir siteye gideceksin."
+    },
+    "spoiler": {
+      "title": "Bu link sürprizi bozabilir",
+      "body": "{owner} bu linkin bir dizi, film, oyun ya da kitap hakkında sürpriz bozan içerik taşıdığını belirtti."
+    },
+    "destination": "Gideceğin adres",
+    "continue": "Devam et",
+    "back": "Geri dön"
+  },
   "appearance": {
     "title": "Görünüm",
     "layout": "Düzen",
@@ -718,6 +779,8 @@
     "supportCopyIban": "IBAN'ı kopyala",
     "supportLink": "Destek ol",
     "sponsored": "İşbirliği",
+    "gateAdult": "18+",
+    "gateSpoiler": "Spoiler",
     "countdownDays": "gün",
     "countdownHours": "saat",
     "countdownMinutes": "dk",
@@ -801,6 +864,36 @@
     "heatmapCell": "{day} {hours} · {views} görüntülenme"
   },
   "account": {
+    "twoFactor": {
+      "title": "İki adımlı doğrulama",
+      "offHint": "Şifren başkasının eline geçse bile hesabına girilemesin: girişte şifrenden sonra telefonundaki kimlik doğrulama uygulamasından (Google Authenticator, 1Password, Authy…) 6 haneli bir kod da sorulur.",
+      "on": "Açık",
+      "onHint": "Girişte şifrenden sonra uygulamandaki kod soruluyor.",
+      "googleNote": "Google ile girişte kod sorulmaz; orada Google hesabının kendi doğrulaması geçerli.",
+      "noPassword": "Google ile giriş yapıyorsun, güvenliğin Google hesabının iki adımlı doğrulamasına bağlı. Şifre belirlersen burada da açabilirsin.",
+      "turnOn": "Aç",
+      "turnOff": "Kapat",
+      "newCodes": "Yeni yedek kodlar",
+      "dialog": { "enable": "İki adımlı doğrulamayı aç", "disable": "İki adımlı doğrulamayı kapat", "codes": "Yeni yedek kodlar" },
+      "passwordHint": {
+        "enable": "Devam etmek için şifreni yaz.",
+        "disable": "Kapatınca girişte yalnızca şifren sorulur. Onaylamak için şifreni yaz.",
+        "codes": "Yeni kodlar oluşunca eskileri geçersiz olur. Onaylamak için şifreni yaz."
+      },
+      "scanHint": "Kimlik doğrulama uygulamanla bu kodu tara ya da anahtarı elle gir. Sonra uygulamanın gösterdiği 6 haneli kodu yaz.",
+      "qrLabel": "Kimlik doğrulama uygulaması için QR kod",
+      "manualKey": "Anahtar",
+      "copyKey": "Anahtarı kopyala",
+      "confirm": "Onayla ve aç",
+      "turnedOn": "İki adımlı doğrulama açıldı.",
+      "turnedOff": "İki adımlı doğrulama kapatıldı.",
+      "codesHint": "Bu yedek kodları güvenli bir yere kaydet. Telefonuna ulaşamazsan her biri bir kez giriş sağlar. Bu pencereyi kapatınca bir daha gösterilmez.",
+      "copyCodes": "Kopyala",
+      "copied": "Kopyalandı",
+      "downloadCodes": "İndir",
+      "saved": "Kaydettim",
+      "fileHeading": "Linkiva yedek kodları: her kod bir kez kullanılır."
+    },
     "email": "E-posta",
     "currentEmail": "Şu anki adresin",
     "newEmail": "Yeni e-posta",

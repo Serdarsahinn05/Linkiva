@@ -1,8 +1,7 @@
 import { after, NextResponse } from "next/server";
 import { recordEvent } from "@/features/analytics/record";
-import { db } from "@/lib/db";
-import { isLive } from "@/lib/schedule";
-import { parseBlock, type ParsedBlock } from "@/lib/validation/blocks";
+import { getLiveBlock } from "@/features/profile/public";
+import type { ParsedBlock } from "@/lib/validation/blocks";
 import { buildVcard, vcardFileName } from "@/lib/vcard";
 
 /**
@@ -35,25 +34,23 @@ function target(block: ParsedBlock, part: string | null): { redirect: string } |
 
 /**
  * Public block link. Only visible, live blocks of published profiles resolve. The tap is recorded after the response
- * is sent (docs/ARCHITECTURE.md §7).
+ * is sent (docs/ARCHITECTURE.md §7). A link marked sensitive (adult / spoiler) first shows a server-rendered warning
+ * page; only the tap confirmed there (?ok=1) is recorded and forwarded.
  */
 export async function GET(request: Request, { params }: RouteContext<"/l/[blockId]">) {
   const { blockId } = await params;
-  const block = await db.block.findUnique({
-    where: { id: blockId },
-    select: { type: true, data: true, isVisible: true, startsAt: true, endsAt: true, profile: { select: { id: true, userId: true, isPublished: true } } },
-  });
+  const live = await getLiveBlock(blockId);
+  const search = new URL(request.url).searchParams;
+  const destination = live ? target(live.block, search.get("k")) : null;
+  if (!live || !destination) return new NextResponse("Not found", { status: 404 });
 
-  const live =
-    block?.isVisible &&
-    block.profile.isPublished &&
-    isLive({ startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
-  const parsed = live ? parseBlock(block.type, block.data) : null;
-  const destination = parsed ? target(parsed, new URL(request.url).searchParams.get("k")) : null;
-  if (!destination || !block) return new NextResponse("Not found", { status: 404 });
+  if (live.block.type === "LINK" && live.block.data.gate && search.get("ok") !== "1") {
+    // Relative, so it stays on a custom domain.
+    return new NextResponse(null, { status: 302, headers: { Location: `/l/${blockId}/gate`, "Cache-Control": "no-store" } });
+  }
 
   const headers = new Headers(request.headers);
-  const profile = block.profile;
+  const profile = live.profile;
   // Referrer of a click is the profile page itself; the source is attributed from the view instead.
   after(() => recordEvent({ type: "CLICK", profile, blockId, headers }).catch((error) => console.error("click record failed", error)));
 

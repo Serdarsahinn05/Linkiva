@@ -21,7 +21,7 @@ export const RESERVED_USERNAMES = new Set([
   "onboarding", "dashboard", "settings", "privacy", "terms", "unsubscribe",
   // framework / metadata files
   "_next", "static", "public", "favicon.ico", "robots.txt", "sitemap.xml", "manifest.webmanifest",
-  "opengraph-image", "twitter-image", "icon", "apple-icon",
+  "opengraph-image", "twitter-image", "icon", "apple-icon", "pwa",
   // product & impersonation
   "linkiva", "admin", "administrator", "root", "support", "help", "about", "blog", "app", "www", "mail",
   "email", "security", "status", "official", "staff", "team", "moderator", "abuse", "legal", "pricing",

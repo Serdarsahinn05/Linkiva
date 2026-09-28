@@ -26,6 +26,9 @@ export type EditorProfile = {
 
 export type EditorSocials = Partial<Record<SocialPlatform, string>>;
 
+/** A block destination that failed the daily link check (features/link-check); shown while the block still points there. */
+export type LinkIssue = { url: string; checkedAt: string };
+
 /** A stored block row in the editor's shape. */
 export const toEditorBlock = (b: { id: string; type: BlockType; data: unknown; isVisible: boolean; isHighlighted: boolean; size: BlockSize; startsAt: Date | null; endsAt: Date | null }): EditorBlock => ({
   id: b.id,

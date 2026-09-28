@@ -60,12 +60,13 @@
 │  │  ├─ page.tsx                 ← public profil (önbellekli)
 │  │  ├─ opengraph-image.tsx      ← OG görseli (dosya konvansiyonu)
 │  │  └─ not-found.tsx
-│  ├─ l/[blockId]/route.ts        ← tıklama kaydı + 302 yönlendirme
+│  ├─ l/[blockId]/route.ts        ← tıklama kaydı + 302 yönlendirme (hassas link → (site)/(auth)/l/[blockId]/gate)
+│  ├─ manifest.webmanifest/route.ts ← PWA manifest'i (yalnızca site sayfaları bağlar, profiller değil)
 │  ├─ api/
 │  │  ├─ auth/[...all]/route.ts   ← auth handler
 │  │  ├─ e/route.ts               ← görüntülenme beacon'ı
 │  │  └─ upload/route.ts          ← Blob client-upload token'ı (oturum zorunlu)
-│  ├─ sitemap.ts  robots.ts  manifest.ts
+│  ├─ sitemap.ts  robots.ts  icon.svg  apple-icon.png
 │  └─ layout.tsx  globals.css
 ├─ components/
 │  ├─ ui/                         ← Button, Input, Field, Tape, Dialog, Menu, Switch, Tabs, Toast, Sheet…
@@ -108,6 +109,8 @@
 - Kullanıcı adı **kayıtta alınmaz**. Kayıt sadece e-posta + şifre (veya Google) ister. İlk girişte onboarding adımında kullanıcı adı seçilir: tek alan, anlık müsaitlik kontrolü, rezerve liste. Landing'deki "kullanıcı adını yaz" alanı bu değeri onboarding'e taşır.
 - Giriş hatası tek bir mesajdır: "E-posta veya şifre hatalı". Şifre sıfırlama her durumda "Hesap varsa mail gönderdik" der.
 - Şifre en az 8 karakter olmalı. Kontrol zod'la sunucuda yapılır.
+- *(Faz 13)* **İki adımlı doğrulama:** Better Auth `twoFactor` eklentisi (`lib/auth.ts`, istemcide `twoFactorClient`). TOTP + 10 yedek kod, yalnızca e-posta/şifre girişini korur (eklenti `/sign-in/email` sonrasında devreye girer; Google girişi Google'ın doğrulamasına kalır). Şifre doğruysa oturum açılmaz, 10 dakikalık 2FA çerezi verilir; giriş formu kod adımına geçer (`verifyTotp` / `verifyBackupCode`, isteğe bağlı 30 gün güvenilen cihaz). Açma/kapatma/yeni yedek kod şifre ister, kapatma `twoFactorOff` güvenlik maili gönderir. Ayarlar sayfası durumu oturum çerez önbelleğinden değil DB'den okur. Art arda 10 hatalı kod hesabı 15 dakika kilitler (eklenti varsayılanı); kilitte sahibine profil dilinde tek `twoFactorLocked` maili gider (`noticeTwoFactorLock`, güvenlik denetimi 2026-09-28).
+- *(Güvenlik başlıkları)* `next.config.ts` → `headers()`: her yanıtta `nosniff`, `Referrer-Policy`, `Permissions-Policy`. Site sayfaları (`/dashboard`, giriş/kayıt akışı, `/l/<id>/gate`) `X-Frame-Options: DENY` + `frame-ancestors 'none'`. Profiller çerçevelenebilir (panel önizlemesi iframe). Yeni site sayfası eklenirse `NO_FRAME` listesine de eklenir.
 
 ---
 
@@ -220,7 +223,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 | 10 ✅ | `block_size` | `enum BlockSize { SMALL WIDE LARGE }`, `Block.size @default(WIDE)`. `appearance.layout: "list" \| "grid"` (yalnızca JSON). EMBED `data`'ya `latest`, `channelId`. |
 | 11 ✅ | `custom_domain` | `CustomDomain { id, profileId @unique, hostname @unique, verifiedAt?, createdAt }` |
 | 12 ✅ | `block_types_portfolio` | `BlockType` += `PROJECT, EXPERIENCE, SKILLS` |
-| 13 | `link_check`, `two_factor` | `LinkCheck { blockId @unique → Block (cascade), status, failCount, checkedAt }`; Better Auth `twoFactor` tabloları (CLI ile üretilir). LINK `data`'ya `gate`. |
+| 13 ✅ | `link_check`, `two_factor` | `LinkCheck { blockId @id → Block (cascade), url, status LinkStatus? (OK/BROKEN, null = değerlendirilemedi), failCount, checkedAt, notifiedAt? }`; Better Auth `twoFactor`: `TwoFactor { id, secret, backupCodes, userId → User (cascade), verified?, failedVerificationCount?, lockedUntil? }`, `User.twoFactorEnabled` (elle yazıldı, eklentinin şemasıyla aynı). LINK `data`'ya `gate: "adult" \| "spoiler"` (yalnızca JSON). |
 
 **Taslak link (Faz 7):** LINK'te boş `url` yalnızca `isVisible = false` iken geçerlidir. Kural `parseBlock`'ta değil, yazma eylemlerinde (`updateBlock`, `setVisibility`) uygulanır. Böylece public okuma yolu hiçbir zaman URL'siz link görmez.
 
@@ -260,7 +263,7 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 - `/l/[blockId]` blok görünür ve yayındaysa bir `CLICK` olayı yazar, ardından `302` ile hedefe gönderir. `Purpose: prefetch`, `Sec-Purpose` ve `Next-Router-Prefetch` başlıklı istekleri ve botları yazmadan yönlendirir.
 - Yazma işlemi `after()` (Next) ile yanıt gönderildikten sonra yapılır, yönlendirme beklemez.
 - Hedef URL kayıt sırasında zod ile doğrulanır (`http:`/`https:`/`mailto:`/`tel:` dışındaki şemalar reddedilir).
-- *(Faz 8)* `/l/[blockId]` tür başına davranır: LINK, IMAGE, PRODUCT, WHATSAPP → 302; CONTACT → `text/vcard` ek dosyası. *(Faz 13)* `gate` alanlı LINK önce sunucuda çizilen bir onay sayfası gösterir, tıklama yalnızca `?ok=1` ile gelen istekte yazılır.
+- *(Faz 8)* `/l/[blockId]` tür başına davranır: LINK, IMAGE, PRODUCT, WHATSAPP → 302; CONTACT → `text/vcard` ek dosyası. *(Faz 13)* `gate` alanlı LINK önce sunucuda çizilen onay sayfasına (`/l/<id>/gate`, 302) gider, tıklama yalnızca `?ok=1` ile gelen istekte yazılır. Görünürlük/yayın/zamanlama kontrolü route ile sayfa arasında ortak (`features/profile/public.ts` → `getLiveBlock`).
 - *(Faz 8)* Kopyalama (IBAN, ad): `/api/e` `{ p, b, k: "copy" }` kabul eder ve `record.ts` üzerinden CLICK yazar. Filtreler ve tekrar kilidi tıklamayla aynıdır. Tek yazma noktası kuralı korunur.
 
 ### Gizlilik
@@ -313,8 +316,8 @@ GITHUB_TOKEN                   # Faz 12 (uygulandı), opsiyonel: pinned repolar 
 
 ## 10.1 Zamanlanmış işler ve dış getirme
 
-- **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, çalıştırma başına sınırlı parti), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İleride `DailyStat` toplaması da buraya gelir.
-- **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com` host'ları; AB onay ekranı için yalnızca bu host'lara `SOCS` çerezi), kırık link kontrolü (Faz 13). Kullanıcının verdiği her URL bu korumadan geçer. Tek istisna kullanıcı URL'i olmayan, sabit host'a doğrulanmış kimlikle kurulan YouTube beslemesi (`channelFeedUrl`).
+- **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, `features/link-check/check.ts`: çalıştırma başına 120 blok, 20 paralel, istek başına 8 sn; blok 20 saatte bir), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İkisi `Promise.allSettled` ile yan yana; biri düşerse uç 500 döner ama diğeri tamamlanır. İleride `DailyStat` toplaması da buraya gelir.
+- **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com` host'ları; AB onay ekranı için yalnızca bu host'lara `SOCS` çerezi), kırık link kontrolü (Faz 13, `probeUrl`: yalnızca durum kodu okunur, gövde okunmaz). Kullanıcının verdiği her URL bu korumadan geçer. Tek istisna kullanıcı URL'i olmayan, sabit host'a doğrulanmış kimlikle kurulan YouTube beslemesi (`channelFeedUrl`).
 - **GitHub API** (Faz 12) `lib/github.ts`: sabit `api.github.com`, doğrulanmış kullanıcı adı (`lib/validation/github.ts`); kullanıcı URL'i getirilmez, bu yüzden `link-preview` korumasından geçmez. Yalnızca sahibinin içe aktarma isteğinde, 10 dakikada 3.
 - **Vercel Domains API** (Faz 11) düz `fetch` ile `lib/vercel-domains.ts`'ten çağrılır. Kullanıcı girdisi yalnızca doğrulanmış hostname olarak gider.
 

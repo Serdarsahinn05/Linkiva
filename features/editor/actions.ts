@@ -118,6 +118,7 @@ const draftSchema = z.partialRecord(z.enum([
     "card",
     "desc",
     "img",
+    "gate",
     "collapsible",
     "name",
     "iban",

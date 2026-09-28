@@ -2,7 +2,9 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import type { BlockSize, BlockType, SocialPlatform } from "@/prisma/generated/enums";
 import { db } from "@/lib/db";
+import { isLive } from "@/lib/schedule";
 import { SOCIAL_ORDER } from "@/lib/socials";
+import { parseBlock } from "@/lib/validation/blocks";
 
 export const profileTag = (username: string) => `profile:${username}`;
 
@@ -84,6 +86,30 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
 export const getPublicProfile = cache((username: string) =>
   unstable_cache(() => loadProfile(username), ["public-profile", username], { tags: [profileTag(username)] })(),
 );
+
+/**
+ * A block a visitor may open: visible, inside its schedule, valid, on a published profile; else null. Uncached, read by
+ * the /l route and the sensitive content page on every tap.
+ */
+export async function getLiveBlock(blockId: string) {
+  const block = await db.block.findUnique({
+    where: { id: blockId },
+    select: {
+      type: true,
+      data: true,
+      isVisible: true,
+      startsAt: true,
+      endsAt: true,
+      profile: { select: { id: true, userId: true, username: true, displayName: true, isPublished: true, customDomain: { select: { hostname: true, verifiedAt: true } } } },
+    },
+  });
+  if (!block?.isVisible || !block.profile.isPublished) return null;
+  if (!isLive({ startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null })) return null;
+  const parsed = parseBlock(block.type, block.data);
+  if (!parsed) return null;
+  const { customDomain, ...profile } = block.profile;
+  return { block: parsed, profile: { ...profile, domain: customDomain?.verifiedAt ? customDomain.hostname : null } };
+}
 
 /**
  * Where a past username now lives, while its redirect is still valid (UsernameHistory). Cached under the old name's tag,

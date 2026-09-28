@@ -2,12 +2,39 @@ import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins/two-factor";
+import { isLocale } from "@/i18n/config";
 import { localeFromRequest } from "@/i18n/detect";
 import { db } from "@/lib/db";
 import { env, isE2E } from "@/lib/env";
 import { sendMail, sendMailQuietly } from "@/lib/mail/send";
+import { allow } from "@/lib/ratelimit";
 import { site } from "@/lib/site";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/validation/auth";
+
+type HookContext = Parameters<Parameters<typeof createAuthMiddleware>[0]>[0];
+
+/** Where the twoFactor plugin counts failed codes (only during sign-in, never on the enable flow's session path). */
+const TWO_FACTOR_VERIFY = new Set(["/two-factor/verify-totp", "/two-factor/verify-backup-code"]);
+
+/**
+ * Ten wrong codes in a row lock the account for 15 minutes (plugin default). Getting that far means someone knows the
+ * password, so the owner is told once per lock, in their own language (not the requester's). The user comes from the
+ * pending sign-in's signed cookie, the same way the plugin reads it.
+ */
+async function noticeTwoFactorLock(ctx: HookContext) {
+  const signed = await ctx.getSignedCookie(ctx.context.createAuthCookie("two_factor").name, ctx.context.secret);
+  const userId = signed ? (await ctx.context.internalAdapter.findVerificationValue(signed))?.value : null;
+  if (!userId) return;
+  const locked = await db.twoFactor.findFirst({
+    where: { userId, lockedUntil: { gt: new Date() } },
+    select: { user: { select: { email: true, profile: { select: { locale: true } } } } },
+  });
+  if (!locked || !(await allow("two-factor-lock-mail", userId, 1, 15 * 60))) return;
+  const saved = locked.user.profile?.locale;
+  const locale = isLocale(saved) ? saved : localeFromRequest(ctx.request);
+  await sendMailQuietly({ to: locked.user.email, kind: "twoFactorLocked", locale, url: `${site.url}/forgot-password` });
+}
 
 const google =
   env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
@@ -103,16 +130,27 @@ export const auth = betterAuth({
   },
 
   hooks: {
-    // Security notice after an in-app password change (resets are covered by onPasswordReset).
+    // Security notices: an in-app password change (resets are covered by onPasswordReset) and two-step verification
+    // turned off (a stolen session plus the password could otherwise remove it silently).
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/change-password" || ctx.context.returned instanceof APIError) return;
+      if (TWO_FACTOR_VERIFY.has(ctx.path)) {
+        if (ctx.context.returned instanceof APIError) await noticeTwoFactorLock(ctx);
+        return;
+      }
+      const notice = ctx.path === "/change-password" ? "passwordChanged" : ctx.path === "/two-factor/disable" ? "twoFactorOff" : null;
+      if (!notice || ctx.context.returned instanceof APIError) return;
       const email = ctx.context.session?.user.email;
-      if (email) await sendMailQuietly({ to: email, kind: "passwordChanged", locale: localeFromRequest(ctx.request), url: `${site.url}/forgot-password` });
+      if (email) await sendMailQuietly({ to: email, kind: notice, locale: localeFromRequest(ctx.request), url: `${site.url}/forgot-password` });
     }),
   },
 
   telemetry: { enabled: false },
-  plugins: [nextCookies()],
+  plugins: [
+    // Two-step verification (TOTP + backup codes) for email/password sign-in. Google sign-in keeps Google's own.
+    // Enabling, disabling and new backup codes all ask for the password. Secrets are encrypted with the auth secret.
+    twoFactor({ issuer: site.name }),
+    nextCookies(), // must stay last
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;

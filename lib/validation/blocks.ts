@@ -96,12 +96,17 @@ const pixels = z.string().regex(/^[1-9]\d{0,4}$/).optional();
 /** Block.data shape per BlockType. Every read and write of Block.data goes through these. */
 export const blockDataSchemas = {
   // card: shown as a preview card (desc + img read from the page by the owner's request, img copied to our Blob).
+  // gate: sensitive content; /l/<id> first shows a warning page, and the profile shows a plain button without the image.
   LINK: z.object({
     title: z.string().trim().min(1).max(TITLE_MAX),
     url,
     card: z.enum(["1", ""]).optional(),
     desc: z.string().trim().max(DESC_MAX).optional(),
     img: z.union([z.literal(""), z.string().max(2048).refine(isBlobStoreUrl, "img")]).optional(),
+    gate: z
+      .enum(["adult", "spoiler", ""])
+      .optional()
+      .transform((v) => v || undefined),
   }),
   // collapsible: the blocks after it, up to the next header or divider, fold under it (<details>).
   HEADER: z.object({ text: z.string().trim().min(1).max(TITLE_MAX), collapsible: flag }),

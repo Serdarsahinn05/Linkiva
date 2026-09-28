@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 import en from "@/messages/en.json";
 import tr from "@/messages/tr.json";
 
-export const MAIL_KINDS = ["verify", "reset", "changeEmail", "changeEmailConfirm", "welcome", "passwordChanged", "accountDeleted"] as const;
+export const MAIL_KINDS = ["verify", "reset", "changeEmail", "changeEmailConfirm", "welcome", "passwordChanged", "accountDeleted", "twoFactorOff", "twoFactorLocked"] as const;
 export type MailKind = (typeof MAIL_KINDS)[number];
 
 /** Values a template may interpolate; each kind uses a subset. */
@@ -73,6 +73,32 @@ export function renderMail(kind: MailKind, locale: Locale, params: MailParams = 
 
   const plain = [heading, "", body, ...(cta ? ["", `${cta}: ${href}`] : []), ...(security ? ["", security] : []), "", "—", catalog.footer, site.url].join("\n");
   return { subject: text("subject"), html, text: plain };
+}
+
+/** Broken link notice (features/link-check): the links that failed the daily check twice in a row, and the editor. */
+export function renderBrokenLinks(locale: Locale, links: { title: string; url: string }[]): RenderedMail {
+  const catalog = catalogOf(locale).mail;
+  const copy = catalog.brokenLinks;
+  const editorUrl = `${site.url}/dashboard`;
+  const count = String(links.length);
+  const body = copy.body.replace("{count}", count);
+
+  const list = `<tr><td style="padding:0 36px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${links
+    .map(
+      (l) =>
+        `<tr><td style="padding:10px 0;border-top:1px solid ${C.edge}"><div style="font-size:15px;font-weight:600;color:${C.ink}">${escapeHtml(l.title)}</div><div style="font-size:13px;line-height:1.5;color:${C.ink3};word-break:break-all">${escapeHtml(l.url)}</div></td></tr>`,
+    )
+    .join("")}</table></td></tr>`;
+  const rows = [
+    `<tr><td style="padding:8px 36px 22px;font-size:16px;line-height:1.6;color:${C.ink2}">${escapeHtml(body)}</td></tr>`,
+    list,
+    buttonRows(copy.cta, editorUrl, catalog.fallback),
+  ].join("\n");
+  const footerHtml = `${escapeHtml(copy.footer)}<br><a href="${escapeHtml(site.url)}" style="color:${C.ink3}">${escapeHtml(site.host)}</a>`;
+  const html = frame({ locale, subject: copy.subject, preheader: copy.preheader.replace("{count}", count), heading: copy.heading, rows, footerHtml });
+
+  const plain = [copy.heading, "", body, "", ...links.map((l) => `- ${l.title}: ${l.url}`), "", `${copy.cta}: ${editorUrl}`, "", "—", copy.footer, site.url].join("\n");
+  return { subject: copy.subject, html, text: plain };
 }
 
 export type DigestMail = {
