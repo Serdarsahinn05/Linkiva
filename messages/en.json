@@ -46,7 +46,7 @@
       ],
       "themes": [
         "Themes and customisation",
-        "Six themes, five typefaces, three button styles, your own colour and background image."
+        "Seven themes, five typefaces, three button styles, your own colour and background image."
       ],
       "schedule": [
         "Scheduled links",
@@ -69,21 +69,93 @@
         "Remove the Linkiva badge with one tap."
       ],
       "qr": [
-        "QR code",
-        "Download your address as an SVG or PNG QR code."
+        "QR code and story card",
+        "Download your address as a QR code and a story image ready to share."
       ],
       "noSale": [
         "Your data is not for sale",
         "No AI training, no ads, no sharing with third parties."
+      ],
+      "grid": [
+        "Grid layout",
+        "Lay your blocks out as tiles instead of a single column."
+      ],
+      "domain": [
+        "Custom domain",
+        "Serve your page on your own domain."
+      ],
+      "payments": [
+        "IBAN and WhatsApp",
+        "Your payment details copy in one tap, WhatsApp opens directly."
+      ],
+      "portfolio": [
+        "Portfolio",
+        "Tell your experience and skills on one wide page."
+      ],
+      "import": [
+        "Import",
+        "Bring your links from another page, or your GitHub projects, in one step."
+      ],
+      "twofa": [
+        "Two-step verification",
+        "Protect your account with an authenticator app code."
+      ],
+      "redirect": [
+        "Your link survives a new name",
+        "Change your username and the old address forwards to the new one for 90 days."
       ]
     },
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
     "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Computer engineer · Ankara",
-    "sampleHeader": "Projects",
     "sampleLinks": ["Linkiva", "GitHub", "Résumé"],
-    "sampleCapture": "Hear about new projects"
+    "sampleCapture": "Hear about new projects",
+    "themesTitle": "Seven themes, all yours.",
+    "themesLede": "Scroll and the phone turns to the next theme. Tap one to stay there.",
+    "stageViews": "Views · 7 days",
+    "stageQr": "QR code",
+    "themeDesc": {
+      "cam": "The default. Follows your device's light or dark mode.",
+      "gece": "Glass in front of a deep violet-blue light.",
+      "sade": "No light, thin outlined buttons.",
+      "kum": "Serif type on a warm sand ground.",
+      "terminal": "Mono type, green outlines.",
+      "afis": "Bold type, solid orange buttons.",
+      "portfolyo": "A quiet document look."
+    },
+    "yourBio": "Your short intro goes here",
+    "yourLinks": ["My website", "Instagram", "YouTube"],
+    "yourCapture": "Want to hear what's next?",
+    "promise": "No locked features · No trial · Your data is never sold",
+    "themeLabel": "Theme",
+    "faqTitle": "Questions",
+    "faq": {
+      "free": {
+        "q": "Is everything really free?",
+        "a": "Yes. No locked features, no trial and no paid plan. Everything on this page is yours from the day you sign up."
+      },
+      "analytics": {
+        "q": "How do you count my visitors?",
+        "a": "Without cookies, and with bots filtered out. You see how many came, from where and what they clicked, not who they are."
+      },
+      "import": {
+        "q": "Can I move from another page?",
+        "a": "Yes. Paste the address of your old page or your GitHub; we show what we found first and add nothing until you confirm."
+      },
+      "domain": {
+        "q": "Can I use my own domain?",
+        "a": "Yes, for free. Add it in Settings and enter the DNS record we show at your provider; once verified, your page opens there."
+      },
+      "rename": {
+        "q": "Will my old link break if I change my username?",
+        "a": "No. Your old address forwards to the new one for 90 days, so the links you shared keep working."
+      },
+      "data": {
+        "q": "Where is my data, and who gets it?",
+        "a": "Nobody. It is stored in Europe; no ads, no AI training, no sharing with third parties. Details in the <link>privacy notice</link>."
+      }
+    }
   },
   "auth": {
     "fields": {

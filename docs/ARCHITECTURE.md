@@ -76,6 +76,7 @@
 │  ├─ appearance/
 │  ├─ analytics/
 │  ├─ auth/
+│  ├─ landing/    (Faz 17: gezen telefon, tema paleti, kaydırma durakları)
 │  └─ account/
 ├─ lib/
 │  ├─ db.ts  env.ts  site.ts  auth.ts  auth-client.ts  session.ts

@@ -46,7 +46,7 @@
       ],
       "themes": [
         "Temalar ve özelleştirme",
-        "Altı tema, beş yazı tipi, üç buton stili, kendi rengin ve arka plan görselin."
+        "Yedi tema, beş yazı tipi, üç buton stili, kendi rengin ve arka plan görselin."
       ],
       "schedule": [
         "Planlı linkler",
@@ -69,21 +69,93 @@
         "Linkiva yazısını tek dokunuşla kaldır."
       ],
       "qr": [
-        "QR kod",
-        "Adresinin QR kodunu SVG ya da PNG olarak indir."
+        "QR kod ve hikâye kartı",
+        "Adresinin QR kodunu ve paylaşmaya hazır hikâye görselini indir."
       ],
       "noSale": [
         "Verin satılmaz",
         "Yapay zekâ eğitimi yok, reklam yok, üçüncü taraflarla paylaşım yok."
+      ],
+      "grid": [
+        "Izgara düzeni",
+        "Blokları tek sütun yerine kutucuklar hâlinde diz."
+      ],
+      "domain": [
+        "Özel alan adı",
+        "Sayfan kendi alan adında açılsın."
+      ],
+      "payments": [
+        "IBAN ve WhatsApp",
+        "Ödeme bilgin tek dokunuşla kopyalanır, WhatsApp doğrudan açılır."
+      ],
+      "portfolio": [
+        "Portfolyo",
+        "Deneyimini ve yeteneklerini geniş, tek parça bir sayfada anlat."
+      ],
+      "import": [
+        "İçe aktarma",
+        "Başka bir sayfadaki linklerini ya da GitHub projelerini tek adımda taşı."
+      ],
+      "twofa": [
+        "İki adımlı doğrulama",
+        "Hesabını doğrulama uygulamasının koduyla koru."
+      ],
+      "redirect": [
+        "Adın değişse de linkin çalışır",
+        "Kullanıcı adını değiştirirsen eski adresin 90 gün yenisine yönlenir."
       ]
     },
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
     "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Bilgisayar mühendisi · Ankara",
-    "sampleHeader": "Projeler",
     "sampleLinks": ["Linkiva", "GitHub", "Özgeçmiş"],
-    "sampleCapture": "Yeni projelerden haberdar ol"
+    "sampleCapture": "Yeni projelerden haberdar ol",
+    "themesTitle": "Yedi tema, hepsi senin.",
+    "themesLede": "Kaydırdıkça telefon döner, tema değişir. Birine dokun, orada dur.",
+    "stageViews": "Görüntülenme · 7 gün",
+    "stageQr": "QR kod",
+    "themeDesc": {
+      "cam": "Varsayılan. Cihazının açık ya da koyu moduna uyar.",
+      "gece": "Derin mor-mavi bir ışığın önünde cam.",
+      "sade": "Işık yok, ince çizgili butonlar.",
+      "kum": "Serif yazı, sıcak kum rengi zemin.",
+      "terminal": "Mono yazı, yeşil çizgi.",
+      "afis": "Kalın yazı, turuncu dolu butonlar.",
+      "portfolyo": "Sade bir belge görünümü."
+    },
+    "yourBio": "Kısa tanıtım yazın burada",
+    "yourLinks": ["Web sitem", "Instagram", "YouTube"],
+    "yourCapture": "Haberdar olmak ister misin?",
+    "promise": "Kilitli özellik yok · Deneme süresi yok · Verin satılmaz",
+    "themeLabel": "Tema",
+    "faqTitle": "Sık sorulanlar",
+    "faq": {
+      "free": {
+        "q": "Gerçekten her şey ücretsiz mi?",
+        "a": "Evet. Kilitli özellik, deneme süresi ya da ücretli plan yok. Bu sayfada gördüğün her şey hesabını açtığın gün açık."
+      },
+      "analytics": {
+        "q": "Ziyaretçilerimi nasıl sayıyorsunuz?",
+        "a": "Çerez kullanmadan ve botları ayıklayarak. Kaç kişinin geldiğini, nereden geldiğini ve neye tıkladığını görürsün; kim olduklarını değil."
+      },
+      "import": {
+        "q": "Başka bir sayfadan taşınabilir miyim?",
+        "a": "Evet. Eski sayfanın ya da GitHub'ının adresini yapıştır; önce ne bulduğumuzu gösteririz, onaylamadan hiçbir şey eklenmez."
+      },
+      "domain": {
+        "q": "Kendi alan adımı bağlayabilir miyim?",
+        "a": "Evet, ücretsiz. Ayarlar'dan alan adını ekle, sağlayıcında göstereceğimiz DNS kaydını gir; doğrulanınca sayfan o adreste açılır."
+      },
+      "rename": {
+        "q": "Kullanıcı adımı değiştirirsem eski linkim bozulur mu?",
+        "a": "Hayır. Eski adresin 90 gün boyunca yenisine yönlenir, paylaştığın linkler çalışmaya devam eder."
+      },
+      "data": {
+        "q": "Verilerim nerede, kiminle paylaşılıyor?",
+        "a": "Kimseyle. Veriler Avrupa'da tutulur; reklam, yapay zekâ eğitimi ve üçüncü taraf paylaşımı yok. Ayrıntılar <link>gizlilik metninde</link>."
+      }
+    }
   },
   "auth": {
     "fields": {

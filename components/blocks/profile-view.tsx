@@ -282,7 +282,7 @@ function pairNarrow(sections: Section[]): Section[][] {
 }
 
 /** The scene's CSS variables: accent (with a readable tone per ground) and the background dim. */
-function sceneVars(look: ResolvedAppearance): React.CSSProperties {
+export function sceneVars(look: ResolvedAppearance): React.CSSProperties {
   const vars: Record<string, string> = {};
   if (look.accent) {
     const light = readableAccent(look.accent, GROUND.light);

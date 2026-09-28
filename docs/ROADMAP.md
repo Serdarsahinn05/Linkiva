@@ -419,8 +419,13 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 
 ### Faz 17: Landing yenileme ve 3D (`faz-17-vitrin`)
 
-- [ ] İçerik güncel: yedi tema, ızgara, özel alan adı, IBAN/WhatsApp, portfolyo, içe aktarma, 2FA. Temaları gerçek CSS'le gösteren şerit, SSS. Rakip adı ve sahte sayı yok.
-- [ ] **3D şekil: uygulamaya geçmeden önce kullanıcıya seçenekler sorulur** (CSS 3D cam katmanlar / kütüphanesiz WebGL / three.js). DESIGN §8 "kütüphane eklenmez" kuralı değişecekse DESIGN.md de güncellenir.
+- [x] İçerik güncel: yedi tema, ızgara, özel alan adı, IBAN/WhatsApp, portfolyo, içe aktarma, 2FA, hikâye kartı, 90 gün ad yönlendirmesi (16 satır). Temaları gerçek CSS'le gösteren tema turu, SSS (6 soru). Rakip adı ve sahte sayı yok (görüntülenme kartı "Örnek profil"in parçası).
+- [x] **3D şekil:** kullanıcı seçenekleri tuvalde (A CSS 3D, B WebGL, C three.js) ve yerelde (`/dev/*` demoları: three.js cam telefon, kil karakter, karma) gördü; karar **A'nın tasarımı + three.js demolarının hareketi**, CSS 3D ile. Paket eklenmedi, DESIGN §8 kuralı yerinde (landing'e kaydırmaya bağlı hareket istisnası yazıldı).
+
+*Uygulama notları (2026-09-28):*
+- `features/landing/`: `landing-stage.tsx` (sabit, `aria-hidden` sahne; dönüşümler her karede elemanlara yazılır, React yalnızca ad/tema değişince çizer), `theme-palette.tsx` (gezen palet + tema adı), `scroll-stops.ts` (duraklar: `data-stop` işaretli bölümler; ekrandan uzun bölüm "tutulur", `tour`, `orbitAt`), `stage-looks.ts` (temaları `resolveAppearance` + `sceneVars` ile sahne özniteliklerine çevirir; `sceneVars` profile-view'dan dışa açıldı), `landing-faq.tsx`, `feature-rows.tsx`, `sample.ts`. Telefon ile sayfa arasında pencere olayları (`theme-events.ts`), adres çubukları olduğu gibi sunucu formu.
+- Tuzaklar: bölüm işareti `data-scene` olamaz (profil CSS'i kullanıyor, katmanlar bölüm sanılıyordu) → `data-stop`. Yörünge açısı zamanla büyürse bloklar giderek hızlanır → açılar sınırlı (`orbitAt`, `tests/unit/scroll-stops.test.ts`).
+- Mobil: telefon ilk ekranda ve tema bölümündeki `data-stage-slot` yerine oturur, arada söner; yatay taşma yok.
 
 ### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
 
