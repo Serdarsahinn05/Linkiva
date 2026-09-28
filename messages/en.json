@@ -1021,7 +1021,7 @@
     "showAllSessions": "Show all ({count})"
   },
   "errors": {
-    "notFoundTitle": "This page does not exist.",
+    "notFoundTitle": "This link is broken.",
     "notFoundBody": "The address may be mistyped, or the page was removed.",
     "home": "Back to home",
     "errorTitle": "Something went wrong.",

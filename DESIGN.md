@@ -223,6 +223,10 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 - *(Faz 14–15)* Alt bilgi (landing ve yasal sayfalar): `©` solda; sağda iletişim adresi (mail ikonu), Gizlilik, Koşullar ve diğer dilin adı (`languages` ikonu), hepsi `--ink-3` metin, hover'da `--ink`. Dil önerisi: yalnızca tercihi diğer dil olan ziyaretçiye, en üstte ortalı `glass` hap içinde tek cümle + ikincil hap düğme, önerilen dilde yazılır.
 - *(Faz 14)* Yasal sayfalar: tek büyük cam yüzey (28px), başlık + tarih, giriş paragrafı, `glass-flat` içindekiler kutusu (numaralar Geist Mono `--ink-3`), bölüm başlıkları 600. E-posta adresi metin içinde altı çizili link.
 
+### Durum sayfaları (404, hata)
+- Hata (500): ortalanmış tek cam kart (28px): Geist Mono kod, başlık, tek cümle, eylemler.
+- *(Faz 17 sonrası)* **404: kart yok, açık sayfa.** Solda Geist Mono `404`, display boyutunda başlık "Bu link kopmuş.", tek cümle ve eylemler; sağda büyük kabartma kil maskot (beyaz, monokrom). Mobilde maskot üstte, yazı ortalı altta. Maskot: iri parlak gözler, ortası kalkık kaşlar, hafif yan bir gülümseme ("hay aksi"); gözleri imleci izler, arada göz kırpar. Kolunu yana uzatıp ucu kopuk altı küçük halkalı zinciri tutar; zincir fizikle sarkar, kolla hafif salınır, imleç geçince hafifçe itilip sallanır (hız sınırlı, halkalar hep izleyiciye dönük: savrulup dönmez). Maskotun arkasında yumuşak bir ışık (`--c-glass-strong` + `--c-ambient-1`) sayfayı biraz aydınlatır; tuval sağa doğru geniştir ki zincir kesilmeden sallanabilsin. Profil 404'ünde başlık ve talep çubuğu aynı kalır, maskot yine gelir.
+
 ### Analitik (Operate + semantik neon)
 - Dört ana sayı cam bir şeritte yan yana durur (kart şablonu değil). Her birinin altında trend rozeti: artış `--positive`, düşüş `--negative`, değişim yoksa `--ink-3`. Koyu temada hafif neon parlamayla.
 - Grafik: görüntülenme `--info` alan grafiği (degrade dolgu → şeffaf), tıklama `--positive` çizgi. Izgara `--glass-edge`.
@@ -239,7 +243,7 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 - **Bölüm iskeleti (Faz 16):** yalnızca verisi akışla gelen bölümlerde (İstatistik rakamları, Kitle listesi): sayfanın başlığı hemen gelir, bölüm kendi yerinde aynı cam panelin veri olmayan hali olarak bekler. Şekiller `--glass-strong`, 12px köşe; 200 ms gecikmeyle belirir, 1,6 sn'lik yavaş nefes (opaklık 1 → 0,5), parlayan süpürme yok. Aralık değişince (7g/30g) yalnızca bu bölüm iskelete döner.
 - `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı, yavaş geçiş çizgisi akmaz (tam genişlikte sabit durur), iskelet nefes almaz.
 - *(Faz 17)* **Landing'de kaydırmaya bağlı hareket:** tek istisna gezen telefon. Hareket kaydırma konumundan türetilir (zamanla oynayan giriş animasyonu değil); duraklar arasında `smoothstep`, telefon kaydırmayı yumuşakça izler. Blok yörüngesi yavaş sabit hızdadır. `prefers-reduced-motion`: dönüş, tema turu dönüşü, yörünge, sırayla dönme ve süzülme yok; telefon yalnızca yer değiştirir, tema yine değişir.
-- Kütüphane eklenmez (CSS + WAAPI). Faz 17'de three.js denendi (cam telefon, kil karakter) ve bırakıldı: aynı etki CSS 3D ile paketsiz ve keskin yazıyla alındı.
+- Kütüphane eklenmez (CSS + WAAPI). Faz 17'de three.js denendi (cam telefon, kil karakter) ve landing için bırakıldı: aynı etki CSS 3D ile paketsiz ve keskin yazıyla alındı. **Tek istisna 404 maskotu** (kullanıcı kararı, 2026-09-28): three.js yalnızca 404 sayfalarında, sayfa çizildikten sonra tembel yüklenir (`features/errors/components/lost-mascot.tsx`); WebGL yoksa kutu boş kalır. `prefers-reduced-motion`: maskot durur, zincir sarkar.
 
 ---
 

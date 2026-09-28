@@ -1021,7 +1021,7 @@
     "showAllSessions": "Tümünü göster ({count})"
   },
   "errors": {
-    "notFoundTitle": "Bu sayfa yok.",
+    "notFoundTitle": "Bu link kopmuş.",
     "notFoundBody": "Adres yanlış yazılmış ya da sayfa kaldırılmış olabilir.",
     "home": "Ana sayfaya dön",
     "errorTitle": "Bir şeyler ters gitti.",

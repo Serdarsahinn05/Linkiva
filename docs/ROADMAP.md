@@ -427,6 +427,11 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 - Tuzaklar: bölüm işareti `data-scene` olamaz (profil CSS'i kullanıyor, katmanlar bölüm sanılıyordu) → `data-stop`. Yörünge açısı zamanla büyürse bloklar giderek hızlanır → açılar sınırlı (`orbitAt`, `tests/unit/scroll-stops.test.ts`).
 - Mobil: telefon ilk ekranda ve tema bölümündeki `data-stage-slot` yerine oturur, arada söner; yatay taşma yok.
 
+### Faz 17 sonrası düzeltmeler (`duzeltme-404`, 2026-09-28)
+
+- [x] Landing'de sol üstteki Linkiva yazısı ana sayfaya (dilin adresine) gider. Diğer sayfalarda zaten bağlantıydı.
+- [x] 404 sayfaları (site, adres eşleşmeyen genel 404, profil 404) kartsız: yazı solda, sağda büyük kil maskot; elinde ucu kopuk zincir fizikle sarkar, imleç geçince sallanır; başlık "Bu link kopmuş." / "This link is broken." (profil 404 başlığı değişmedi). three.js yalnızca burada, tembel; DESIGN §8'e istisna olarak yazıldı.
+
 ### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
 
 - [ ] Editörün üstünde kapatılabilir "Başlangıç" kartı (ilk link, fotoğraf, tema, adresi paylaş); adımlar mevcut veriden kendiliğinden işaretlenir. Açılışta modal tur yok (ilk 60 saniye ilkesi).

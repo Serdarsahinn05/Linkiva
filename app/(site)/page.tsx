@@ -12,7 +12,7 @@ import { stageLooks } from "@/features/landing/stage-looks";
 import { SiteFooter } from "@/features/legal/components/site-footer";
 import { LanguageSuggestion } from "@/features/locale/components/language-switch";
 import { ClaimForm } from "@/features/profile/components/claim-form";
-import { marketingAlternates, pageLocale } from "@/i18n/marketing";
+import { localizedPath, marketingAlternates, pageLocale } from "@/i18n/marketing";
 import { cn } from "@/lib/cn";
 import { THEME_KEYS, type ThemeKey } from "@/themes";
 
@@ -56,7 +56,9 @@ export default async function HomePage() {
       />
       <LanguageSuggestion page="/" />
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between py-2">
-        <Wordmark />
+        <Link href={localizedPath("/", pageLocale(await getLocale()))} className="inline-block rounded-full">
+          <Wordmark />
+        </Link>
         <nav className="flex items-center gap-1">
           <Link href="/login" className={cn(buttonBase, buttonVariants.ghost, buttonSizes.md)}>
             {t("common.login")}
