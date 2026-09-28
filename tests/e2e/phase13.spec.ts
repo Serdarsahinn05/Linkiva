@@ -169,6 +169,51 @@ test("two-step verification: nobody gets in with the password alone", async ({ p
   await lastMail(email, "twoFactorOff", started);
 });
 
+test("ten wrong codes lock the sign-in and tell the owner", async ({ page, browser }) => {
+  const username = `tl-${uid()}`;
+  const { email } = await createUser(page, username);
+  // Turned on through the API (the dialog is covered above); same-origin requests carry the page's session cookie.
+  const origin = { origin: new URL(page.url()).origin };
+  const enabled = await page.request.post("/api/auth/two-factor/enable", { data: { password: PASSWORD }, headers: origin });
+  const secret = new URL((await enabled.json()).totpURI).searchParams.get("secret")!;
+  expect((await page.request.post("/api/auth/two-factor/verify-totp", { data: { code: totp(secret) }, headers: origin })).ok()).toBe(true);
+
+  const other = await browser.newContext({ locale: "tr-TR" });
+  const stranger = await other.newPage();
+  const wrong = String((Number(totp(secret)) + 500_000) % 1_000_000).padStart(6, "0");
+  const started = Date.now();
+  // Five tries per sign-in (then the plugin asks for a new one), ten in a row lock the account.
+  for (let round = 0; round < 2; round++) {
+    await signIn(stranger, email);
+    for (let i = 0; i < 5; i++) {
+      await stranger.getByLabel("6 haneli kod").fill(wrong);
+      await Promise.all([stranger.waitForResponse((r) => r.url().includes("/two-factor/verify-totp")), stranger.getByRole("button", { name: "Doğrula" }).click()]);
+    }
+  }
+  expect(await lastMail(email, "twoFactorLocked", started)).toContain("/forgot-password");
+
+  // Locked: even the right code is refused for now.
+  await stranger.getByLabel("6 haneli kod").fill(totp(secret));
+  await stranger.getByRole("button", { name: "Doğrula" }).click();
+  await expect(stranger.getByRole("alert").filter({ hasText: "15 dakika kilitlendi" })).toBeVisible();
+  await expect(stranger).not.toHaveURL(/\/dashboard/);
+  await other.close();
+});
+
+test("site pages cannot be framed; profiles can (the dashboard previews them in an iframe)", async ({ request }) => {
+  for (const path of ["/login", "/register", "/forgot-password"]) {
+    const headers = (await request.get(path)).headers();
+    expect(headers["x-frame-options"], path).toBe("DENY");
+    expect(headers["content-security-policy"], path).toContain("frame-ancestors 'none'");
+    expect(headers["x-content-type-options"], path).toBe("nosniff");
+    expect(headers["x-powered-by"], path).toBeUndefined();
+  }
+  const [{ username }] = await sql(`select username from profile where "isPublished" limit 1`);
+  const profile = (await request.get(`/${username}`)).headers();
+  expect(profile["x-frame-options"]).toBeUndefined();
+  expect(profile["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+});
+
 test("the dashboard installs as an app; profiles do not link the manifest", async ({ page, request }) => {
   const res = await request.get("/manifest.webmanifest");
   expect(res.headers()["content-type"]).toContain("application/manifest+json");

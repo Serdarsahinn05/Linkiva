@@ -150,7 +150,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ## v2 sonrası yol haritası (Faz 6–13)
 
-> Durum: **Onaylandı 2026-09-27. Faz 6–12 canlıda, Faz 13 `faz-13-bakim` dalında bitti (2026-09-28), birleştirme kullanıcı onayında.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
+> Durum: **Onaylandı 2026-09-27. Faz 6–12 canlıda, Faz 13 `master`'a birleşti (2026-09-28), canlıya push production `db:deploy` sonrası.** Dayanak: rakip araştırması (aşağıda) ve kullanıcının onayladığı öneri listesi.
 > Her faz kendi dalında (`faz-6-guven`, `faz-7-hizli-baslangic` …) yürür, kendi içinde yeşil biter (`npm run check`, ilgili e2e, 390/1440 görüntü), preview'da denenir ve kullanıcı onayıyla `master`'a birleşir. Mutasyon içeren her maddede ARCHITECTURE §11 uygulanır ve sahiplik testi yazılır.
 
 ### Neden bu sıra

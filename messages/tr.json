@@ -91,7 +91,8 @@
       "useBackup": "Uygulamana ulaşamıyor musun? Yedek kod kullan",
       "useApp": "Uygulamadaki kodu kullan",
       "badCode": "Kod hatalı. Uygulamadaki güncel kodu yaz.",
-      "expired": "Kodu girme süresi doldu. Yeniden giriş yap."
+      "expired": "Kodu girme süresi doldu. Yeniden giriş yap.",
+      "locked": "Art arda çok fazla hatalı kod girildi. Güvenliğin için giriş 15 dakika kilitlendi."
     },
     "login": {
       "title": "Tekrar hoş geldin.",
@@ -229,6 +230,14 @@
       "body": "Linkiva hesabında iki adımlı doğrulama az önce kapatıldı. Giriş için artık yalnızca şifren yetiyor.",
       "cta": "Ben kapatmadım, şifremi sıfırla",
       "security": "Bunu sen yaptıysan başka bir şey yapmana gerek yok. Ayarlar'dan yeniden açabilirsin."
+    },
+    "twoFactorLocked": {
+      "subject": "Linkiva: hesabına giriş denendi",
+      "preheader": "Şifren doğru girildi ama doğrulama kodu art arda hatalıydı.",
+      "heading": "Hesabına giriş denendi",
+      "body": "Linkiva hesabına şifrenle giriş yapıldı ama iki adımlı doğrulama kodu art arda 10 kez hatalı girildi. Güvenliğin için girişi 15 dakika kilitledik. Bu sen değilsen şifren başkasının elinde olabilir.",
+      "cta": "Şifremi değiştir",
+      "security": "Bu sendin ve kodu karıştırdıysan 15 dakika sonra yeniden deneyebilirsin. Uygulamana ulaşamıyorsan yedek kodlarından birini kullan."
     },
     "brokenLinks": {
       "subject": "Linkiva: sayfandaki bir link açılmıyor",

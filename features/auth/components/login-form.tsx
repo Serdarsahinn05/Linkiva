@@ -11,7 +11,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { GoogleButton, OrDivider } from "./google-button";
 
-type Status = "idle" | "invalid" | "unverified" | "tooMany" | "error" | "badCode" | "expired";
+type Status = "idle" | "invalid" | "unverified" | "tooMany" | "error" | "badCode" | "expired" | "locked";
 
 export function LoginForm({ googleEnabled, notice }: { googleEnabled: boolean; notice?: "passwordReset" }) {
   const t = useTranslations();
@@ -68,7 +68,8 @@ export function LoginForm({ googleEnabled, notice }: { googleEnabled: boolean; n
       // The ten minutes to enter the code ran out: start again from the password.
       setStep("password");
       setStatus("expired");
-    } else if (error.status === 429 || error.code === "ACCOUNT_TEMPORARILY_LOCKED" || error.code === "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE") setStatus("tooMany");
+    } else if (error.code === "ACCOUNT_TEMPORARILY_LOCKED") setStatus("locked");
+    else if (error.status === 429 || error.code === "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE") setStatus("tooMany");
     else if (error.code === "INVALID_CODE" || error.code === "INVALID_BACKUP_CODE" || error.status === 401) setStatus("badCode");
     else setStatus("error");
   }
@@ -80,6 +81,7 @@ export function LoginForm({ googleEnabled, notice }: { googleEnabled: boolean; n
     error: t("common.genericError"),
     badCode: t("auth.twoFactor.badCode"),
     expired: t("auth.twoFactor.expired"),
+    locked: t("auth.twoFactor.locked"),
   };
   const statusNotice = status !== "idle" && <Notice tone={status === "unverified" || status === "expired" ? "info" : "error"}>{messages[status]}</Notice>;
 

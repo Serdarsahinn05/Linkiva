@@ -91,7 +91,8 @@
       "useBackup": "Can't reach your app? Use a backup code",
       "useApp": "Use the code from your app",
       "badCode": "Wrong code. Enter the current code from your app.",
-      "expired": "The time to enter the code ran out. Log in again."
+      "expired": "The time to enter the code ran out. Log in again.",
+      "locked": "Too many wrong codes in a row. To keep you safe, sign-in is locked for 15 minutes."
     },
     "login": {
       "title": "Welcome back.",
@@ -229,6 +230,14 @@
       "body": "Two-step verification was just turned off on your Linkiva account. Signing in now only needs your password.",
       "cta": "It wasn't me, reset my password",
       "security": "If you turned it off, there is nothing else to do. You can turn it back on in Settings."
+    },
+    "twoFactorLocked": {
+      "subject": "Linkiva: someone tried to sign in to your account",
+      "preheader": "Your password was entered correctly, but the verification code was wrong again and again.",
+      "heading": "Someone tried to sign in",
+      "body": "Someone signed in to your Linkiva account with your password, then entered a wrong two-step verification code 10 times in a row. To keep you safe, we locked sign-in for 15 minutes. If this wasn't you, someone else may have your password.",
+      "cta": "Change my password",
+      "security": "If it was you and you mixed up the code, try again in 15 minutes. Can't reach your app? Use one of your backup codes."
     },
     "brokenLinks": {
       "subject": "Linkiva: a link on your page is not opening",

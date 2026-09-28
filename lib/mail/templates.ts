@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 import en from "@/messages/en.json";
 import tr from "@/messages/tr.json";
 
-export const MAIL_KINDS = ["verify", "reset", "changeEmail", "changeEmailConfirm", "welcome", "passwordChanged", "accountDeleted", "twoFactorOff"] as const;
+export const MAIL_KINDS = ["verify", "reset", "changeEmail", "changeEmailConfirm", "welcome", "passwordChanged", "accountDeleted", "twoFactorOff", "twoFactorLocked"] as const;
 export type MailKind = (typeof MAIL_KINDS)[number];
 
 /** Values a template may interpolate; each kind uses a subset. */
