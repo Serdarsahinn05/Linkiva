@@ -109,6 +109,42 @@ Anahtarla sabitlenmiş (pinned) repolar gelir ve sınır saatte 5000 olur.
 2. Token name: `linkiva-import`, Expiration: 1 yıl (dolunca yenilenir), Repository access: **Public repositories (read-only)**. Başka izin verme.
 3. **Generate token** → değeri kopyala → Vercel → proje → Settings → Environment Variables → `GITHUB_TOKEN`, yalnızca **Production** → Redeploy.
 
+## 5d. İçerik kaldırma (Faz 14, admin paneli gelene kadar)
+
+Kullanım Koşulları, hukuka aykırı içerik bildirimlerinin `hello@linkiva.space`'e yapılacağını ve içeriğin kaldırılacağını
+söylüyor (5651 sayılı Kanun, yer sağlayıcı). Kaldırma, canlı sitedeki `/api/takedown` ucunu çağıran küçük bir komutla yapılır.
+Profil sayfaları önbellekte durduğu için veritabanından elle silmek yetmez; bu komut önbelleği de hemen temizler.
+
+**Bir kez kurulum**
+
+1. Gizli anahtar üret (Git Bash): `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`.
+   Çıkan değeri parola yöneticine kaydet. Depoya ya da bir dosyaya yazma.
+2. Vercel → proje → **Settings** → **Environment Variables** → Key `TAKEDOWN_SECRET`, Value az önceki değer, yalnızca
+   **Production** → **Save** → **Deployments** → en üstteki → **⋯** → **Redeploy**. Anahtar yokken uç 404 döner.
+
+**Bir bildirim geldiğinde**
+
+1. Bildirilen sayfayı aç ve gerçekten Koşullar'a aykırı mı bak.
+   - **Çocuk istismarı şüphesi varsa:** içeriği indirme, ekran görüntüsü alma, kimseye iletme (bulundurmak da suçtur).
+     Kullanıcı adını ve adresi not et, <https://www.ihbarweb.org.tr> üzerinden bildir, sonra aşağıdaki adımlarla kaldır.
+2. Kaldırılacak bloğun kimliğini bul. İki yol var:
+   - Link, ürün, proje gibi tıklanan bloklarda: profilde öğeye sağ tık → **Bağlantı adresini kopyala** →
+     `linkiva.space/l/` sonrasındaki kısım blok kimliğidir.
+   - Görsel bloğu ya da hepsi için: Supabase → proje → **SQL Editor** → aşağıdakini kullanıcı adıyla çalıştır (yalnızca okur):
+     `select b.id, b.type, b.data from block b join profile p on p.id = b."profileId" where p.username = 'kullaniciadi' order by b.position;`
+3. Git Bash'te depo klasöründe, anahtarı komut geçmişine düşmeden gir (yazdığın görünmez, Enter'a bas):
+   `read -rs TAKEDOWN_SECRET && export TAKEDOWN_SECRET TAKEDOWN_URL="https://linkiva.space"`
+4. Duruma göre birini çalıştır:
+   - Bir blok (görseliyle birlikte): `node scripts/takedown.mjs remove-block <blokKimliği>`
+   - Profil fotoğrafı ve arka plan görseli: `node scripts/takedown.mjs remove-images <kullanıcıadı>`
+   - Bütün sayfayı yayından kaldır: `node scripts/takedown.mjs unpublish <kullanıcıadı>`
+5. `200 {"ok":true,…}` görmelisin. Profili yeniden aç, içeriğin gittiğini gör. `404` "bulunamadı", `401` anahtar yanlış demektir.
+6. Kaydını tut: tarih, bildiren, adres, gerekçe, yapılan işlem (Vercel günlükleri kısa süre saklanır, `[takedown]` satırı
+   yalnızca geçici kanıt). Bildirimi yapana ve içerik sahibine kısa bir e-postayla haber ver (Koşullar böyle söylüyor).
+
+**Sınırlar:** `unpublish` sonrası sahip sayfasını Ayarlar'dan yeniden yayına alabilir; tekrar ederse askıya alma ve hesap
+kapatma Faz 19'daki admin paneliyle gelir. Hesabın tamamen silinmesi gerekirse o zamana kadar elle yapılır, sor.
+
 ## 6. Önce dene, sonra birleştir
 
 1. `rebuild/v2` dalını GitHub'a gönder. Vercel dal için bir **preview** adresi üretir.
@@ -144,11 +180,30 @@ e2e yeşil olunca kullanıcı onayıyla doğrudan `master`'a birleştirilip push
 `npm run db:deploy` (yalnızca eksik migration'lar, veri silmez) uygulanır; migration'lar geriye uyumlu yazılır
 (yeni kolon varsayılanlı ya da boş olabilir), böylece eski kod yeni şemayla da çalışır.
 
-**Faz 13 (2026-09-28, `faz-13-bakim`):** iki yeni migration: `20261002090000_link_check`, `20261003090000_two_factor`
-(yalnızca yeni tablo ve varsayılanlı kolon, eski kod etkilenmez). Birleştirmeden önce production DB'ye `db:deploy`.
+**Faz 13 (2026-09-28, `master` `cf30439`, push'landı):** iki yeni migration: `20261002090000_link_check`, `20261003090000_two_factor`
+(yalnızca yeni tablo ve varsayılanlı kolon, eski kod etkilenmez). Production DB'de uygulandı (12/12).
 Yeni ortam değişkeni yok: kırık link kontrolü mevcut günlük cron'u (`CRON_SECRET`) kullanır, 2FA sırları
 `BETTER_AUTH_SECRET` ile şifrelenir (**bu değer değiştirilirse açık 2FA'lar çözülemez**, kullanıcılar yedek kodla da
 giremez; değiştirmek gerekirse önce 2FA'yı kapattırın).
+
+Canlıda kontrol edilecekler (Faz 13 + güvenlik düzeltmeleri; yapıldıkça işaretle):
+
+- [ ] Başlıklar: `https://linkiva.space/login` yanıtında `X-Frame-Options: DENY`,
+  `Content-Security-Policy: frame-ancestors 'none'`, `X-Content-Type-Options: nosniff` var, `X-Powered-By` yok
+  (tarayıcı → DevTools → Network → isteğe tıkla → Response Headers). Bir profil sayfasında `X-Frame-Options` yok.
+- [ ] Panel önizlemesi (sağdaki profil iframe'i) hâlâ görünüyor.
+- [ ] 2FA: Ayarlar → İki adımlı doğrulama → Aç; başka bir tarayıcıdan (gizli pencere) girişte kod soruluyor,
+  kod girmeden panel açılmıyor.
+- [ ] 2FA kilit maili: gizli pencerede 10 kez yanlış kod → "Hesabına giriş denendi" maili geliyor, formda
+  "15 dakika kilitlendi" yazıyor. (15 dakika sonra ya da yedek kodla tekrar girilebilir.)
+- [ ] Hassas içerik kapısı: bir linke "18+ uyarısı" koy, profilden tıklayınca önce uyarı sayfası açılıyor.
+- [ ] Kırık link kontrolü: ilk günlük çalışma (06:00 UTC) sonrası Vercel → Logs'ta `[cron:daily]` satırında
+  `links: { checked: … }` görünüyor, hata yok.
+- [ ] PWA: telefonda `linkiva.space/dashboard` → "Ana ekrana ekle" → uygulama panelden açılıyor.
+
+**Faz 14 (`faz-14-yasal`):** migration yok. Yeni ortam değişkeni `TAKEDOWN_SECRET` (§5d); eklenmezse yalnızca kaldırma ucu
+kapalı kalır, site çalışır. Günlük cron artık temizlik de yapıyor: Vercel → Logs'ta `[cron:daily]` satırında
+`cleanup: { rateLimits, verifications, usernames }` görünür.
 
 ### Sonra eklenebilecekler (isteğe bağlı ortam değişkenleri)
 

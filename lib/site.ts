@@ -5,6 +5,8 @@ export const site = {
   name: "Linkiva",
   url: appUrl,
   host: new URL(appUrl).host,
+  /** The real mailbox people write to (docs/DEPLOY.md §5): contact, rights requests, abuse reports. */
+  email: "hello@linkiva.space",
 } as const;
 
 /** The profile's address: its verified custom domain when it has one (ROADMAP Faz 11), else linkiva.space/<username>. */

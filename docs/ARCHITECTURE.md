@@ -306,6 +306,7 @@ UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   # opsiyonel lokal
 BLOB_READ_WRITE_TOKEN
 TRACKING_SALT_SECRET
 CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer (yoksa uç 404); ayrıca özet maili çıkış token'ının HMAC anahtarı
+TAKEDOWN_SECRET                # Faz 14: /api/takedown için Bearer, en az 32 karakter (yoksa uç 404); yalnızca scripts/takedown.mjs kullanır
 VERCEL_API_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID   # Faz 11: özel alan adı (yoksa bölüm gizli); team id yalnızca proje bir ekipteyse
 # Planlı (faz geldiğinde lib/env.ts + .env.example'a eklenir; yoksa özellik lib/features.ts ile gizlenir)
 GITHUB_TOKEN                   # Faz 12 (uygulandı), opsiyonel: pinned repolar (GraphQL) ve 5000/saat limit; yoksa son repolar, 60/saat
@@ -316,9 +317,10 @@ GITHUB_TOKEN                   # Faz 12 (uygulandı), opsiyonel: pinned repolar 
 
 ## 10.1 Zamanlanmış işler ve dış getirme
 
-- **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, `features/link-check/check.ts`: çalıştırma başına 120 blok, 20 paralel, istek başına 8 sn; blok 20 saatte bir), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent). İkisi `Promise.allSettled` ile yan yana; biri düşerse uç 500 döner ama diğeri tamamlanır. İleride `DailyStat` toplaması da buraya gelir.
+- **Tek cron:** `vercel.json` → `/api/cron/daily`, günde bir (Vercel Hobby sınırı). `Authorization: Bearer CRON_SECRET` yoksa 401. İçinde: her gün kırık link kontrolü (Faz 13, `features/link-check/check.ts`: çalıştırma başına 120 blok, 20 paralel, istek başına 8 sn; blok 20 saatte bir), pazartesi haftalık özet maili (Faz 9, `digestSentAt` ile idempotent), her gün temizlik (Faz 14, `features/maintenance/cleanup.ts`: bir günden eski hız sınırı sayaçları, süresi dolmuş doğrulama kayıtları, 90 günü dolmuş eski kullanıcı adları; gizlilik metnindeki saklama sürelerinin kod karşılığı). Üçü `Promise.allSettled` ile yan yana; biri düşerse uç 500 döner ama diğerleri tamamlanır. İleride `DailyStat` toplaması da buraya gelir.
 - **Dış getirmenin tek kapısı `lib/link-preview.ts`:** link kartı, içe aktarma (Faz 7, host beyaz listesi `linktr.ee`), YouTube kanal kimliği (Faz 10, `youtube.com` host'ları; AB onay ekranı için yalnızca bu host'lara `SOCS` çerezi), kırık link kontrolü (Faz 13, `probeUrl`: yalnızca durum kodu okunur, gövde okunmaz). Kullanıcının verdiği her URL bu korumadan geçer. Tek istisna kullanıcı URL'i olmayan, sabit host'a doğrulanmış kimlikle kurulan YouTube beslemesi (`channelFeedUrl`).
 - **GitHub API** (Faz 12) `lib/github.ts`: sabit `api.github.com`, doğrulanmış kullanıcı adı (`lib/validation/github.ts`); kullanıcı URL'i getirilmez, bu yüzden `link-preview` korumasından geçmez. Yalnızca sahibinin içe aktarma isteğinde, 10 dakikada 3.
+- **İçerik kaldırma** (Faz 14, admin paneline kadar): `POST /api/takedown`, `Authorization: Bearer TAKEDOWN_SECRET` (sabit zamanlı karşılaştırma, `lib/bearer.ts`), zod ile üç eylem (`unpublish`, `remove-images`, `remove-block`). Önce dosyalar silinir (barındırılan içerik odur), sonra kayıt; profil önbelleği `revalidateTag(…, { expire: 0 })` ile hemen düşer. Oturumla değil operatör anahtarıyla çalışır; arayüzden çağrılmaz. Faz 19'da rol tabanlı panel ve denetim günlüğüyle değişir.
 - **Vercel Domains API** (Faz 11) düz `fetch` ile `lib/vercel-domains.ts`'ten çağrılır. Kullanıcı girdisi yalnızca doğrulanmış hostname olarak gider.
 
 ---

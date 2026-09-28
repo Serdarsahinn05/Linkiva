@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
+import { TermsConsent } from "@/features/legal/components/terms-consent";
 import { cn } from "@/lib/cn";
 import { createProfile } from "../actions";
 import { UsernameField, useUsernameCheck } from "./username-field";
@@ -53,6 +54,7 @@ export function OnboardingForm({ initialUsername, host }: { initialUsername: str
       <Button type="submit" block pending={submitting} pendingLabel={t("onboarding.pending")} disabled={!available || checking}>
         {t("onboarding.submit")}
       </Button>
+      <TermsConsent action="publish" />
     </form>
   );
 }

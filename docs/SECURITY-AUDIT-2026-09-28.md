@@ -27,7 +27,7 @@ Faz 13 diff'inde istismar edilebilir bir açık bulunmadı. 2FA atlatma, SSRF, e
 - Tüm yanıtlar: `nosniff`, `Referrer-Policy`, `Permissions-Policy`.
 - Site sayfaları (`/dashboard`, `/login`, `/register`, `/onboarding`, `/forgot-password`, `/reset-password`, `/check-email`, `/unsubscribe`, `/l/<id>/gate`): `X-Frame-Options: DENY` ve `frame-ancestors 'none'`.
 - Profiller gömülebilir kalıyor: panel önizlemesi profili iframe'de gösteriyor. `/` listede yok çünkü özel alan adı profili `/` adresinde sunuyor.
-- Tam CSP (`script-src` + nonce) hâlâ açık iş.
+- Tam CSP (`script-src` + nonce) hâlâ açık iş: ROADMAP → Backlog #8. Canlı kontrol listesi: DEPLOY.md → Durum → Faz 13.
 
 - **Nerede:** `next.config.ts` (`headers()` yok), `proxy.ts`, `vercel.json`
 - **Kanıt:** `GET /` ve `GET /login` yanıtlarında `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` ve `Permissions-Policy` başlıkları yok. `X-Powered-By: Next.js` var. HSTS yerelde yok; Vercel bunu kendi alan adlarında varsayılan olarak ekler.

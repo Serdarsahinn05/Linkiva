@@ -48,6 +48,7 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 - Yeniden kurulum temiz bir veritabanıyla başlar. Mevcut kullanıcı verisi taşınmaz.
 - Para kazanma modeli **karara bağlanmadı**. Ücretli plan yok, fiyatlandırma iddiası yazılmaz.
 - Portfolyo modu Faz 12'de geldi: `portfolyo` teması, proje/deneyim/yetenek blokları, GitHub'dan içe aktarma (DESIGN.md §7 Portfolyo).
+- Yasal metinler (`/privacy`, `/terms`, Faz 14) kodun davranışına göre yazıldı; veri sorumlusu Serdar Şahin. **Hukukçu okumasından geçmedi** (açık sorular ROADMAP Faz 14 notlarında). Müstehcen görsel yüklemek Koşullar'la yasak; 18+ uyarısı yalnızca linkler için.
 - İçe aktarma arayüzünde kaynak platformun adı ("Linktree'den taşı") işlevsel olarak geçebilir. Pazarlama metninde (landing, OG, mail) rakip adı ve fiyatı geçmez.
 
 ## Bilinçli olarak yapılmayanlar (2026-09-27)

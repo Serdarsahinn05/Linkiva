@@ -13,6 +13,17 @@
     "continue": "Continue",
     "genericError": "Something went wrong. Try again in a moment."
   },
+  "legal": {
+    "footerNav": "About the site",
+    "contact": "Write to us",
+    "privacy": "Privacy",
+    "terms": "Terms of Use",
+    "contents": "Contents",
+    "consent": {
+      "register": "By signing up you accept the <terms>Terms of Use</terms>. The <privacy>Privacy Notice</privacy> explains how your personal data is handled.",
+      "publish": "By publishing your page you agree to follow the <terms>Terms of Use</terms>. About your data: <privacy>Privacy Notice</privacy>."
+    }
+  },
   "landing": {
     "headline": "Everything you are, at one address.",
     "lede": "Gather your links, socials and content on one page. Build it, share it, see who clicks.",
@@ -62,7 +73,6 @@
     },
     "closeTitle": "Is your address still free?",
     "closeLede": "Claim your username and go live in a minute.",
-    "privacy": "Privacy",
     "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Computer engineer · Ankara",
     "sampleHeader": "Projects",
@@ -113,7 +123,6 @@
       "pending": "Creating account",
       "hasAccount": "Already have an account?",
       "toLogin": "Log in",
-      "terms": "By continuing you accept the Terms of Use and Privacy Policy.",
       "tooMany": "Too many sign-up attempts. Try again in a few minutes."
     },
     "checkEmail": {

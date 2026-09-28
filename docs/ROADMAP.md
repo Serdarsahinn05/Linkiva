@@ -367,6 +367,64 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 
 ---
 
+## Vitrin, yasal ve yönetim yol haritası (Faz 14–19)
+
+> Durum: **Onaylandı 2026-09-28** (kullanıcının yapılacaklar listesi). Faz 6–13 ile aynı kural: her faz kendi dalında, kendi içinde yeşil biter, kullanıcı onayıyla `master`'a birleşir. Sıra riske göre: önce yasal boşluk (kayıt formu var olmayan bir Kullanım Koşulları'na atıf yapıyordu), en son en çok uğraş ve güvenlik isteyen admin paneli.
+
+### Faz 14: Yasal metinler ve iletişim (`faz-14-yasal`)
+
+**Amaç:** Kayıt formunun atıf yaptığı Koşullar'ı yazmak, gizlilik metnini kodun bugün yaptığıyla eşitlemek (Faz 7–13 hiç anlatılmıyordu), ziyaretçiye ulaşma yolu ve hukuka aykırı içerik için bildirim-kaldırma düzeni kurmak.
+
+- [x] Ortak yasal belge düzeni (`features/legal/`): `/privacy` ve yeni `/terms` aynı bileşen, TR/EN, içindekiler, son güncelleme tarihi, site alt bilgisi. Metin kodda (`privacy.ts`, `terms.ts`), başında hangi kodu anlattığı yazılı.
+- [x] **Gizlilik ve KVKK aydınlatma metni:** veri sorumlusu (Serdar Şahin, `hello@linkiva.space`), işlenen veriler, amaçlar ve hukuki sebepler (KVKK m.5), alıcılar ve yurt dışı aktarım (Vercel, Supabase, Resend, Upstash, Google, ImprovMX, GitHub), toplama yöntemi ve sunucunun sahip adına attığı istekler, saklama süreleri, çerezler, m.11 hakları ve başvuru yolu, çocuklar. Oturumdaki IP/tarayıcı bilgisi, YouTube küçük resminin ziyaretçi tarayıcısından yüklenmesi, abone listesinde sahibin veri sorumlusu olması açıkça yazıldı.
+- [x] **Kullanım Koşulları:** hizmet (ödemeye aracılık yok), hesap ve yaş (13+, 18 altı veli izni), kullanıcı adı, içerik lisansı, abone listesi ve 6563, işbirliği etiketi, yasaklar (müstehcen görsel yüklenemez; 18+ uyarısı yalnızca hukuka uygun linke), bildirim ve kaldırma (5651 yer sağlayıcı), hesabın kapanması, sorumluluk (kast/ağır ihmal ve tüketici hakları saklı), değişiklik (süre taahhüdü yok, kullanıcı isteği), Türk hukuku. İki belgede de Türkçe sürüm esas.
+- [x] Onay cümlesi iki belgeye link verir; kayıtta "kabul" yalnızca Koşullar için, gizlilik metni "bilgilendirme" (KVKK aydınlatması rıza değildir). Google ile gelenler kayıt formunu görmeyebildiği için onboarding'de de ("Sayfamı yayınla" altında).
+- [x] İletişim: landing ve yasal sayfaların alt bilgisinde `hello@linkiva.space` (`site.email`), Gizlilik, Koşullar. Ayrı iletişim sayfası yok (`mailto:` yeter).
+- [x] Saklama sürelerini doğru kılmak: günlük cron bir günden eski hız sınırı sayaçlarını, süresi dolmuş doğrulama kayıtlarını ve 90 günü dolmuş eski kullanıcı adlarını siler (`features/maintenance/cleanup.ts`). Oturumlar bilinçli olarak silinmez (güvenlik; metin "hesap silinene kadar" diyor).
+- [x] +18 kapısı testi: kart görseli olan kapılı linkin görsel adresi profil HTML'inde yok, liste ve ızgarada (`tests/e2e/phase13.spec.ts`).
+- [x] Kaldırma yolu (admin paneli gelene kadar): `POST /api/takedown` (`TAKEDOWN_SECRET` Bearer, yoksa 404) ve onu çağıran `scripts/takedown.mjs`: bloğu görseliyle sil, profil fotoğrafı ve arka planı sil, sayfayı yayından kaldır; önbellek hemen düşer. Adımlar `docs/DEPLOY.md` §5d.
+
+**Kabul:** `/terms` ve `/privacy` iki dilde, 390px'te taşmıyor; kayıt formundan ve onboarding'den ikisine de gidiliyor; metindeki her iddia koddaki bir davranışa karşılık geliyor.
+
+*Uygulama notları (2026-09-28):*
+- **Hukukçu okuması yapılmadı.** Metinler kodun davranışına göre yazıldı, hukuki görüş değil. Açık sorular: yurt dışı aktarım için KVKK m.9 (2024) standart sözleşme ve Kurul'a bildirim; 5651 m.5 yer sağlayıcının trafik bilgisi saklama yükümlülüğünün bu projeye uygulanıp uygulanmadığı (uygulanıyorsa oturum kayıtlarının süresi buna göre belirlenir); VERBİS muafiyeti; yaş sınırı.
+- `/terms` zaten rezerve addı. Kaldırma ucu oturumla değil operatör anahtarıyla çalışır; ARCHITECTURE §10.1'de.
+- Test: `tests/integration/cleanup.test.ts` (yalnızca süresi dolanlar silinir), `tests/integration/takedown.test.ts` (yalnızca sahibin kendi Blob dosyaları silinir, diğer görünüm ayarları korunur, bilinmeyen ad/geçersiz girdi), `tests/e2e/phase13.spec.ts` (kapılı görsel sızmıyor).
+
+### Faz 15: Dil ve arama motoru (`faz-15-dil`)
+
+- [ ] Vitrin sayfalarına `/en` öneki (`/en`, `/en/privacy`, `/en/terms`). Kullanıcı adı en az 3 karakter olduğu için çakışmaz, yine de rezerve listeye girer. Türkçe `/`'de kalır; panel ve profil bugünkü gibi (çerez / sahibin dili).
+- [ ] `hreflang`: metadata `alternates.languages` (tr, en, x-default) ve sitemap'te `alternates`. Sitemap'e yasal sayfalar da girer.
+- [ ] Landing ve yasal sayfalarda dil seçici (link + çerez). Accept-Language'e göre otomatik yönlendirme yok.
+- [ ] 404'ler: ziyaretçinin dilinde; profil 404'ünde denenen ad hazır dolu adres çubuğu ("Bu ad boşta"), durum kodu 404 kalır.
+
+### Faz 16: Yükleme hissi (`faz-16-yukleme`)
+
+Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran donmuş gibi bekliyoruz". Faz 5 sonrası kaldırılan tam sayfa iskelet geri gelmez (her geçişte yanıp sönüyordu).
+- [ ] Geçiş 300 ms'yi aşarsa içerik alanı hafifçe söner, üstte ince ilerleme çizgisi akar (tüm panel sayfaları). Hızlı geçişte hiçbir şey görünmez.
+- [ ] Yavaş bölümler (grafik, harita, ısı haritası, listeler) sayfa içinde `Suspense` ile akar; kabuk ve başlık hemen gelir, bölüm kendi yerinde iskelet gösterir.
+- [ ] Yavaşlık ölçümü: sayfa başına sorgu süreleri (Server-Timing), ardışık sorgular paralelleştirilir. Bölge sorunu değil: fonksiyonlar `fra1`, DB Frankfurt (2026-09-28 doğrulandı).
+
+### Faz 17: Landing yenileme ve 3D (`faz-17-vitrin`)
+
+- [ ] İçerik güncel: yedi tema, ızgara, özel alan adı, IBAN/WhatsApp, portfolyo, içe aktarma, 2FA. Temaları gerçek CSS'le gösteren şerit, SSS. Rakip adı ve sahte sayı yok.
+- [ ] **3D şekil: uygulamaya geçmeden önce kullanıcıya seçenekler sorulur** (CSS 3D cam katmanlar / kütüphanesiz WebGL / three.js). DESIGN §8 "kütüphane eklenmez" kuralı değişecekse DESIGN.md de güncellenir.
+
+### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
+
+- [ ] Editörün üstünde kapatılabilir "Başlangıç" kartı (ilk link, fotoğraf, tema, adresi paylaş); adımlar mevcut veriden kendiliğinden işaretlenir. Açılışta modal tur yok (ilk 60 saniye ilkesi).
+- [ ] Mobil alt çubukta bir kez gösterilen ipuçları, masaüstünde ⌘K tanıtımı.
+
+### Faz 19: Admin paneli ve kötüye kullanım yönetimi (`faz-19-admin`)
+
+Backlog #4'ün genişletilmişi. En çok güvenlik önlemi isteyen faz; ayrı tehdit modeli ve `/security-review` ile biter.
+- [ ] Rol modeli (`role: ADMIN`), admin yolları ayrı layout'ta sunucu tarafı rol kontrolü, admin için 2FA zorunlu, yeniden kimlik doğrulama (hassas işlemde şifre/kod).
+- [ ] Kötüye kullanım bildirimi (profilde "Bildir"), bildirim kuyruğu, içerik kaldırma, hesap askıya alma (profil 404 ya da bilgilendirme sayfası), geri alma.
+- [ ] Denetim günlüğü: her admin işlemi kim, ne zaman, neyi, neden; silinemez.
+- [ ] Faz 14'teki `scripts/takedown.mjs` panelin eylemleriyle değiştirilir.
+
+---
+
 ## Kullanıcı geri bildirimiyle yapılan düzeltmeler (2026-09-27)
 
 - [x] Editörde blok türü satırı PC'de kaydırılamıyordu: cam oklar (yalnızca fare), odak çerçevesi kırpılmıyor, oklar ortalı.
@@ -388,7 +446,8 @@ Faz 6–13'e taşınanlar: kullanıcı adı yönlendirmesi (6), Linktree içe ak
 1. Link başına QR ve UTM oluşturucu.
 2. Kısa link (`linkiva.space/l/abc`).
 3. İletişim formu bloğu (mail yönlendirme), Cal.com bloğu, harita (konum) bloğu.
-4. Doğrulanmış rozet, admin paneli (`role: ADMIN`, kötüye kullanım raporları, kullanıcı askıya alma). Kullanıcı sayısı büyüyünce kötüye kullanım yönetimi öne çekilir.
+4. Doğrulanmış rozet. *(Admin paneli ve kötüye kullanım yönetimi Faz 19'a taşındı.)*
 5. Herkese açık API + webhooks (yeni abone, günlük özet).
 6. `DailyStat` özet tablosu (analitik ölçeği büyüyünce; Faz 9'un cron'u kullanılır).
 7. bio.link / Beacons içe aktarıcıları (Faz 7'deki `importers.ts` haritasına).
+8. **Tam CSP** (güvenlik denetimi 2026-09-28, `docs/SECURITY-AUDIT-2026-09-28.md` → D-1). Bugün yalnızca `frame-ancestors` var. `script-src 'nonce-…' 'strict-dynamic'` için proxy'de istek başına nonce üretilir (Next rehberi: `node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md`). Nonce, statik/ISR profil önbelleğini bozabilir, önce bunun etkisi ölçülür. Embed iframe'leri (YouTube, Spotify…) ve Vercel Blob görselleri `frame-src`/`img-src` listesine girer. Olası XSS'in etkisini sınırlar (oturum token'ları ayarlar sayfasında istemciye gidiyor, denetim B-3).

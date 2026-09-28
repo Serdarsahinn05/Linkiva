@@ -37,6 +37,28 @@ async function insertBlock(username: string, data: object) {
   return id;
 }
 
+/** A card image address the server accepts: our Blob store's host (same rule as lib/uploads.ts → isBlobStoreUrl). */
+const storeId = process.env.BLOB_READ_WRITE_TOKEN?.match(/^vercel_blob_rw_([a-z0-9]+)_/i)?.[1]?.toLowerCase() ?? "e2e";
+const cardImage = (name: string) => `https://${storeId}.public.blob.vercel-storage.com/u/e2e/${name}.webp`;
+
+for (const layout of ["list", "grid"] as const) {
+  test(`a sensitive link's card image never reaches the page source (${layout})`, async ({ page, request }) => {
+    const username = `gi-${uid()}`;
+    await createUser(page, username);
+    if (layout === "grid") await sql(`update profile set appearance = '{"layout":"grid"}' where username = $1`, [username]);
+    const gated = await insertBlock(username, { title: "Yetişkin", url: "https://example.com/adult", gate: "adult", card: "1", img: cardImage(`hidden-${uid()}`) });
+    await insertBlock(username, { title: "Normal", url: "https://example.com/normal", card: "1", img: cardImage("shown") });
+    // In the grid the photo tile is the large one; a small tile shows no image for any block.
+    if (layout === "grid") await sql(`update block set size = 'LARGE' where "profileId" = (select id from profile where username = $1)`, [username]);
+
+    // What F12 would show: the server HTML, including React's payload. The ungated card proves images do render.
+    const html = await (await request.get(`/${username}`, { headers: { "user-agent": REAL_UA } })).text();
+    expect(html).toContain(cardImage("shown"));
+    expect(html).not.toContain("/u/e2e/hidden-");
+    expect(html).toContain(`/l/${gated}`);
+  });
+}
+
 const clicks = async (blockId: string) => Number((await sql(`select count(*)::int as n from event where "blockId" = $1 and type = 'CLICK'`, [blockId]))[0].n);
 
 test("a sensitive link shows a warning page first, works without JS and counts the tap only after it", async ({ page, browser, request }) => {
