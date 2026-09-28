@@ -13,6 +13,12 @@
     "continue": "Continue",
     "genericError": "Something went wrong. Try again in a moment."
   },
+  "languageSwitch": {
+    "name": "Türkçe",
+    "title": "Open this page in Turkish",
+    "suggest": "This page is also in English.",
+    "switch": "Switch to English"
+  },
   "legal": {
     "footerNav": "About the site",
     "contact": "Write to us",
@@ -273,6 +279,7 @@
     "madeWith": "Made with",
     "notFoundTitle": "Nobody lives here yet.",
     "claim": "Claim this address",
+    "claimable": "If nobody has {username} yet, it could be yours.",
     "home": "Back to home"
   },
   "nav": {

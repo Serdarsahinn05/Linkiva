@@ -280,6 +280,8 @@ model Subscriber {                           // EMAIL_CAPTURE bloğu (Faz 3)
 ## 8. i18n
 
 - `next-intl` URL öneki olmadan kullanılır. Dil sırası: kullanıcı ayarı, `NEXT_LOCALE` çerezi, `Accept-Language`, `tr`. Bu yaklaşım `/[username]` route'uyla çakışmaz.
+- **Site sayfaları sabit dilli adreslerde (Faz 15, `i18n/marketing.ts`):** landing, gizlilik ve koşullar Türkçe `/`, `/privacy`, `/terms`; İngilizce `/en`, `/en/privacy`, `/en/terms` (`en` kullanıcı adı olamaz: en az 3 karakter, ayrıca rezerve). `proxy.ts` bu adreslerde `x-linkiva-locale` istek başlığını koyar, diğer her yolda ziyaretçinin gönderdiğini siler; `i18n/request.ts` bu başlığı çerezden önce okur. `/en/*` sayfaları Türkçe sayfaların yeniden dışa aktarımıdır. Metadata ve sitemap `hreflang` (tr, en, x-default=tr) verir. Otomatik yönlendirme yok: tercihi (çerez, yoksa tarayıcı) diğer dil olan ziyaretçiye üstte bir öneri hapı, alt bilgide her zaman dil anahtarı; ikisi de JS'siz form + sunucu eylemi (`features/locale/actions.ts`), çerezi yazar ve yalnızca bilinen sayfaya yönlendirir.
+- **Statik kalması gereken 404'ler** (profil 404'ü, `global-not-found`) çerez okuyamaz (profil ISR'ı bozulur): iki dilin metni gönderilir, `i18n/use-visitor-locale.ts` tarayıcıda çerez/tarayıcı diline göre seçer. Profil 404'ü adresteki adı hazır dolu adres çubuğuyla sunar.
 - Mesajlar `messages/tr.json` ve `messages/en.json` dosyalarında, özellik bazlı namespace'lerle tutulur. Arayüzde sabit metin olmaz (ESLint veya review kuralı).
 - Public profil sayfasının arayüz metinleri (ör. "Abone ol") **profil sahibinin** `locale` ayarını kullanır.
 - Tarih ve sayı biçimlendirme `Intl` API'siyle yapılır.

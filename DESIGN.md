@@ -217,6 +217,8 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 - İlk ekran: ortam ışığı, display başlık "Her şeyin, tek bir adreste.", alt metin ve **cam bir adres çubuğu**: `linkiva.space/` + kullanıcı adı girişi + birincil hap buton. Yanında (mobilde altında) örnek bir profil (sentetik, "Örnek" etiketli) cam telefon içinde durur.
 - "Ücretsiz" bölümü: rakiplerde ücretli olan özellikler **tek bir cam panelde satır listesi** olarak durur. Her satırda özellik adı, açıklama ve sağda yeşil (semantik: "var") onay.
 - *(Faz 6)* Aynı listeye "Verin satılmaz" satırı: yapay zekâ eğitimi yok, üçüncü tarafla paylaşım yok, reklam yok. Ayrı bir bölüm ya da rozet değil, listenin bir satırı. Rakip adı geçmez.
+- *(Faz 14–15)* Alt bilgi (landing ve yasal sayfalar): `©` solda; sağda iletişim adresi (mail ikonu), Gizlilik, Koşullar ve diğer dilin adı (`languages` ikonu), hepsi `--ink-3` metin, hover'da `--ink`. Dil önerisi: yalnızca tercihi diğer dil olan ziyaretçiye, en üstte ortalı `glass` hap içinde tek cümle + ikincil hap düğme, önerilen dilde yazılır.
+- *(Faz 14)* Yasal sayfalar: tek büyük cam yüzey (28px), başlık + tarih, giriş paragrafı, `glass-flat` içindekiler kutusu (numaralar Geist Mono `--ink-3`), bölüm başlıkları 600. E-posta adresi metin içinde altı çizili link.
 
 ### Analitik (Operate + semantik neon)
 - Dört ana sayı cam bir şeritte yan yana durur (kart şablonu değil). Her birinin altında trend rozeti: artış `--positive`, düşüş `--negative`, değişim yoksa `--ink-3`. Koyu temada hafif neon parlamayla.

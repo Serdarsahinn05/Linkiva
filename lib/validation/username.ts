@@ -19,6 +19,8 @@ export const RESERVED_USERNAMES = new Set([
   // routes
   "api", "l", "e", "login", "register", "forgot-password", "reset-password", "check-email", "verify-email",
   "onboarding", "dashboard", "settings", "privacy", "terms", "unsubscribe",
+  // language prefixes of the site pages (i18n/marketing.ts); two letters are below the minimum length anyway
+  "en", "tr",
   // framework / metadata files
   "_next", "static", "public", "favicon.ico", "robots.txt", "sitemap.xml", "manifest.webmanifest",
   "opengraph-image", "twitter-image", "icon", "apple-icon", "pwa",
