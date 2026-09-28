@@ -266,11 +266,55 @@
     from { translate: 0 24px; opacity: 0; scale: 0.96; }
   }
 
-  /* A dashboard link whose page takes a moment: a small dot fades in under it, but only after 200 ms, so a quick
-     navigation shows nothing at all (dashboard-shell.tsx, useLinkStatus). */
-  .link-pending { animation: link-pending 200ms var(--ease-out) 200ms both; }
-  @keyframes link-pending {
+  /* A slow dashboard page change (dashboard-shell.tsx, useNavigationPending). Nothing for the first 300 ms, so a quick
+     change shows no cue at all; after that the page dims and a thin ink line runs along the top until the next page
+     is in. With reduced motion the line stands still. */
+  .nav-dim { transition: opacity 0s; }
+  .nav-dim[data-navigating] {
+    opacity: 0.55;
+    transition: opacity 200ms var(--ease-out) 300ms;
+  }
+  .nav-progress {
+    position: fixed;
+    inset: env(safe-area-inset-top) 0 auto;
+    z-index: 60;
+    height: 2px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .nav-progress[data-active] {
+    opacity: 1;
+    transition: opacity 150ms var(--ease-out) 300ms;
+  }
+  .nav-progress[data-active]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    width: 35%;
+    border-radius: 999px;
+    background: var(--c-ink);
+    animation: nav-progress 1.2s var(--ease-out) infinite;
+  }
+  @keyframes nav-progress {
+    from { translate: -100% 0; }
+    to { translate: 300% 0; }
+  }
+
+  /* Section skeleton inside a streamed page (Faz 16): the page's shell is already there, only this part waits. It
+     fades in after 200 ms (a fast answer never shows it) and breathes slowly; no sweeping shine. */
+  .skeleton {
+    border-radius: var(--radius-control);
+    background: var(--c-glass-strong);
+    animation:
+      skeleton-in 200ms var(--ease-out) 200ms both,
+      skeleton-breathe 1.6s ease-in-out 400ms infinite alternate;
+  }
+  @keyframes skeleton-in {
     from { opacity: 0; }
+  }
+  @keyframes skeleton-breathe {
+    to { opacity: 0.5; }
   }
 
   /* "Skip to content": the first Tab stop on every site page; off-screen until focused (app/(site)/layout.tsx). */
@@ -327,6 +371,7 @@
     transition-duration: 1ms !important;
   }
   .glass-interactive::before { display: none; }
+  .nav-progress[data-active]::before { width: 100%; translate: 0 0; opacity: 0.6; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {

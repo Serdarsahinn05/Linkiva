@@ -7,9 +7,12 @@ import { requireSession } from "@/lib/session";
 // The real check (proxy.ts only does an optimistic cookie check).
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession();
-  const profile = await getOwnProfile(session.user.id);
+  // Side by side: the domain is looked up through the profile's owner, not its id.
+  const [profile, domain] = await Promise.all([
+    getOwnProfile(session.user.id),
+    db.customDomain.findFirst({ where: { profile: { userId: session.user.id } }, select: { hostname: true, verifiedAt: true } }),
+  ]);
   if (!profile) redirect("/onboarding");
-  const domain = await db.customDomain.findUnique({ where: { profileId: profile.id }, select: { hostname: true, verifiedAt: true } });
   return (
     <DashboardShell username={profile.username} domain={domain?.verifiedAt ? domain.hostname : null}>
       {children}

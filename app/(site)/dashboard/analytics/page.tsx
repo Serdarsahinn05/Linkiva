@@ -1,8 +1,10 @@
 import { Download, Minus, TrendingDown, TrendingUp, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Heatmap } from "@/features/analytics/components/heatmap";
 import { TrafficChart } from "@/features/analytics/components/traffic-chart";
 import { WorldMap } from "@/features/analytics/components/world-map";
@@ -27,8 +29,81 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
   const locale = await getLocale();
   const t = await getTranslations("analytics");
   const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+  // Started here, awaited inside the streamed parts: the header and range tabs render without waiting for them.
+  const data = getAnalytics(profile, range, locale);
+  const extras = getAnalyticsExtras(profile, range);
+
+  return (
+    <PageReveal>
+      <div className="mx-auto flex max-w-[1080px] flex-col gap-6 px-4 py-4 sm:px-8 lg:py-10">
+        <PageHeader title={t("title")}>
+          <div className="flex items-center gap-2">
+          {/* Audience has no slot in the 5-tab mobile bar; it is reached from here on phones. */}
+          <Link href="/dashboard/audience" className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "px-3 lg:hidden")}>
+            <Users size={16} aria-hidden />
+            {tNav("audience")}
+          </Link>
+          <Suspense key={range} fallback={null}>
+            <ExportLink data={data} range={range} label={t("export")} />
+          </Suspense>
+          </div>
+        </PageHeader>
+
+        {/* Range tabs are links: shareable, back-button friendly, no client state. */}
+        <nav aria-label={t("title")} className="glass-flat flex w-fit rounded-full p-1">
+          {RANGES.map((r) => (
+            <Link
+              key={r}
+              href={`/dashboard/analytics?range=${r}`}
+              aria-current={r === range ? "page" : undefined}
+              className={cn(
+                "flex h-10 items-center rounded-full px-4 text-sm font-medium transition-colors",
+                r === range ? "bg-glass-strong text-ink shadow-[inset_0_1px_0_var(--c-glass-shine)]" : "text-ink-2 hover:text-ink",
+              )}
+            >
+              {t(`ranges.${r}`)}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Keyed by range: a new range shows the skeleton instead of leaving the old figures on screen. */}
+        <Suspense key={range} fallback={<AnalyticsSkeleton loading={tCommon("loading")} />}>
+          <AnalyticsBody data={data} extras={extras} range={range} locale={locale} />
+        </Suspense>
+
+        <p className="text-center text-sm text-ink-3">
+          {t("privacy")}{" "}
+          <Link href="/privacy" className="underline underline-offset-4 hover:text-ink">
+            {t("privacyLink")}
+          </Link>
+        </p>
+      </div>
+    </PageReveal>
+  );
+}
+
+type AnalyticsData = Awaited<ReturnType<typeof getAnalytics>>;
+type AnalyticsExtras = Awaited<ReturnType<typeof getAnalyticsExtras>>;
+
+/** CSV download, only once there is something to download. */
+async function ExportLink({ data, range, label }: { data: Promise<AnalyticsData>; range: string; label: string }) {
+  if ((await data).totals.views === 0) return null;
+  return (
+    // A file download, not a navigation.
+    <a href={`/dashboard/analytics/export?range=${range}`} download className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "max-sm:px-3")}>
+      <Download size={16} aria-hidden />
+      <span className="max-sm:sr-only">{label}</span>
+    </a>
+  );
+}
+
+/** The figures: stat strip, insights, chart, heatmap and the breakdowns. */
+async function AnalyticsBody(props: { data: Promise<AnalyticsData>; extras: Promise<AnalyticsExtras>; range: string; locale: string }) {
+  const { range, locale } = props;
+  const t = await getTranslations("analytics");
   const format = await getFormatter();
-  const [data, extras] = await Promise.all([getAnalytics(profile, range, locale), getAnalyticsExtras(profile, range)]);
+  const [data, extras] = await Promise.all([props.data, props.extras]);
   const insights = computeInsights({
     totalViews: data.totals.views,
     sources: data.sources,
@@ -56,42 +131,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
   ];
 
   return (
-    <PageReveal>
-      <div className="mx-auto flex max-w-[1080px] flex-col gap-6 px-4 py-4 sm:px-8 lg:py-10">
-        <PageHeader title={t("title")}>
-          <div className="flex items-center gap-2">
-          {/* Audience has no slot in the 5-tab mobile bar; it is reached from here on phones. */}
-          <Link href="/dashboard/audience" className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "px-3 lg:hidden")}>
-            <Users size={16} aria-hidden />
-            {tNav("audience")}
-          </Link>
-          {data.totals.views > 0 && (
-            // A file download, not a navigation.
-            <a href={`/dashboard/analytics/export?range=${range}`} download className={cn(buttonBase, buttonVariants.secondary, buttonSizes.md, "max-sm:px-3")}>
-              <Download size={16} aria-hidden />
-              <span className="max-sm:sr-only">{t("export")}</span>
-            </a>
-          )}
-          </div>
-        </PageHeader>
-
-        {/* Range tabs are links: shareable, back-button friendly, no client state. */}
-        <nav aria-label={t("title")} className="glass-flat flex w-fit rounded-full p-1">
-          {RANGES.map((r) => (
-            <Link
-              key={r}
-              href={`/dashboard/analytics?range=${r}`}
-              aria-current={r === range ? "page" : undefined}
-              className={cn(
-                "flex h-10 items-center rounded-full px-4 text-sm font-medium transition-colors",
-                r === range ? "bg-glass-strong text-ink shadow-[inset_0_1px_0_var(--c-glass-shine)]" : "text-ink-2 hover:text-ink",
-              )}
-            >
-              {t(`ranges.${r}`)}
-            </Link>
-          ))}
-        </nav>
-
+    <>
         {/* Stat strip: one glass band, not a grid of cards (DESIGN.md §7). */}
         <section className="glass grid grid-cols-2 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-4">
           {stats.map((s, i) => (
@@ -187,15 +227,35 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/dashbo
             </div>
           </>
         )}
+    </>
+  );
+}
 
-        <p className="text-center text-sm text-ink-3">
-          {t("privacy")}{" "}
-          <Link href="/privacy" className="underline underline-offset-4 hover:text-ink">
-            {t("privacyLink")}
-          </Link>
-        </p>
+/** The streamed part's placeholder: the same bands and panels, without figures. */
+function AnalyticsSkeleton({ loading }: { loading: string }) {
+  return (
+    <div role="status" className="flex flex-col gap-6">
+      <span className="sr-only">{loading}</span>
+      <div className="glass grid grid-cols-2 overflow-hidden rounded-[var(--radius-card)] lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className={cn("flex flex-col gap-2.5 p-5", i % 2 === 1 && "border-l border-glass-edge", i >= 2 && "max-lg:border-t max-lg:border-glass-edge", i === 2 && "lg:border-l lg:border-glass-edge")}>
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-7 w-24" />
+            <Skeleton className="h-4 w-14" />
+          </div>
+        ))}
       </div>
-    </PageReveal>
+      <Section>
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-56 w-full" />
+      </Section>
+      <Section>
+        <Skeleton className="h-4 w-24" />
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-5 w-full" />
+        ))}
+      </Section>
+    </div>
   );
 }
 

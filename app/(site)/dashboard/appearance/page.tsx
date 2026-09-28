@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AppearancePage() {
   const session = await requireSession();
-  const data = await getEditorData(session.user.id);
+  const data = await getEditorData(session.user.id, { sparklines: false });
   if (!data) return null;
   return (
     <PageReveal>

@@ -407,9 +407,15 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 ### Faz 16: Yükleme hissi (`faz-16-yukleme`)
 
 Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran donmuş gibi bekliyoruz". Faz 5 sonrası kaldırılan tam sayfa iskelet geri gelmez (her geçişte yanıp sönüyordu).
-- [ ] Geçiş 300 ms'yi aşarsa içerik alanı hafifçe söner, üstte ince ilerleme çizgisi akar (tüm panel sayfaları). Hızlı geçişte hiçbir şey görünmez.
-- [ ] Yavaş bölümler (grafik, harita, ısı haritası, listeler) sayfa içinde `Suspense` ile akar; kabuk ve başlık hemen gelir, bölüm kendi yerinde iskelet gösterir.
-- [ ] Yavaşlık ölçümü: sayfa başına sorgu süreleri (Server-Timing), ardışık sorgular paralelleştirilir. Bölge sorunu değil: fonksiyonlar `fra1`, DB Frankfurt (2026-09-28 doğrulandı).
+- [x] Geçiş 300 ms'yi aşarsa içerik alanı söner (%55), üstte 2px ilerleme çizgisi akar (tüm panel sayfaları). Hızlı geçişte hiçbir şey görünmez. Sekme altındaki nokta bunun yerini aldı.
+- [x] Yavaş bölümler sayfa içinde `Suspense` ile akar: İstatistik (başlık ve aralık sekmeleri hemen, rakamlar/grafik/harita/listeler iskeletle; aralık değişince yalnızca bu bölüm) ve Kitle (liste). Editör, Görünüm ve Ayarlar bütün veriye ihtiyaç duyduğu için akıtılmadı; onlarda geçiş ipucu yeterli.
+- [x] Yavaşlık ölçümü: bölge sorunu değil (fonksiyon `fra1`, DB Frankfurt). Canlıda ısınmış sunucu `/login` ~0,3 sn, **soğuk başlangıç ~2 sn** (ilk istek). Donma hissinin kaynağı soğuk başlangıç + tıklamadan sonra hiçbir değişiklik olmaması. Panel düzeninde profil ve alan adı sorguları paralel, Görünüm sayfası kullanmadığı tıklama geçmişi sorgusunu atlıyor.
+
+*Uygulama notları (2026-09-28):*
+- `features/dashboard/components/navigation-pending.tsx`: yakalama aşamasında belge tıklaması dinlenir (linklere tek tek dokunmadan: sekmeler, aralık, "Aboneleri gör"); adres değişince biter (yönlendirme dahil), aynı sayfaya tıklama bir şey başlatmaz, 15 sn'de vazgeçer. Komut paleti `router.push` öncesi `announceNavigation` çağırır. Görsel gecikme CSS'te (`.nav-dim`, `.nav-progress`), `main` ayrıca `aria-busy`.
+- Başlık ile gövde aynı sorgu sözünü (promise) paylaşır; CSV düğmesi de kendi küçük `Suspense`'inde, veri gelince görünür.
+- Server-Timing başlığı eklenmedi: App Router sayfası yanıt başlığı yazamıyor, ölçüm dışarıdan (curl) yapıldı.
+- Test: `tests/e2e/phase16.spec.ts` (yanıt bekletilince `data-navigating`, `aria-busy`, çizgi ve gerçekten düşen opaklık; sayfa gelince hepsi kalkar; açık sayfaya tıklama bir şey başlatmaz; İstatistik aralık değişimi), mobil ve masaüstü.
 
 ### Faz 17: Landing yenileme ve 3D (`faz-17-vitrin`)
 
