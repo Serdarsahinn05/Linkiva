@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { parseBlock } from "@/lib/validation/blocks";
 import { toEditorBlock, type EditorBlock, type EditorProfile, type EditorSocials, type LinkIssue } from "./types";
 
-export async function getEditorData(userId: string): Promise<{
+/** `sparklines: false` skips the click-history query for screens that don't show it (Appearance). */
+export async function getEditorData(userId: string, { sparklines: withSparklines = true } = {}): Promise<{
   profile: EditorProfile;
   blocks: EditorBlock[];
   socials: EditorSocials;
@@ -16,7 +17,7 @@ export async function getEditorData(userId: string): Promise<{
     include: { blocks: { orderBy: { position: "asc" }, include: { linkCheck: true } }, socials: true },
   });
   if (!profile) return null;
-  const sparklines = await getBlockSparklines(profile);
+  const sparklines = withSparklines ? await getBlockSparklines(profile) : {};
   // Only a destination that really failed the daily check BROKEN_AFTER times in a row, and that the block still points to.
   const linkIssues: Record<string, LinkIssue> = {};
   for (const { id, type, data, linkCheck: c } of profile.blocks) {

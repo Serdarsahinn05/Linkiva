@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { profileUrl } from "@/lib/site";
 import { EDITABLE_BLOCK_TYPES } from "@/lib/validation/blocks";
+import { announceNavigation } from "./navigation-pending";
 
 type Command = { id: string; group: "add" | "go" | "page"; label: string; icon: LucideIcon; run: () => void };
 
@@ -50,7 +51,10 @@ export function CommandPalette({
   }, [open, onOpenChange]);
 
   const commands = useMemo<Command[]>(() => {
-    const go = (href: Parameters<typeof router.push>[0]) => () => router.push(href);
+    const go = (href: Parameters<typeof router.push>[0]) => () => {
+      announceNavigation(href);
+      router.push(href);
+    };
     return [
       ...EDITABLE_BLOCK_TYPES.map((type) => ({
         id: `add-${type}`,

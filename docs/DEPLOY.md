@@ -205,6 +205,10 @@ Canlıda kontrol edilecekler (Faz 13 + güvenlik düzeltmeleri; yapıldıkça i�
 kapalı kalır, site çalışır. Günlük cron artık temizlik de yapıyor: Vercel → Logs'ta `[cron:daily]` satırında
 `cleanup: { rateLimits, verifications, usernames }` görünür.
 
+**Faz 16 (`faz-16-yukleme`):** migration ve ortam değişkeni yok. Soğuk başlangıç ölçüldü (~2 sn, ısınmışken ~0,3 sn).
+Kontrol: Vercel → proje → **Settings** → **Functions** → **Fluid Compute** açık olsun (yeni projelerde varsayılan; aynı
+sunucu örneği istekler arasında sıcak kalır, soğuk başlangıç seyrekleşir).
+
 ### Sonra eklenebilecekler (isteğe bağlı ortam değişkenleri)
 
 Site bunlar olmadan da çalışır; eklenince ilgili özellik kendiliğinden güçlenir ya da açılır. Değerler **yalnızca Vercel →

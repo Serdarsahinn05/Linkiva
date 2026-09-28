@@ -232,8 +232,9 @@ Tema = hazır ayar. Sahip her değeri ezebilir, hepsi ücretsiz.
 
 - Sheet eğrisi `--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1)` 280–500ms (iOS sheet eğrisi; hızlı üstel yavaşlama, hedefi aşmaz). Mikro etkileşimler `--ease-out` 160ms.
 - İmza hareketler: sıvı sekme göstergesi, specular highlight, sheet açılışı.
-- Panel geçişi (2026-09-27, kullanıcı geri bildirimiyle sadeleşti): iskelet yok. Eski sayfa yenisi hazır olana kadar yerinde kalır, sonra 100 ms söner ve yeni sayfa 160 ms bulanıksız belirir. Geçiş 200 ms'yi aşarsa tıklanan sekmenin altında 6px `--ink` nokta belirir (`.link-pending`). Ziyaret edilen sekmeler 30 sn önbellekten anında açılır. Kabuk yerinden oynamaz. Scroll'da "fade-up" girişleri yok. *(Eski "cam iskelet + buğusu çözülen cam" hızlı gidip gelirken göz yorduğu için kaldırıldı.)*
-- `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı.
+- Panel geçişi (2026-09-27, kullanıcı geri bildirimiyle sadeleşti; Faz 16'da yavaş geçiş ipucu eklendi): sayfa başına iskelet yok. Eski sayfa yenisi hazır olana kadar yerinde kalır, sonra 100 ms söner ve yeni sayfa 160 ms bulanıksız belirir. **Geçiş 300 ms'yi aşarsa** (soğuk sunucu) eski sayfa %55 opaklığa iner (200 ms) ve ekranın en üstünde 2px `--ink` çizgi soldan sağa akar; hızlı geçişte hiçbir ipucu görünmez. Ziyaret edilen sekmeler 30 sn önbellekten anında açılır. Kabuk yerinden oynamaz. Scroll'da "fade-up" girişleri yok. *(Eski "cam iskelet + buğusu çözülen cam" hızlı gidip gelirken göz yorduğu için kaldırıldı; sekme altındaki 6px nokta Faz 16'da çizgiye dönüştü.)*
+- **Bölüm iskeleti (Faz 16):** yalnızca verisi akışla gelen bölümlerde (İstatistik rakamları, Kitle listesi): sayfanın başlığı hemen gelir, bölüm kendi yerinde aynı cam panelin veri olmayan hali olarak bekler. Şekiller `--glass-strong`, 12px köşe; 200 ms gecikmeyle belirir, 1,6 sn'lik yavaş nefes (opaklık 1 → 0,5), parlayan süpürme yok. Aralık değişince (7g/30g) yalnızca bu bölüm iskelete döner.
+- `prefers-reduced-motion`: ortam ışığı sabit, gösterge anında yer değiştirir, specular kapalı, yavaş geçiş çizgisi akmaz (tam genişlikte sabit durur), iskelet nefes almaz.
 - Kütüphane eklenmez (CSS + WAAPI).
 
 ---

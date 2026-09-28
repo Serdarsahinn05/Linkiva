@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart3, Eye, Link2, Palette, Search, Settings, Share2, Users, type LucideIcon } from "lucide-react";
-import Link, { useLinkStatus } from "next/link";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/account/components/logout-button";
 import { CommandPalette } from "./command-palette";
+import { useNavigationPending } from "./navigation-pending";
 import { PreviewProvider, usePreview } from "./preview-context";
 import { SharePanel } from "./share-panel";
 
@@ -47,10 +48,13 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
   const [shareOpen, setShareOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const livePreview = usePreview();
+  const navigating = useNavigationPending();
   const activeIndex = NAV.findIndex((item) => item.href === pathname);
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
+      {/* A slow page change: a thin line runs along the top and the page dims (both only after 300 ms, globals.css). */}
+      <div aria-hidden className="nav-progress" data-active={navigating || undefined} />
       {/* Desktop: glass sidebar */}
       <aside className="sticky top-0 hidden h-dvh p-3 lg:block">
         <div className="glass flex h-full flex-col gap-8 rounded-[var(--radius-card)] p-4">
@@ -82,7 +86,6 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
                     >
                       <Icon size={19} strokeWidth={1.75} aria-hidden />
                       {t(`nav.${key}`)}
-                      <PendingDot className="ml-auto" />
                     </Link>
                   </li>
                 );
@@ -111,7 +114,7 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
         </button>
       </header>
 
-      <main id="main" className="min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main id="main" aria-busy={navigating || undefined} data-navigating={navigating || undefined} className="nav-dim min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
 
@@ -175,16 +178,6 @@ function TabLink({ item, active, label }: { item: NavItem; active: boolean; labe
     >
       <Icon size={22} strokeWidth={active ? 2 : 1.75} aria-hidden />
       {label}
-      <PendingDot className="absolute bottom-1.5" />
     </Link>
   );
-}
-
-/**
- * Shown while a dashboard link's page is still on its way. Pages are not swapped for a skeleton any more: the current
- * page stays until the next one is ready, and this dot (fading in after 200 ms) says the tap was heard.
- */
-function PendingDot({ className }: { className?: string }) {
-  const { pending } = useLinkStatus();
-  return pending ? <span aria-hidden className={cn("link-pending size-1.5 rounded-full bg-ink", className)} /> : null;
 }
