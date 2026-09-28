@@ -143,3 +143,19 @@ Bundan sonra (kullanıcı kararı, 2026-09-27): her faz kendi dalında geliştir
 e2e yeşil olunca kullanıcı onayıyla doğrudan `master`'a birleştirilip push edilir; preview adımı yok, kullanıcı canlıda bakar. Şema değişikliği olan fazlarda birleştirmeden **önce** production DB'ye
 `npm run db:deploy` (yalnızca eksik migration'lar, veri silmez) uygulanır; migration'lar geriye uyumlu yazılır
 (yeni kolon varsayılanlı ya da boş olabilir), böylece eski kod yeni şemayla da çalışır.
+
+**Faz 13 (2026-09-28, `faz-13-bakim`):** iki yeni migration: `20261002090000_link_check`, `20261003090000_two_factor`
+(yalnızca yeni tablo ve varsayılanlı kolon, eski kod etkilenmez). Birleştirmeden önce production DB'ye `db:deploy`.
+Yeni ortam değişkeni yok: kırık link kontrolü mevcut günlük cron'u (`CRON_SECRET`) kullanır, 2FA sırları
+`BETTER_AUTH_SECRET` ile şifrelenir (**bu değer değiştirilirse açık 2FA'lar çözülemez**, kullanıcılar yedek kodla da
+giremez; değiştirmek gerekirse önce 2FA'yı kapattırın).
+
+### Sonra eklenebilecekler (isteğe bağlı ortam değişkenleri)
+
+Site bunlar olmadan da çalışır; eklenince ilgili özellik kendiliğinden güçlenir ya da açılır. Değerler **yalnızca Vercel →
+Settings → Environment Variables**'a (Production) girilir, bu dosyaya ya da depoya asla yazılmaz.
+
+- [ ] `GITHUB_TOKEN`: GitHub'dan yalnızca okuma izinli (Public repositories, read-only) fine-grained token. Eklenince
+  GitHub içe aktarma sabitlenmiş (pinned) repoları getirir ve sınır saatte 60'tan 5000 isteğe çıkar. Adımlar: §5c.
+- [x] `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_TEAM_ID`: özel alan adı. Eklenmeden Ayarlar'daki "Alan adı"
+  bölümü görünmez. Adımlar: §5b. *Production'a eklendi (kullanıcı, 2026-09-27).*

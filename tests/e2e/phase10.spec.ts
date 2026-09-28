@@ -33,7 +33,7 @@ test("grid layout: tile sizes from the editor reach the public page in DOM order
 
   // Sizes are a grid thing: the menu does not offer them in the list layout.
   await rows(page).first().getByRole("button", { name: "Diğer işlemler" }).click();
-  await expect(page.getByRole("menuitemradio")).toHaveCount(0);
+  await expect(page.getByRole("menuitemradio", { name: /karo|Tam satır/ })).toHaveCount(0);
   await page.keyboard.press("Escape");
 
   await page.goto("/dashboard/appearance");

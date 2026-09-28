@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { localeFromRequest } from "@/i18n/detect";
 import { db } from "@/lib/db";
 import { env, isE2E } from "@/lib/env";
@@ -103,16 +104,23 @@ export const auth = betterAuth({
   },
 
   hooks: {
-    // Security notice after an in-app password change (resets are covered by onPasswordReset).
+    // Security notices: an in-app password change (resets are covered by onPasswordReset) and two-step verification
+    // turned off (a stolen session plus the password could otherwise remove it silently).
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/change-password" || ctx.context.returned instanceof APIError) return;
+      const notice = ctx.path === "/change-password" ? "passwordChanged" : ctx.path === "/two-factor/disable" ? "twoFactorOff" : null;
+      if (!notice || ctx.context.returned instanceof APIError) return;
       const email = ctx.context.session?.user.email;
-      if (email) await sendMailQuietly({ to: email, kind: "passwordChanged", locale: localeFromRequest(ctx.request), url: `${site.url}/forgot-password` });
+      if (email) await sendMailQuietly({ to: email, kind: notice, locale: localeFromRequest(ctx.request), url: `${site.url}/forgot-password` });
     }),
   },
 
   telemetry: { enabled: false },
-  plugins: [nextCookies()],
+  plugins: [
+    // Two-step verification (TOTP + backup codes) for email/password sign-in. Google sign-in keeps Google's own.
+    // Enabling, disabling and new backup codes all ask for the password. Secrets are encrypted with the auth secret.
+    twoFactor({ issuer: site.name }),
+    nextCookies(), // must stay last
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;

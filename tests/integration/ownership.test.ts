@@ -87,6 +87,20 @@ describe("editor actions only touch the caller's own profile (v1 bug S1)", () =>
     expect(block.data).toEqual({ title: "Bob", url: "https://bob.example/new" });
   });
 
+  it("sets the sensitive content warning only on its own link, and only to a known kind", async () => {
+    expect(await actions.updateBlock(aliceBlock, { title: "Alice", url: "https://alice.example/", gate: "adult" })).toEqual({ ok: false, error: "notFound" });
+    expect((await db.block.findUniqueOrThrow({ where: { id: aliceBlock } })).data).toEqual({ title: "Alice", url: "https://alice.example/" });
+    await actions.updateBlock(bobBlock, { title: "Bob", url: "bob.example", gate: "spoiler" });
+    expect((await db.block.findUniqueOrThrow({ where: { id: bobBlock } })).data).toEqual({ title: "Bob", url: "https://bob.example/", gate: "spoiler" });
+    // An unknown kind keeps the block an unpublished draft instead of an ungated link.
+    await actions.updateBlock(bobBlock, { title: "Bob", url: "bob.example", gate: "nsfw" });
+    const { parseBlock } = await import("@/lib/validation/blocks");
+    expect(parseBlock("LINK", (await db.block.findUniqueOrThrow({ where: { id: bobBlock } })).data)).toBeNull();
+    // Turning it off stores no gate at all.
+    await actions.updateBlock(bobBlock, { title: "Bob", url: "bob.example", gate: "" });
+    expect((await db.block.findUniqueOrThrow({ where: { id: bobBlock } })).data).toEqual({ title: "Bob", url: "https://bob.example/" });
+  });
+
   it("rejects unsafe urls as unfinished drafts that never publish", async () => {
     await actions.updateBlock(bobBlock, { title: "Bob", url: "javascript:alert(1)" });
     const { parseBlock } = await import("@/lib/validation/blocks");

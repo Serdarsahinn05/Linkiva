@@ -17,6 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t("title"), template: `%s · ${site.name}` },
     description: t("description"),
     openGraph: { siteName: site.name, type: "website" },
+    // Installable dashboard (app/manifest.webmanifest/route.ts); linked only from the site, never from profiles.
+    manifest: "/manifest.webmanifest",
+    appleWebApp: { capable: true, title: site.name },
   };
 }
 

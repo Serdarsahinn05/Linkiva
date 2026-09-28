@@ -118,6 +118,89 @@ async function safeGet(url: URL, accept: string, maxBytes: number, cookie?: stri
   throw new Error("too many redirects");
 }
 
+// ─── Reachability (broken link check) ────────────────────────────────────────
+
+/** ok: the server answered with a live page (or refused this bot). broken: gone or failing. skipped: not judged. */
+export type ProbeOutcome = "ok" | "broken" | "skipped";
+export type Probe = { outcome: ProbeOutcome; status?: number };
+
+const PROBE_TIMEOUT_MS = 8000;
+
+/**
+ * Only statuses that mean the page is gone or its server is down count as broken. Auth walls, bot blocks and rate
+ * limits (401, 403, 429…) answer from a live page this bot may not read; 503 is also a maintenance or bot-challenge
+ * page, so it is not counted.
+ */
+export function statusOutcome(status: number): "ok" | "broken" {
+  return [404, 410, 500, 502, 504, 521, 522, 523, 530].includes(status) ? "broken" : "ok";
+}
+
+// The address does not exist, refuses connections, or its certificate is invalid.
+const BROKEN_ERRORS = new Set([
+  "ENOTFOUND", "ECONNREFUSED", "ECONNRESET", "EHOSTUNREACH", "ENETUNREACH", "ETIMEDOUT", "EPROTO",
+  "CERT_HAS_EXPIRED", "ERR_TLS_CERT_ALTNAME_INVALID", "DEPTH_ZERO_SELF_SIGNED_CERT", "SELF_SIGNED_CERT_IN_CHAIN", "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+]);
+
+/** Blocked (private network, bad port) and unknown errors are not judged; a timeout is a dead or unusable page. */
+function errorOutcome(error: unknown): ProbeOutcome {
+  if (error instanceof BlockedAddressError) return "skipped";
+  const { code, name } = (error ?? {}) as { code?: string; name?: string };
+  if (name === "AbortError" || name === "TimeoutError" || (code && BROKEN_ERRORS.has(code))) return "broken";
+  return "skipped";
+}
+
+/** One request with the same guards as getOnce; only the status and the redirect target are read, never the body. */
+function statusOnce(url: URL, method: "HEAD" | "GET", signal: AbortSignal): Promise<{ status: number; location?: string }> {
+  checkTarget(url);
+  const client = url.protocol === "https:" ? https : http;
+  return new Promise((resolve, reject) => {
+    const request = client.request(
+      url,
+      { method, lookup: guardedLookup, signal, headers: { "user-agent": `LinkivaBot/1.0 (+${site.url})`, accept: "*/*" } },
+      (response) => {
+        resolve({ status: response.statusCode ?? 0, location: response.headers.location });
+        response.destroy();
+      },
+    );
+    request.on("error", reject);
+    request.end();
+  });
+}
+
+/**
+ * Is the page at a user's link still there? HEAD first, GET when HEAD is refused or fails (many servers mishandle
+ * HEAD). Redirects are followed by hand, each hop checked; a private address is never contacted (skipped, not broken).
+ */
+export async function probeUrl(target: string): Promise<Probe> {
+  let url: URL;
+  try {
+    url = new URL(target);
+  } catch {
+    return { outcome: "skipped" };
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return { outcome: "skipped" };
+  const signal = AbortSignal.timeout(PROBE_TIMEOUT_MS);
+  let method: "HEAD" | "GET" = "HEAD";
+  try {
+    for (let hop = 0; hop <= MAX_REDIRECTS; ) {
+      const { status, location } = await statusOnce(url, method, signal);
+      if (status >= 300 && status < 400 && location) {
+        url = new URL(location, url);
+        hop++;
+        continue;
+      }
+      if (method === "HEAD" && (status < 200 || status >= 300)) {
+        method = "GET";
+        continue;
+      }
+      return { outcome: statusOutcome(status), status };
+    }
+    return { outcome: "skipped" };
+  } catch (error) {
+    return { outcome: errorOutcome(error) };
+  }
+}
+
 // ─── Parsing ─────────────────────────────────────────────────────────────────
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };

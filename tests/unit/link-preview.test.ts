@@ -1,5 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { imageType, isPublicAddress, parsePreview } from "@/lib/link-preview";
+import { checkableUrl } from "@/features/link-check/targets";
+import { imageType, isPublicAddress, parsePreview, probeUrl, statusOutcome } from "@/lib/link-preview";
+import { parseBlock } from "@/lib/validation/blocks";
+
+describe("probeUrl (broken link check) never contacts a private network", () => {
+  // A real connection to these would be refused (→ broken) or hang until the 8 s timeout (→ broken). "skipped", and
+  // fast, means the guard stopped it before any connection was opened.
+  it.each([
+    "http://127.0.0.1/", "http://localhost/admin", "http://10.255.255.1/", "http://169.254.169.254/latest/meta-data/",
+    "http://192.168.1.1/", "http://[::1]/", "http://[::ffff:127.0.0.1]/", "http://0.0.0.0/", "https://127.0.0.1:8443/",
+    "http://user:pw@example.com/", "ftp://example.com/", "mailto:a@example.com", "not a url",
+  ])("skips %s", async (url) => {
+    const started = Date.now();
+    expect(await probeUrl(url)).toEqual({ outcome: "skipped" });
+    expect(Date.now() - started).toBeLessThan(1500);
+  });
+});
+
+describe("statusOutcome", () => {
+  it("counts only gone pages and failing servers as broken", () => {
+    for (const status of [404, 410, 500, 502, 504, 522]) expect(statusOutcome(status)).toBe("broken");
+    // Live pages this bot may not read: auth walls, bot blocks, rate limits, maintenance/challenge pages.
+    for (const status of [200, 204, 401, 403, 405, 429, 451, 503]) expect(statusOutcome(status)).toBe("ok");
+  });
+});
+
+describe("checkableUrl", () => {
+  const url = (type: Parameters<typeof parseBlock>[0], data: object) => {
+    const parsed = parseBlock(type, data);
+    return parsed ? checkableUrl(parsed) : "invalid";
+  };
+  it("picks the address a tap opens, web addresses only", () => {
+    expect(url("LINK", { title: "a", url: "example.com/x" })).toBe("https://example.com/x");
+    expect(url("LINK", { title: "a", url: "mailto:a@example.com" })).toBeNull();
+    expect(url("PROJECT", { title: "p", repo: "https://github.com/a/b" })).toBe("https://github.com/a/b");
+    expect(url("PROJECT", { title: "p", url: "https://a.dev", repo: "https://github.com/a/b" })).toBe("https://a.dev/");
+    expect(url("SUPPORT", { name: "n", iban: "TR330006100519786457841326" })).toBeNull();
+    expect(url("WHATSAPP", { phone: "05321234567" })).toBeNull();
+  });
+});
 
 describe("isPublicAddress (SSRF guard)", () => {
   it.each([

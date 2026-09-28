@@ -1,9 +1,9 @@
 import { env } from "@/lib/env";
-import { MAIL_KINDS, renderDigest, renderMail, type MailKind } from "@/lib/mail/templates";
+import { MAIL_KINDS, renderBrokenLinks, renderDigest, renderMail, type MailKind } from "@/lib/mail/templates";
 
-const KINDS = [...MAIL_KINDS, "digest"] as const;
+const KINDS = [...MAIL_KINDS, "digest", "brokenLinks"] as const;
 
-/** Development only: renders a mail in the browser, e.g. /api/dev/mail?kind=reset&locale=en (digest uses sample figures). */
+/** Development only: renders a mail in the browser, e.g. /api/dev/mail?kind=reset&locale=en (digest and brokenLinks use samples). */
 export function GET(request: Request) {
   if (env.NODE_ENV === "production") return new Response("Not found", { status: 404 });
 
@@ -30,7 +30,12 @@ export function GET(request: Request) {
           insight: locale === "en" ? "Busiest hours are 20:00–23:00 (41% of visits)." : "En yoğun saatler 20:00–23:00 (ziyaretlerin %41'i).",
           unsubscribeUrl: "https://linkiva.space/unsubscribe?t=example",
         })
-      : // Narrowed by the includes check above; "digest" is handled in the other branch.
+      : kind === "brokenLinks"
+        ? renderBrokenLinks(locale, [
+            { title: "Portfolyo", url: "https://example.com/portfolyo" },
+            { title: "Etkinlik bileti", url: "https://example.com/bilet/2026" },
+          ])
+      : // Narrowed by the includes check above; the samples are handled in the other branches.
         renderMail(kind as MailKind, locale, { url: "https://linkiva.space/example-link", newEmail: "yeni@example.com" });
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
 }

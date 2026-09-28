@@ -10,6 +10,7 @@ import {
   CalendarClock,
   CircleAlert,
   Contact,
+  EyeOff,
   FolderGit2,
   Grid2x2,
   GripVertical,
@@ -29,6 +30,8 @@ import {
   Tags,
   Timer,
   Trash2,
+  TriangleAlert,
+  Unlink,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -49,7 +52,8 @@ import { ScheduleDialog } from "./schedule-dialog";
 import { Sparkline } from "./sparkline";
 import { ContactSupportFields } from "./contact-support-fields";
 import { PortfolioFields } from "./portfolio-fields";
-import type { EditorBlock } from "../types";
+import { checkableUrl } from "@/features/link-check/targets";
+import type { EditorBlock, LinkIssue } from "../types";
 
 /** Block types are told apart by icon, never by colour (DESIGN.md §6). */
 export const BLOCK_ICON: Record<EditorBlock["type"], LucideIcon> = {
@@ -81,6 +85,8 @@ type RowProps = {
   nested?: boolean;
   /** Clicks per day for the last 7 days (tappable blocks only). */
   clicks?: number[];
+  /** The destination failed the daily link check; flagged while the block still points there. */
+  linkIssue?: LinkIssue;
   index: number;
   count: number;
   autoFocus: boolean;
@@ -96,7 +102,7 @@ type RowProps = {
   onSize: (size: BlockSize) => void;
 };
 
-export function BlockRow({ block, nested, clicks, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule, grid, onSize }: RowProps) {
+export function BlockRow({ block, nested, clicks, linkIssue, index, count, autoFocus, userId, uploadsEnabled, onChange, onFlags, onMove, onDelete, onSchedule, grid, onSize }: RowProps) {
   const t = useTranslations("editor");
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   // A stored (reloaded) address is judged immediately; a fresh one only after the field is left.
@@ -117,7 +123,10 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
   const embedInvalid =
     block.type === "EMBED" && urlTouched && Boolean(block.data.url) && parseEmbed(block.data.url ?? "") === null && !youtubeChannel(block.data.url ?? "");
 
-  const complete = parseBlock(block.type, block.data) !== null;
+  const parsed = parseBlock(block.type, block.data);
+  const complete = parsed !== null;
+  // An edited address is a new destination: the old result no longer applies.
+  const unreachable = linkIssue && parsed && checkableUrl(parsed) === linkIssue.url ? linkIssue : null;
   const urlInvalid = (block.type === "LINK" || block.type === "IMAGE") && urlTouched && Boolean(block.data.url) && normalizeUrl(block.data.url ?? "") === null;
   const TypeIcon = BLOCK_ICON[block.type];
   const field = (key: string) => block.data[key] ?? "";
@@ -155,8 +164,12 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
               <TypeIcon size={16} strokeWidth={1.75} aria-hidden />
               {t(`types.${block.type}`)}
               {sizes.length > 1 && size !== "WIDE" && <span className="font-normal text-ink-3">· {t(`sizes.${size}`)}</span>}
+              {block.type === "LINK" && (field("gate") === "adult" || field("gate") === "spoiler") && (
+                <span className="font-normal text-warning">· {t(`gate.tag.${field("gate") as "adult" | "spoiler"}`)}</span>
+              )}
             </span>
             {block.isHighlighted && <Star size={14} className="fill-ink text-ink" aria-label={t("highlight")} />}
+            {unreachable && <span className="rounded-full border border-negative/40 px-2 py-0.5 text-xs font-medium text-negative">{t("unreachable")}</span>}
             <div className="-my-2 ml-auto flex shrink-0 items-center">
               {TAPPABLE.has(block.type) && (
                 <span className="mr-2 hidden sm:flex">
@@ -174,6 +187,13 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
                           icon: block.isHighlighted ? <StarOff size={18} strokeWidth={1.75} /> : <Star size={18} strokeWidth={1.75} />,
                           onSelect: () => onFlags({ isHighlighted: !block.isHighlighted }),
                         },
+                        // Sensitive content warning: picking the checked one again turns it off.
+                        ...(["adult", "spoiler"] as const).map((gate) => ({
+                          label: t(`gate.${gate}`),
+                          icon: gate === "adult" ? <TriangleAlert size={18} strokeWidth={1.75} /> : <EyeOff size={18} strokeWidth={1.75} />,
+                          onSelect: () => set("gate", field("gate") === gate ? "" : gate),
+                          checked: field("gate") === gate,
+                        })),
                       ]
                     : []),
                   ...(sizes.length > 1
@@ -313,6 +333,12 @@ export function BlockRow({ block, nested, clicks, index, count, autoFocus, userI
             </>
           )}
           {block.type === "DIVIDER" && <hr className="my-3 border-glass-edge" aria-hidden />}
+          {unreachable && (
+            <p className="flex items-start gap-1.5 text-sm text-negative">
+              <Unlink size={14} strokeWidth={1.75} aria-hidden className="mt-0.5 shrink-0" />
+              {t("unreachableHint", { date: format.dateTime(new Date(unreachable.checkedAt), { dateStyle: "medium" }) })}
+            </p>
+          )}
           {scheduleNote && (
             <p className={cn("flex items-center gap-1.5 text-sm", scheduleNote.tone)}>
               <CalendarClock size={14} strokeWidth={1.75} aria-hidden />

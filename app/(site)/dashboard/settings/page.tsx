@@ -29,11 +29,13 @@ export default async function SettingsPage() {
   const theme = parseThemePreference((await cookies()).get(THEME_COOKIE)?.value);
   const locale = await getLocale();
 
-  const [profile, accounts, sessions, domain] = await Promise.all([
+  const [profile, accounts, sessions, domain, user] = await Promise.all([
     getOwnProfile(session.user.id),
     db.account.findMany({ where: { userId: session.user.id }, select: { providerId: true, accountId: true } }),
     auth.api.listSessions({ headers: await headers() }),
     features.domains ? db.customDomain.findFirst({ where: { profile: { userId: session.user.id } } }) : null,
+    // From the database, not the session: the session cookie cache can be up to five minutes old.
+    db.user.findUnique({ where: { id: session.user.id }, select: { twoFactorEnabled: true } }),
   ]);
   const td = await getTranslations("domain");
 
@@ -66,6 +68,7 @@ export default async function SettingsPage() {
           hasPassword={accounts.some((a) => a.providerId === "credential")}
           googleAccountId={accounts.find((a) => a.providerId === "google")?.accountId ?? null}
           googleEnabled={features.google}
+          twoFactorEnabled={user?.twoFactorEnabled === true}
           sessions={sessions
             .map((s) => ({ token: s.token, userAgent: s.userAgent ?? null, createdAt: s.createdAt.toISOString(), current: s.token === session.session.token }))
             .sort((a, b) => Number(b.current) - Number(a.current))}

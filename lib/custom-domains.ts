@@ -4,11 +4,12 @@ import { site } from "@/lib/site";
  * Custom domains (ROADMAP Faz 11): which requests the proxy hands to a profile. Pure, so it is unit-tested.
  * - main: our own host or a Vercel preview → untouched.
  * - For a custom host, only the profile's own pages are rewritten to /<username>…; the paths those pages call
- *   (/l/<id>, /api/e, Next's assets, icons) pass through; everything else (panel, sign-in, other profiles) is a 404.
+ *   (/l/<id> and its sensitive content warning /l/<id>/gate, /api/e, Next's assets, icons) pass through; everything
+ *   else (panel, sign-in, other profiles) is a 404.
  */
 export type DomainRoute = { kind: "main" } | { kind: "pass" } | { kind: "profile"; path: string } | { kind: "notFound" };
 
-const PASS = /^\/(?:_next\/|l\/[^/]+$|api\/e$|favicon\.ico$|icon\.svg$|robots\.txt$)/;
+const PASS = /^\/(?:_next\/|l\/[^/]+(?:\/gate)?$|api\/e$|favicon\.ico$|icon\.svg$|robots\.txt$)/;
 const PROFILE = /^\/(?:story|opengraph-image[\w-]*)?$/;
 
 export function isMainHost(host: string): boolean {

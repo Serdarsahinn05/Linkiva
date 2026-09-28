@@ -412,7 +412,8 @@ function BlockTile({
   switch (block.type) {
     case "LINK":
       title = block.data.title;
-      if (block.data.img) image = { src: block.data.img, alt: "" };
+      // A sensitive link keeps its image hidden until the warning page (like the list layout).
+      if (block.data.img && !block.data.gate) image = { src: block.data.img, alt: "" };
       break;
     case "PROJECT":
       title = block.data.title;
@@ -444,8 +445,10 @@ function BlockTile({
       return null;
   }
   const sponsored = block.type === "PRODUCT" && block.data.sponsored === "1";
-  // Paid content keeps its label on every size (Reklam Kurulu guidance, like the product card).
-  const badge = sponsored && <span className="glass absolute top-2.5 right-2.5 z-10 rounded-full px-2 py-0.5 text-xs font-normal text-ink-2">{labels.sponsored}</span>;
+  const gate = block.type === "LINK" ? block.data.gate : undefined;
+  // Paid content keeps its label on every size (Reklam Kurulu guidance, like the product card); so does a sensitive link.
+  const tag = sponsored ? labels.sponsored : gate === "adult" ? labels.gateAdult : gate === "spoiler" ? labels.gateSpoiler : null;
+  const badge = tag && <span className="glass absolute top-2.5 right-2.5 z-10 rounded-full px-2 py-0.5 text-xs font-normal text-ink-2">{tag}</span>;
   const photo = size === "LARGE" || block.type === "IMAGE" ? image : null;
 
   const textTile = !photo && size === "LARGE" && block.type === "PROJECT" ? { desc: block.data.desc, tags: splitList(block.data.tags) } : null;
@@ -501,7 +504,7 @@ function BlockTile({
       data-highlight={hl}
       aria-label={label}
       title={title || undefined}
-      rel={sponsored ? "noopener sponsored" : "noopener"}
+      rel={sponsored ? "noopener sponsored" : gate ? "noopener nofollow" : "noopener"}
       download={block.type === "CONTACT" || undefined}
     >
       {body}
@@ -567,7 +570,9 @@ function BlockView({
 }) {
   switch (block.type) {
     case "LINK": {
-      if (block.data.card === "1") return <LinkCard id={id} data={block.data} highlighted={highlighted} mode={mode} loading={loading} />;
+      const gate = block.data.gate;
+      // A sensitive link never shows its page's image before the warning: it is drawn as a plain button.
+      if (block.data.card === "1" && !gate) return <LinkCard id={id} data={block.data} highlighted={highlighted} mode={mode} loading={loading} />;
       // Highlight styling depends on the button style (globals.css .p-btn[data-highlight]).
       const className = linkClass;
       const hl = highlighted ? "" : undefined;
@@ -579,15 +584,18 @@ function BlockView({
           className="absolute right-5 opacity-45 transition-[transform,opacity] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-90"
         />
       );
+      const tag = gate && <span className="ml-2 shrink-0 rounded-full border border-current px-1.5 text-xs font-normal opacity-70">{gate === "adult" ? labels.gateAdult : labels.gateSpoiler}</span>;
       return mode === "public" ? (
         // Goes through /l/<id> so the click is counted server-side and works without JS.
-        <a href={`/l/${id}`} className={className} data-highlight={hl} rel="noopener">
+        <a href={`/l/${id}`} className={className} data-highlight={hl} rel={gate ? "noopener nofollow" : "noopener"}>
           {block.data.title}
+          {tag}
           {arrow}
         </a>
       ) : (
         <span className={cn(className, "cursor-default")} data-highlight={hl}>
           {block.data.title}
+          {tag}
           {arrow}
         </span>
       );

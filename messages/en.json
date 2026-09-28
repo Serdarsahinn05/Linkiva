@@ -10,6 +10,7 @@
     "skipToContent": "Skip to content",
     "or": "or",
     "loading": "Loading…",
+    "continue": "Continue",
     "genericError": "Something went wrong. Try again in a moment."
   },
   "landing": {
@@ -78,6 +79,20 @@
       "hidePassword": "Hide password"
     },
     "google": "Continue with Google",
+    "twoFactor": {
+      "title": "Verification code",
+      "hint": "Enter the 6-digit code from your authenticator app.",
+      "backupHint": "Enter one of the backup codes you saved. Each code works once.",
+      "code": "6-digit code",
+      "backupCode": "Backup code",
+      "trust": "Don't ask for a code on this device for 30 days",
+      "submit": "Verify",
+      "pending": "Verifying…",
+      "useBackup": "Can't reach your app? Use a backup code",
+      "useApp": "Use the code from your app",
+      "badCode": "Wrong code. Enter the current code from your app.",
+      "expired": "The time to enter the code ran out. Log in again."
+    },
     "login": {
       "title": "Welcome back.",
       "submit": "Log in",
@@ -207,6 +222,22 @@
       "cta": "",
       "security": "If this wasn't you, write to us right away: hello@linkiva.space"
     },
+    "twoFactorOff": {
+      "subject": "Linkiva: two-step verification turned off",
+      "preheader": "Your account no longer asks for a code at sign-in.",
+      "heading": "Two-step verification is off",
+      "body": "Two-step verification was just turned off on your Linkiva account. Signing in now only needs your password.",
+      "cta": "It wasn't me, reset my password",
+      "security": "If you turned it off, there is nothing else to do. You can turn it back on in Settings."
+    },
+    "brokenLinks": {
+      "subject": "Linkiva: a link on your page is not opening",
+      "preheader": "{count} link(s) failed our daily check twice in a row.",
+      "heading": "A link on your page is not opening",
+      "body": "We try the links on your page once a day. These did not open twice in a row ({count}). Your visitors may be landing on an error page. Check the address or hide the block.",
+      "cta": "Open my editor",
+      "footer": "You get this mail once per broken link. When it works again or you change it, the check starts over."
+    },
     "digest": {
       "subject": "Linkiva: your page's last week",
       "preheader": "{views} views, {clicks} clicks.",
@@ -282,6 +313,13 @@
     },
     "urlInvalid": "We cannot open this address. Try a link starting with https://.",
     "incomplete": "Unfinished, not shown on your page.",
+    "gate": {
+      "adult": "18+ warning",
+      "spoiler": "Spoiler warning",
+      "tag": { "adult": "18+ warning", "spoiler": "spoiler warning" }
+    },
+    "unreachable": "Unreachable",
+    "unreachableHint": "This address did not open in our daily check twice in a row (last checked {date}). Check the address or hide the block.",
     "visible": "Show on page",
     "highlight": "Highlight",
     "unhighlight": "Remove highlight",
@@ -632,6 +670,20 @@
     "invalidBody": "The link may be broken. Sign in and turn the summary off in Settings → Notifications.",
     "error": "Something went wrong, try again."
   },
+  "gate": {
+    "metaTitle": "Warning",
+    "adult": {
+      "title": "This link may contain adult content",
+      "body": "{owner} marked this link as for adults only (18+). If you continue, you will leave for another site."
+    },
+    "spoiler": {
+      "title": "This link may spoil a surprise",
+      "body": "{owner} noted that this link carries spoilers about a show, film, game or book."
+    },
+    "destination": "You are going to",
+    "continue": "Continue",
+    "back": "Go back"
+  },
   "appearance": {
     "title": "Appearance",
     "layout": "Layout",
@@ -718,6 +770,8 @@
     "supportCopyIban": "Copy IBAN",
     "supportLink": "Support me",
     "sponsored": "Sponsored",
+    "gateAdult": "18+",
+    "gateSpoiler": "Spoiler",
     "countdownDays": "days",
     "countdownHours": "hrs",
     "countdownMinutes": "min",
@@ -801,6 +855,36 @@
     "heatmapCell": "{day} {hours} · {views} views"
   },
   "account": {
+    "twoFactor": {
+      "title": "Two-step verification",
+      "offHint": "Keep your account safe even if someone gets your password: after your password, sign-in also asks for a 6-digit code from an authenticator app on your phone (Google Authenticator, 1Password, Authy…).",
+      "on": "On",
+      "onHint": "Sign-in asks for the code from your app after your password.",
+      "googleNote": "Signing in with Google does not ask for a code; your Google account's own verification applies there.",
+      "noPassword": "You sign in with Google, so your security rests on your Google account's two-step verification. Set a password to turn it on here too.",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "newCodes": "New backup codes",
+      "dialog": { "enable": "Turn on two-step verification", "disable": "Turn off two-step verification", "codes": "New backup codes" },
+      "passwordHint": {
+        "enable": "Enter your password to continue.",
+        "disable": "Once off, sign-in only asks for your password. Enter your password to confirm.",
+        "codes": "New codes make the old ones invalid. Enter your password to confirm."
+      },
+      "scanHint": "Scan this code with your authenticator app or enter the key by hand. Then type the 6-digit code the app shows.",
+      "qrLabel": "QR code for your authenticator app",
+      "manualKey": "Key",
+      "copyKey": "Copy the key",
+      "confirm": "Confirm and turn on",
+      "turnedOn": "Two-step verification is on.",
+      "turnedOff": "Two-step verification is off.",
+      "codesHint": "Save these backup codes somewhere safe. If you can't reach your phone, each one signs you in once. They are not shown again after you close this window.",
+      "copyCodes": "Copy",
+      "copied": "Copied",
+      "downloadCodes": "Download",
+      "saved": "I saved them",
+      "fileHeading": "Linkiva backup codes: each code works once."
+    },
     "email": "Email",
     "currentEmail": "Your current address",
     "newEmail": "New email",

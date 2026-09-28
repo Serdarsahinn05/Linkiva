@@ -47,6 +47,8 @@ describe("reserved list covers every top-level route", () => {
     }
   };
   walk(join(process.cwd(), "app"));
+  // Static folders are served at the top level too (public/pwa → /pwa/…).
+  for (const entry of readdirSync(join(process.cwd(), "public"), { withFileTypes: true })) if (entry.isDirectory()) topLevel.add(entry.name);
 
   it("has no unreserved segment", () => {
     expect([...topLevel].filter((segment) => !RESERVED_USERNAMES.has(segment))).toEqual([]);

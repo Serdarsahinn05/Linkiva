@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { parseUserAgent } from "@/lib/ua";
 import { emailSchema, PASSWORD_MIN, passwordSchema } from "@/lib/validation/auth";
 import { deleteAccount } from "../actions";
+import { TwoFactor } from "./two-factor";
 
 export type SessionInfo = { token: string; userAgent: string | null; createdAt: string; current: boolean };
 
@@ -27,12 +28,13 @@ type Props = {
   /** Google account id when linked (unlinking needs it), else null. */
   googleAccountId: string | null;
   googleEnabled: boolean;
+  twoFactorEnabled: boolean;
   sessions: SessionInfo[];
 };
 
 const DEVICE_ICON = { MOBILE: Smartphone, TABLET: Tablet, DESKTOP: Monitor } as const;
 
-export function AccountSecurity({ email, username, hasPassword, googleAccountId, googleEnabled, sessions: initialSessions }: Props) {
+export function AccountSecurity({ email, username, hasPassword, googleAccountId, googleEnabled, twoFactorEnabled, sessions: initialSessions }: Props) {
   const googleLinked = googleAccountId !== null;
   const t = useTranslations();
   const format = useFormatter();
@@ -172,6 +174,10 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
         ) : (
           <p className="text-ink-2">{t("account.noPassword")}</p>
         )}
+      </Section>
+
+      <Section title={t("account.twoFactor.title")}>
+        <TwoFactor enabled={twoFactorEnabled} hasPassword={hasPassword} googleLinked={googleLinked} />
       </Section>
 
       {googleEnabled && (

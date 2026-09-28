@@ -22,7 +22,7 @@ import { ImportDialog } from "@/features/import/components/import-dialog";
 import { addBlock, applyTemplate, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setBlockSize, setSocial, updateBlock, updateProfileBasics } from "../actions";
 import { detectBlock, type Detected } from "../detect-block";
 import type { TemplateKey } from "../templates";
-import type { EditorBlock, EditorProfile, EditorSocials } from "../types";
+import type { EditorBlock, EditorProfile, EditorSocials, LinkIssue } from "../types";
 import { AvatarUploader } from "./avatar-uploader";
 import { PageHeader, Section } from "@/features/dashboard/components/page";
 import { useRegisterPreview } from "@/features/dashboard/components/preview-context";
@@ -38,11 +38,12 @@ type Props = {
   blocks: EditorBlock[];
   socials: EditorSocials;
   sparklines: Record<string, number[]>;
+  linkIssues: Record<string, LinkIssue>;
   userId: string;
   uploadsEnabled: boolean;
 };
 
-export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, sparklines, userId, uploadsEnabled }: Props) {
+export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, sparklines, linkIssues, userId, uploadsEnabled }: Props) {
   const t = useTranslations();
   const toast = useToast();
   const { state: saveState, schedule } = useAutosave();
@@ -356,6 +357,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
                       block={block}
                       nested={folded.has(block.id)}
                       clicks={sparklines[block.id]}
+                      linkIssue={linkIssues[block.id]}
                       index={index}
                       count={blocks.length}
                       autoFocus={block.id === focusId}

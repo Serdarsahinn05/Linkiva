@@ -30,7 +30,7 @@ describe("what the proxy does with a request", () => {
     expect(domainRoute("serdar.com", "/")).toEqual({ kind: "profile", path: "" });
     expect(domainRoute("serdar.com", "/story")).toEqual({ kind: "profile", path: "/story" });
     expect(domainRoute("serdar.com", "/opengraph-image-1uj0pv")).toEqual({ kind: "profile", path: "/opengraph-image-1uj0pv" });
-    for (const pass of ["/l/abc123", "/api/e", "/_next/static/chunk.js", "/icon.svg", "/favicon.ico"]) expect(domainRoute("serdar.com", pass), pass).toEqual({ kind: "pass" });
+    for (const pass of ["/l/abc123", "/l/abc123/gate", "/api/e", "/_next/static/chunk.js", "/icon.svg", "/favicon.ico"]) expect(domainRoute("serdar.com", pass), pass).toEqual({ kind: "pass" });
     for (const blocked of ["/dashboard", "/login", "/api/auth/sign-in", "/someone-else", "/l/a/b", "/api/upload", "/privacy"]) {
       expect(domainRoute("serdar.com", blocked), blocked).toEqual({ kind: "notFound" });
     }

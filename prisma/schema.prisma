@@ -17,11 +17,30 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  /// Better Auth twoFactor plugin: set once a TOTP code has been verified.
+  twoFactorEnabled Boolean?   @default(false)
   sessions      Session[]
   accounts      Account[]
+  twoFactors    TwoFactor[]
   profile       Profile?
 
   @@map("user")
+}
+
+/// Better Auth twoFactor plugin: the TOTP secret and the backup codes, both encrypted with BETTER_AUTH_SECRET.
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+
+  @@index([secret])
+  @@index([userId])
+  @@map("two_factor")
 }
 
 model Session {
@@ -154,11 +173,35 @@ model Block {
   startsAt      DateTime?
   endsAt        DateTime?
   events        Event[]
+  linkCheck     LinkCheck?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   @@index([profileId, position])
   @@map("block")
+}
+
+enum LinkStatus {
+  OK
+  BROKEN
+}
+
+/// The daily reachability check of a block's destination (ROADMAP Faz 13). Only results of real requests are stored.
+model LinkCheck {
+  blockId    String     @id
+  block      Block      @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  /// The address that was checked. A block whose destination changed starts over.
+  url        String
+  /// null: not judged (not a web address, a private network address, too many redirects). Never shown as broken.
+  status     LinkStatus?
+  /// Consecutive failed checks of `url`; the editor flags the block from 2 on.
+  failCount  Int        @default(0)
+  checkedAt  DateTime
+  /// The owner was mailed about this failure: once, until the link works again or changes.
+  notifiedAt DateTime?
+
+  @@index([checkedAt])
+  @@map("link_check")
 }
 
 enum SocialPlatform {
@@ -235,7 +278,6 @@ model Subscriber {
   @@map("subscriber")
 }
 
-/// A username the profile used before. It keeps redirecting to the current one and stays unclaimable until expiresAt.
 /// The owner's own domain, served by this profile once verified (ROADMAP Faz 11). One per profile.
 model CustomDomain {
   id         String    @id @default(cuid())
@@ -250,6 +292,7 @@ model CustomDomain {
   @@map("custom_domain")
 }
 
+/// A username the profile used before. It keeps redirecting to the current one and stays unclaimable until expiresAt.
 model UsernameHistory {
   username  String   @id
   profileId String

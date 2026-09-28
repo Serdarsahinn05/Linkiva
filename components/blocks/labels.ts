@@ -22,6 +22,9 @@ export type ProfileLabels = {
   supportCopyIban: string;
   supportLink: string;
   sponsored: string;
+  /** Tags on links behind the sensitive content warning. */
+  gateAdult: string;
+  gateSpoiler: string;
   countdownDays: string;
   countdownHours: string;
   countdownMinutes: string;
@@ -57,6 +60,8 @@ export function profileLabels(translator: AnyTranslator): ProfileLabels {
     supportCopyIban: t("blocks.supportCopyIban"),
     supportLink: t("blocks.supportLink"),
     sponsored: t("blocks.sponsored"),
+    gateAdult: t("blocks.gateAdult"),
+    gateSpoiler: t("blocks.gateSpoiler"),
     countdownDays: t("blocks.countdownDays"),
     countdownHours: t("blocks.countdownHours"),
     countdownMinutes: t("blocks.countdownMinutes"),
