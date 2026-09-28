@@ -5,6 +5,7 @@ import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView, type ProfileViewData } from "@/components/blocks/profile-view";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/surface";
+import { SiteFooter } from "@/features/legal/components/site-footer";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
@@ -53,7 +54,7 @@ export default async function HomePage() {
     socials: [
       { platform: "GITHUB", handle: "Serdarsahinn05" },
       { platform: "LINKEDIN", handle: "serdarsahin" },
-      { platform: "EMAIL", handle: "hello@linkiva.space" },
+      { platform: "EMAIL", handle: site.email },
     ],
     blocks: [
       { id: "s1", type: "HEADER", data: { text: tl("sampleHeader") }, isHighlighted: false },
@@ -131,14 +132,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-glass-edge py-6 text-sm text-ink-3">
-        <span lang="en" translate="no">
-          © {new Date().getFullYear()} {site.name}
-        </span>
-        <Link href="/privacy" className="hover:text-ink">
-          {tl("privacy")}
-        </Link>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

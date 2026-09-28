@@ -10,6 +10,7 @@ import { Notice } from "@/components/ui/notice";
 import { PasswordInput } from "@/components/ui/password-input";
 import { authClient } from "@/lib/auth-client";
 import { emailSchema, PASSWORD_MAX, PASSWORD_MIN, passwordSchema } from "@/lib/validation/auth";
+import { TermsConsent } from "@/features/legal/components/terms-consent";
 import { GoogleButton, OrDivider } from "./google-button";
 
 type Errors = { email?: string; password?: string; form?: string };
@@ -94,7 +95,7 @@ export function RegisterForm({ googleEnabled, claimedUsername }: { googleEnabled
         <Button type="submit" block pending={pending} pendingLabel={t("auth.register.pending")}>
           {t("auth.register.submit")}
         </Button>
-        <p className="text-sm text-ink-2">{t("auth.register.terms")}</p>
+        <TermsConsent action="register" />
       </form>
 
       <p className="text-sm text-ink-2">

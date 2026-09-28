@@ -13,6 +13,17 @@
     "continue": "Devam et",
     "genericError": "Bir şeyler ters gitti. Birazdan tekrar dene."
   },
+  "legal": {
+    "footerNav": "Site bilgileri",
+    "contact": "Bize yaz",
+    "privacy": "Gizlilik",
+    "terms": "Kullanım Koşulları",
+    "contents": "İçindekiler",
+    "consent": {
+      "register": "Kayıt olarak <terms>Kullanım Koşulları</terms>'nı kabul etmiş olursun. Kişisel verilerinin nasıl işlendiğini <privacy>Gizlilik ve Aydınlatma Metni</privacy> anlatır.",
+      "publish": "Sayfanı yayınlayarak <terms>Kullanım Koşulları</terms>'na uymayı kabul edersin. Verilerin için: <privacy>Gizlilik ve Aydınlatma Metni</privacy>."
+    }
+  },
   "landing": {
     "headline": "Her şeyin, tek bir adreste.",
     "lede": "Linklerini, sosyal hesaplarını ve içeriklerini tek sayfada topla. Kur, paylaş, kimin tıkladığını gör.",
@@ -62,7 +73,6 @@
     },
     "closeTitle": "Adresin boşta mı?",
     "closeLede": "Kullanıcı adını al, bir dakikada yayında ol.",
-    "privacy": "Gizlilik",
     "sampleName": "Serdar ŞAHİN",
     "sampleBio": "Bilgisayar mühendisi · Ankara",
     "sampleHeader": "Projeler",
@@ -113,7 +123,6 @@
       "pending": "Hesap oluşturuluyor",
       "hasAccount": "Zaten hesabın var mı?",
       "toLogin": "Giriş yap",
-      "terms": "Devam ederek Kullanım Koşulları'nı ve Gizlilik Politikası'nı kabul etmiş olursun.",
       "tooMany": "Çok fazla kayıt denemesi. Birkaç dakika sonra tekrar dene."
     },
     "checkEmail": {
