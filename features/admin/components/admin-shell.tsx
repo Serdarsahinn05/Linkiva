@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Flag, LayoutGrid, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Flag, LayoutGrid, ScrollText, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -10,12 +10,13 @@ import { cn } from "@/lib/cn";
 import type { StaffRole } from "@/lib/admin";
 import { StepUp } from "./step-up";
 
-type NavItem = { href: "/admin" | "/admin/reports" | "/admin/users"; key: "overview" | "reports" | "users"; icon: LucideIcon; adminOnly?: boolean };
+type NavItem = { href: "/admin" | "/admin/reports" | "/admin/users" | "/admin/audit"; key: "overview" | "reports" | "users" | "audit"; icon: LucideIcon; adminOnly?: boolean };
 const NAV: NavItem[] = [
   { href: "/admin", key: "overview", icon: LayoutGrid },
   { href: "/admin/reports", key: "reports", icon: Flag },
   // Hidden from moderators; the pages check the role themselves.
   { href: "/admin/users", key: "users", icon: Users, adminOnly: true },
+  { href: "/admin/audit", key: "audit", icon: ScrollText, adminOnly: true },
 ];
 
 /**

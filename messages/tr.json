@@ -654,7 +654,8 @@
     "title": "Yönetim",
     "back": "Kendi panelime dön",
     "roles": { "ADMIN": "Yönetici", "MODERATOR": "Moderatör" },
-    "nav": { "overview": "Genel bakış", "reports": "Bildirimler", "users": "Kullanıcılar" },
+    "nav": { "overview": "Genel bakış", "reports": "Bildirimler", "users": "Kullanıcılar", "audit": "Günlük" },
+    "auditLog": { "filter": "İşleme göre süz", "all": "Hepsi", "older": "Daha eski kayıtlar", "found": "{count, plural, other {# hesap bulundu}}" },
     "users": {
       "title": "Kullanıcılar",
       "search": "Kullanıcı adı ya da tam e-posta adresi",

@@ -18,6 +18,28 @@ export async function getOverview(now = new Date()) {
 
 export type AuditRow = Awaited<ReturnType<typeof getOverview>>["recent"][number];
 
+const AUDIT_PAGE = 50;
+
+/** The audit log, newest first, AUDIT_PAGE at a time (`before`: the last id of the previous page). */
+export async function listAudit({ action, before }: { action?: string; before?: string }) {
+  const beforeId = before && /^\d{1,19}$/.test(before) ? BigInt(before) : undefined;
+  const rows = await db.adminAudit.findMany({
+    where: { ...(action ? { action } : {}), ...(beforeId ? { id: { lt: beforeId } } : {}) },
+    orderBy: { id: "desc" },
+    take: AUDIT_PAGE + 1,
+  });
+  return {
+    rows: rows.slice(0, AUDIT_PAGE).map((r) => ({
+      ...r,
+      id: r.id.toString(),
+      at: r.at.toISOString(),
+      // Prisma types Json as a union; the checks before the cast leave only a plain object.
+      meta: r.meta && typeof r.meta === "object" && !Array.isArray(r.meta) ? (r.meta as Record<string, unknown>) : {},
+    })),
+    next: rows.length > AUDIT_PAGE ? rows[AUDIT_PAGE - 1]!.id.toString() : null,
+  };
+}
+
 export const countOpenReports = () => db.report.count({ where: { status: "OPEN" } });
 
 export type ReportListRow = {

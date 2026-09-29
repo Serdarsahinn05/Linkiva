@@ -654,7 +654,8 @@
     "title": "Admin",
     "back": "Back to my dashboard",
     "roles": { "ADMIN": "Admin", "MODERATOR": "Moderator" },
-    "nav": { "overview": "Overview", "reports": "Reports", "users": "Users" },
+    "nav": { "overview": "Overview", "reports": "Reports", "users": "Users", "audit": "Log" },
+    "auditLog": { "filter": "Filter by action", "all": "All", "older": "Older entries", "found": "{count, plural, one {# account found} other {# accounts found}}" },
     "users": {
       "title": "Users",
       "search": "Username or full email address",

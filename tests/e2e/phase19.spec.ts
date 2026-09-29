@@ -40,10 +40,13 @@ test("the admin panel does not exist for anyone but staff with two-step verifica
 
   // An admin finds accounts by name; the page shows the email, to admins only.
   if (info.project.name === "desktop") {
-    await page.goto(`/admin/users?q=${username}`);
+    await page.goto(`/admin/users?q=${encodeURIComponent(email)}`);
     await page.getByRole("link", { name: new RegExp(`@${username}`) }).click();
     await expect(page.getByText(email)).toBeVisible();
     if (shots) await page.screenshot({ path: `${shots}/admin-user-1440.png` });
+    await page.goto("/admin/audit");
+    await expect(page.getByRole("heading", { name: "Günlük", level: 1 })).toBeVisible();
+    await expect(page.getByText("E-postayla hesap arandı").first()).toBeVisible();
     await page.goto("/admin");
   }
 
@@ -105,6 +108,7 @@ test("a visitor reports a page from its foot, and staff dismiss it from the queu
   await sql(`UPDATE "user" SET role = 'MODERATOR', "twoFactorEnabled" = true WHERE email = $1`, [email]);
   // Users (and their emails) are for admins only: a moderator gets the 404.
   expect((await page.goto("/admin/users"))?.status()).toBe(404);
+  expect((await page.goto("/admin/audit"))?.status()).toBe(404);
   await page.goto("/admin/reports");
   const row = page.getByRole("link", { name: new RegExp(`@${owner}`) });
   await expect(row).toBeVisible();
