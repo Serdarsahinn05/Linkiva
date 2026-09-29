@@ -57,11 +57,13 @@ export function ThemePalette({ label, names }: { label: string; names: Record<Th
       const slot = document.querySelector<HTMLElement>("[data-palette-slot]")?.getBoundingClientRect();
       const anchor = document.querySelector<HTMLElement>("[data-palette-anchor]")?.getBoundingClientRect();
       if (!slot) return;
-      const wide = window.innerWidth >= 1024;
+      const wide = window.innerWidth >= 768;
       const e = wide && anchor ? smooth(clamp01(readScroll(sections).p)) : 1;
       if (held.current && e < 1) return;
       const from = wide && anchor ? anchor : slot;
-      el.style.transform = `translate3d(${lerp(from.left, slot.left, e)}px, ${lerp(from.top, slot.top, e)}px, 0)`;
+      // Never past the right edge: beside a small phone the anchor sits near it.
+      const left = Math.min(lerp(from.left, slot.left, e), window.innerWidth - el.offsetWidth - 16);
+      el.style.transform = `translate3d(${left}px, ${lerp(from.top, slot.top, e)}px, 0)`;
       el.style.visibility = "visible";
       docked.current = e > 0.5;
     };
