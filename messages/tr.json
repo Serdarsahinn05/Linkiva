@@ -424,6 +424,12 @@
     "moveDown": "Aşağı taşı",
     "delete": "Sil",
     "deleted": "Blok silindi.",
+    "deleteAll": "Tümünü sil",
+    "deleteAllTitle": "Bütün bloklar silinsin mi?",
+    "deleteAllBody": "{count, plural, one {# blok} other {# blok}} sayfandan kaldırılacak. Hemen ardından geri alabilirsin.",
+    "deleteAllConfirm": "Hepsini sil",
+    "deletedAll": "{count, plural, one {# blok silindi.} other {# blok silindi.}}",
+    "blockCount": "{count, plural, one {# blok} other {# blok}}",
     "undo": "Geri al",
     "drag": "Sırasını değiştirmek için sürükle",
     "more": "Diğer işlemler",
@@ -575,6 +581,7 @@
     "title": "Ya da bir şablonla başla",
     "hint": "Bloklar eklenir, adreslerini sen doldurursun. Adresi olmayan link sayfanda görünmez.",
     "applied": "Şablon eklendi. Linklerin adreslerini doldurunca sayfanda görünür.",
+    "undone": "Şablon geri alındı.",
     "names": {
       "student": "Öğrenci",
       "musician": "Müzisyen",
@@ -651,6 +658,7 @@
     "apply": "Seçilenleri ekle",
     "applying": "Ekleniyor",
     "done": "{count} blok eklendi.",
+    "undone": "İçe aktarılanlar geri alındı.",
     "skipped": "{count} öğe geçersiz olduğu için atlandı.",
     "back": "Başka adres",
     "errors": {

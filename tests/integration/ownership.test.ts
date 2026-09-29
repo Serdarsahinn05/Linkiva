@@ -170,3 +170,28 @@ describe("phase 3 actions stay inside the caller's profile", () => {
     expect(await db.subscriber.count({ where: { id: sub.id } })).toBe(1);
   });
 });
+
+describe("bulk delete and its undo stay inside the caller's profile", () => {
+  it("deletes only the caller's own blocks, ignoring someone else's ids", async () => {
+    expect(await actions.deleteBlocks([aliceBlock])).toEqual({ ok: false, error: "notFound" });
+    const bob = await db.profile.findUniqueOrThrow({ where: { userId: ids.bob } });
+    const mine = await db.block.create({ data: { profileId: bob.id, type: "HEADER", position: 9, data: { text: "Bulk" } } });
+    const result = await actions.deleteBlocks([mine.id, aliceBlock]);
+    expect(result.ok && result.data.map((b) => b.id)).toEqual([mine.id]);
+    expect(await db.block.count({ where: { id: aliceBlock } })).toBe(1);
+    expect(await db.block.count({ where: { id: mine.id } })).toBe(0);
+
+    // Undo recreates them on the caller's profile, with the same ids.
+    if (!result.ok) throw new Error("deleteBlocks failed");
+    const restored = await actions.restoreBlocks(result.data);
+    expect(restored.ok && restored.data.map((b) => b.id)).toEqual([mine.id]);
+    expect((await db.block.findUniqueOrThrow({ where: { id: mine.id } })).profileId).toBe(bob.id);
+  });
+
+  it("refuses an undo that would bring in someone else's file", async () => {
+    const foreign = `https://store.public.blob.vercel-storage.com/u/${ids.alice}/block/photo.webp`;
+    const snapshot = { id: `bulk-${suffix}`, type: "IMAGE" as const, data: { src: foreign }, position: 7, isVisible: true, isHighlighted: false, size: "WIDE" as const, startsAt: null, endsAt: null };
+    expect(await actions.restoreBlocks([snapshot])).toEqual({ ok: false, error: "invalid" });
+    expect(await db.block.count({ where: { id: snapshot.id } })).toBe(0);
+  });
+});
