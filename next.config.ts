@@ -8,7 +8,7 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
  * dashboard previews them in an iframe and owners may embed them elsewhere. The landing page (/) is left out because a
  * custom domain serves its profile at / and headers match the incoming path, before the proxy rewrites it.
  */
-const NO_FRAME = ["dashboard", "login", "register", "onboarding", "forgot-password", "reset-password", "check-email", "unsubscribe"];
+const NO_FRAME = ["admin", "dashboard", "login", "register", "onboarding", "forgot-password", "reset-password", "check-email", "unsubscribe"];
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
@@ -29,6 +29,8 @@ const nextConfig: NextConfig = {
         { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
       ],
     })),
+    // The admin panel (Faz 19) never ends up in a search index or a shared cache.
+    { source: "/admin/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }, { key: "Cache-Control", value: "no-store" }] },
   ],
   // Two root layouts ((site) and (profile)): unmatched URLs need their own full-document 404.
   experimental: {

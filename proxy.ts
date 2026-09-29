@@ -25,6 +25,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.rewrite(new URL(`/${username}${route.path}${request.nextUrl.search}`, request.url));
   }
 
+  // The admin panel does not admit it exists: without a session it is a plain 404, not a sign-in page. The real check
+  // (role, two-step verification) is in app/(site)/admin/layout.tsx and in every admin action.
+  if ((pathname === "/admin" || pathname.startsWith("/admin/")) && !getSessionCookie(request)) return notFound(request);
+
   // Optimistic redirect only: a missing cookie means "surely logged out". The authoritative
   // session check happens in the dashboard/onboarding server components.
   if ((pathname.startsWith("/dashboard") || pathname === "/onboarding") && !getSessionCookie(request)) {

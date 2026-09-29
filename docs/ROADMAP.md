@@ -453,7 +453,14 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 ### Faz 19: Admin paneli ve kötüye kullanım yönetimi (`faz-19-admin`)
 
 Backlog #4'ün genişletilmişi. En çok güvenlik önlemi isteyen faz; ayrı tehdit modeli ve `/security-review` ile biter.
-- [ ] Rol modeli (`role: ADMIN`), admin yolları ayrı layout'ta sunucu tarafı rol kontrolü, admin için 2FA zorunlu, yeniden kimlik doğrulama (hassas işlemde şifre/kod).
+- [x] Hazırlık: uygulamanın hız sınırları Upstash'ten Postgres'e (`rate_counter`, hash'li anahtar, tek atomik upsert). Upstash canlıda hiç kurulmamıştı; sınırlar örnek başına bellekteydi. Upstash gizlilik metninden ve bağımlılıklardan çıktı.
+- [x] Rol modeli (`user.role`: USER / MODERATOR / ADMIN; Better Auth alanı değil, hiçbir auth ucu okuyup yazamaz), `lib/admin.ts` tek kapı: `/admin` sayfaları ve her admin action sunucuda rol + 2FA kontrolü; personel olmayana düz 404 (oturumsuz istek proxy'de 404). Oturum çerez önbelleği atlanır (iptal edilen oturum/rol anında düşer). Silinmeyi bekleyen hesap personel sayılmaz.
+- [x] Yeniden doğrulama (`admin_step_up`): güncel TOTP kodu bu oturumda 10 dk hassas işlemleri açar. Better Auth oturumlu doğrulamada hata saymadığı için 15 dk'da 5 deneme sınırı bizde; her deneme günlükte.
+- [x] Denetim günlüğü `admin_audit`: yabancı anahtar yok (silinen hesaptan sonra da kalır), e-posta değil etiket; UPDATE/DELETE/TRUNCATE veritabanı tetikleyicisiyle reddedilir.
+- [x] İlk admin: `scripts/set-role.mjs <email> ADMIN` (sonrası panelden). `/admin` noindex, no-store, çerçevelenemez.
+- [x] Test: `tests/integration/admin.test.ts` (oturumsuz/normal/2FA'sız/moderatör/silinmeyi bekleyen, yeniden doğrulama süresi-oturumu-deneme sınırı, günlük değiştirilemez), `admin-role.test.ts` (kayıtta rol gönderilemez), `ratelimit.test.ts`, `tests/e2e/phase19.spec.ts`.
+- [ ] Kullanıcılar listesi ve rol değiştirme (yalnız admin, yeniden doğrulamalı, son admin kendini düşüremez).
+- [ ] Supabase Data API: public şemadaki tablolarda RLS kapalı; Data API açıksa tablolar anon anahtarla okunabilir. Kontrol edilip kapatılacak (Data API kapatma ya da RLS açma; uygulama `postgres` rolüyle bağlanır, RLS'ten etkilenmez).
 - [ ] Kötüye kullanım bildirimi (profilde "Bildir"), bildirim kuyruğu, içerik kaldırma, hesap askıya alma (profil 404 ya da bilgilendirme sayfası), geri alma.
 - [ ] Denetim günlüğü: her admin işlemi kim, ne zaman, neyi, neden; silinemez.
 - [ ] Faz 14'teki `scripts/takedown.mjs` panelin eylemleriyle değiştirilir.

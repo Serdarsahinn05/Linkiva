@@ -585,6 +585,41 @@
       "listInvalid": "Too many items, or one is too long."
     }
   },
+  "admin": {
+    "title": "Admin",
+    "back": "Back to my dashboard",
+    "roles": { "ADMIN": "Admin", "MODERATOR": "Moderator" },
+    "nav": { "overview": "Overview" },
+    "twoFactorTitle": "Two-step verification first",
+    "twoFactorBody": "The admin panel only works for accounts with two-step verification on. Turn it on in Settings, then come back.",
+    "twoFactorAction": "Go to settings",
+    "stepUp": {
+      "unlock": "Unlock sensitive actions",
+      "openUntil": "Sensitive actions unlocked until {time}",
+      "title": "Confirm it's you",
+      "body": "Removing content, suspending accounts and changing roles need the current code from your authenticator app. It holds for 10 minutes on this session.",
+      "code": "6-digit code",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "invalid": "The code is wrong or has expired.",
+      "tooMany": "Too many attempts. Try again in 15 minutes.",
+      "error": "Could not confirm. Try again."
+    },
+    "overview": {
+      "pages": "Pages",
+      "published": "Published",
+      "newThisWeek": "New this week",
+      "pendingDeletions": "Waiting to be deleted",
+      "recent": "Recent actions",
+      "recentEmpty": "No admin actions yet."
+    },
+    "audit": {
+      "stepUp": "Identity confirmed",
+      "stepUpFailed": "Wrong confirmation code",
+      "stepUpLimited": "Confirmation attempt limit reached",
+      "roleSet": "Role changed"
+    }
+  },
   "guide": {
     "title": "First steps",
     "body": "The steps to a page that is ready to share. Each one ticks itself as you go.",

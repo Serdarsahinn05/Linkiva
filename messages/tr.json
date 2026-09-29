@@ -585,6 +585,41 @@
       "listInvalid": "Çok fazla ya da çok uzun öğe var."
     }
   },
+  "admin": {
+    "title": "Yönetim",
+    "back": "Kendi panelime dön",
+    "roles": { "ADMIN": "Yönetici", "MODERATOR": "Moderatör" },
+    "nav": { "overview": "Genel bakış" },
+    "twoFactorTitle": "Önce iki adımlı doğrulama",
+    "twoFactorBody": "Yönetim paneli yalnızca iki adımlı doğrulaması açık hesaplarla kullanılır. Ayarlar'dan aç, sonra buraya dön.",
+    "twoFactorAction": "Ayarlara git",
+    "stepUp": {
+      "unlock": "Hassas işlemleri aç",
+      "openUntil": "Hassas işlemler {time}'e kadar açık",
+      "title": "Kimliğini doğrula",
+      "body": "Kaldırma, askıya alma ve rol değiştirme gibi işlemler için doğrulama uygulamandaki güncel kodu gir. Bu oturumda 10 dakika geçerli olur.",
+      "code": "6 haneli kod",
+      "confirm": "Doğrula",
+      "cancel": "Vazgeç",
+      "invalid": "Kod doğru değil ya da süresi geçmiş.",
+      "tooMany": "Çok fazla deneme oldu. 15 dakika sonra yeniden dene.",
+      "error": "Doğrulanamadı. Tekrar dene."
+    },
+    "overview": {
+      "pages": "Sayfa",
+      "published": "Yayında",
+      "newThisWeek": "Bu hafta açılan",
+      "pendingDeletions": "Silinmeyi bekleyen",
+      "recent": "Son işlemler",
+      "recentEmpty": "Henüz bir yönetim işlemi yok."
+    },
+    "audit": {
+      "stepUp": "Kimlik doğrulandı",
+      "stepUpFailed": "Hatalı doğrulama kodu",
+      "stepUpLimited": "Doğrulama denemesi sınırı aşıldı",
+      "roleSet": "Rol değiştirildi"
+    }
+  },
   "guide": {
     "title": "İlk adımlar",
     "body": "Sayfanı paylaşmaya hazırlayan adımlar. Yaptıkça kendiliğinden işaretlenir.",
