@@ -32,7 +32,7 @@ export function StatusPage({
         </header>
         <main
           id="main"
-          className="mx-auto grid min-h-dvh w-full max-w-6xl grid-cols-[minmax(0,1fr)] content-center items-center gap-4 px-4 py-10 sm:px-8 lg:grid-cols-2 lg:gap-12"
+          className="mx-auto grid min-h-dvh w-full max-w-6xl grid-cols-[minmax(0,1fr)] content-center items-center gap-4 px-4 py-10 sm:px-8 md:grid-cols-2 md:gap-12"
         >
           {/* A soft light behind the figure lifts the page a little (above the ambient, below everything else). */}
           <div
@@ -43,10 +43,10 @@ export function StatusPage({
                 "radial-gradient(55% 65% at 68% 45%, var(--c-glass-strong), transparent 75%), radial-gradient(70% 60% at 70% 40%, var(--c-ambient-1), transparent 70%)",
             }}
           />
-          <div className="flex justify-center lg:order-2 lg:justify-start">
+          <div className="flex justify-center md:order-2 md:justify-start">
             {figure}
           </div>
-          <div className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
+          <div className="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
             <span className="font-mono text-sm text-ink-3">{code}</span>
             <h1 className="text-[length:var(--text-display)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance">
               {title}
@@ -56,7 +56,7 @@ export function StatusPage({
                 {body}
               </p>
             )}
-            <div className="mt-2 flex w-full max-w-xl flex-wrap items-center justify-center gap-3 lg:justify-start">
+            <div className="mt-2 flex w-full max-w-xl flex-wrap items-center justify-center gap-3 md:justify-start">
               {actions}
             </div>
           </div>

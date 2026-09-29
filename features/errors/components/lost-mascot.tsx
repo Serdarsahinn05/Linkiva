@@ -39,7 +39,6 @@ export function LostMascot() {
       const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
       // Framed wider than the figure: the chain needs room to swing out to the right.
       camera.position.set(0.75, 0.05, 5.2);
-      camera.lookAt(0.75, 0.05, 0);
       const pmrem = new THREE.PMREMGenerator(renderer);
       const room = new RoomEnvironment();
       const envMap = pmrem.fromScene(room, 0.04).texture;
@@ -223,6 +222,11 @@ export function LostMascot() {
         const h = el.clientHeight || 1;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
+        // Wide: the figure left of centre, room for the chain's swing on the right. Narrow (the figure above the
+        // words, centred on the page): the figure and its chain centred.
+        const cx = w < 560 ? 0.35 : 0.75;
+        camera.position.set(cx, 0.05, 5.2);
+        camera.lookAt(cx, 0.05, 0);
         camera.updateProjectionMatrix();
       };
       size();
@@ -373,5 +377,5 @@ export function LostMascot() {
   }, []);
 
   // Wider than the figure, with the figure on its left: the room on the right is for the chain's swing.
-  return <div ref={host} aria-hidden className="aspect-[5/4] w-full max-w-96 shrink-0 sm:max-w-[30rem] lg:w-[min(44rem,46vw)] lg:max-w-none [&>canvas]:block [&>canvas]:size-full" />;
+  return <div ref={host} aria-hidden className="aspect-[5/4] w-full max-w-96 shrink-0 sm:max-w-[30rem] md:w-[min(44rem,46vw)] md:max-w-none [&>canvas]:block [&>canvas]:size-full" />;
 }

@@ -70,8 +70,8 @@ export default async function HomePage() {
       </header>
 
       <main id="main" className="mx-auto flex w-full max-w-6xl flex-col">
-        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] content-center items-center gap-10 py-12 lg:grid-cols-2 lg:py-0">
-          <div className="flex flex-col items-center gap-7 text-center lg:items-start lg:text-left">
+        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] content-center items-center gap-10 py-12 md:grid-cols-2 md:py-0">
+          <div className="flex flex-col items-center gap-7 text-center md:items-start md:text-left">
             <h1 className="text-[length:var(--text-display)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance">{tl("headline")}</h1>
             <p className="max-w-[46ch] text-lg text-ink-2 text-pretty">{tl("lede")}</p>
             <ClaimForm id="claim" label={tl("usernameLabel")} placeholder={tl("usernamePlaceholder")} cta={tl("claim")} />
@@ -80,36 +80,36 @@ export default async function HomePage() {
             <ThemePalette label={tl("themeLabel")} names={names} />
           </div>
           {/* Narrow screens: the room the phone takes under the hero (LandingStage). */}
-          <div data-stage-slot className="mx-auto aspect-[620/760] w-full max-w-88 lg:hidden" />
+          <div data-stage-slot className="mx-auto aspect-[620/760] w-full max-w-88 md:hidden" />
         </section>
 
         {/* Held for several screens: the phone stays put and turns to the next theme per stretch. */}
         <section data-stop className="h-[560vh]">
-          <div className="sticky top-0 grid min-h-dvh grid-cols-[minmax(0,1fr)] content-center items-center gap-6 py-8 lg:grid-cols-2">
-            <div className="flex flex-col gap-5 lg:gap-6">
+          <div className="sticky top-0 grid min-h-dvh grid-cols-[minmax(0,1fr)] content-center items-center gap-6 py-8 md:grid-cols-2">
+            <div className="flex flex-col gap-5 md:gap-6">
               <h2 className={title}>{tl("themesTitle")}</h2>
               <p className="max-w-[40ch] text-lg text-ink-2">{tl("themesLede")}</p>
               <ThemeCaption names={names} descriptions={descriptions} />
               {/* The palette docks here (ThemePalette); this keeps its room. */}
               <div data-palette-slot className="h-[86px] w-72" />
             </div>
-            <div data-stage-slot className="mx-auto aspect-[620/760] w-full max-w-60 lg:hidden" />
+            <div data-stage-slot className="mx-auto aspect-[620/760] w-full max-w-60 md:hidden" />
           </div>
         </section>
 
-        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 lg:grid-cols-2">
-          <div className="flex flex-col gap-5 lg:col-start-2">
+        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 md:grid-cols-2">
+          <div className="flex flex-col gap-5 md:col-start-2">
             <h2 className={title}>{tl("freeTitle")}</h2>
             <p className="text-lg text-ink-2">{tl("freeLede")}</p>
             <FeatureRows keys={FIRST} />
           </div>
         </section>
 
-        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 lg:grid-cols-2">
+        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 md:grid-cols-2">
           <FeatureRows keys={SECOND} />
         </section>
 
-        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 lg:grid-cols-2">
+        <section data-stop className="grid min-h-dvh grid-cols-[minmax(0,1fr)] items-center py-16 md:grid-cols-2">
           <div className="flex max-w-xl flex-col gap-6">
             <h2 className={title}>{tl("faqTitle")}</h2>
             <LandingFaq />
@@ -117,6 +117,7 @@ export default async function HomePage() {
         </section>
 
         <section data-stop className="flex min-h-dvh flex-col items-center justify-end gap-6 pb-[18vh] text-center">
+          <div data-stage-slot className="aspect-[620/760] w-full max-w-52 md:hidden" />
           <h2 className="text-[2.25rem] leading-tight font-semibold tracking-[-0.03em]">{tl("closeTitle")}</h2>
           <p className="text-lg text-ink-2">{tl("closeLede")}</p>
           <ClaimForm id="claim-bottom" label={tl("usernameLabel")} placeholder={tl("usernamePlaceholder")} cta={tl("claim")} />

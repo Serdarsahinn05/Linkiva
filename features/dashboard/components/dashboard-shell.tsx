@@ -4,10 +4,11 @@ import { BarChart3, Eye, Link2, Palette, Search, Settings, Share2, Users, type L
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Dialog } from "@/components/ui/dialog";
 import { Wordmark } from "@/components/ui/surface";
 import { ToastProvider } from "@/components/ui/toast";
+import { localizedPath, pageLocale } from "@/i18n/marketing";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/account/components/logout-button";
 import { CommandPalette } from "./command-palette";
@@ -50,15 +51,16 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
   const livePreview = usePreview();
   const navigating = useNavigationPending();
   const activeIndex = NAV.findIndex((item) => item.href === pathname);
+  const home = localizedPath("/", pageLocale(useLocale()));
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
+    <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
       {/* A slow page change: a thin line runs along the top and the page dims (both only after 300 ms, globals.css). */}
       <div aria-hidden className="nav-progress" data-active={navigating || undefined} />
-      {/* Desktop: glass sidebar */}
-      <aside className="sticky top-0 hidden h-dvh p-3 lg:block">
+      {/* Desktop (and a phone asking for the desktop site, about 980px): glass sidebar */}
+      <aside className="sticky top-0 hidden h-dvh p-3 md:block">
         <div className="glass flex h-full flex-col gap-8 rounded-[var(--radius-card)] p-4">
-          <Link href="/dashboard" className="self-start">
+          <Link href={home} className="self-start">
             <Wordmark />
           </Link>
           <button
@@ -93,6 +95,15 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
             </ul>
           </nav>
           <div className="mt-auto flex flex-col gap-2">
+            {/* Below lg the page has no preview column (editor, appearance): it opens as a sheet, like on a phone. */}
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              className="glass-flat flex h-11 items-center gap-3 rounded-full px-4 font-medium text-ink-2 transition-colors hover:text-ink lg:hidden"
+            >
+              <Eye size={19} strokeWidth={1.75} aria-hidden />
+              {t("nav.preview")}
+            </button>
             <SharePanel username={username} domain={domain} />
             <LogoutButton />
           </div>
@@ -100,8 +111,8 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
       </aside>
 
       {/* Mobile: top bar */}
-      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 lg:hidden">
-        <Link href="/dashboard">
+      <header className="flex items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 md:hidden">
+        <Link href={home}>
           <Wordmark />
         </Link>
         <button
@@ -114,14 +125,14 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
         </button>
       </header>
 
-      <main id="main" aria-busy={navigating || undefined} data-navigating={navigating || undefined} className="nav-dim min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main id="main" aria-busy={navigating || undefined} data-navigating={navigating || undefined} className="nav-dim min-w-0 pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-0">
         {children}
       </main>
 
       {/* Mobile: Instagram-style floating glass tab bar with a liquid active indicator. */}
       <nav
         aria-label={t("nav.main")}
-        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 lg:hidden"
+        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 md:hidden"
       >
         <div className="glass-float liquid relative grid h-16 grid-cols-5 items-center rounded-full px-1.5">
           {activeIndex >= 0 && (

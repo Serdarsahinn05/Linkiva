@@ -32,7 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={show}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-6">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 md:bottom-6">
         {toast && (
           <div key={toast.id} className="glass-float toast-in pointer-events-auto flex min-h-12 max-w-full items-center gap-3 rounded-full py-1.5 pr-1.5 pl-4 text-[0.9375rem]">
             <span aria-hidden className={cn("neon size-2 shrink-0 rounded-full", toast.tone === "success" ? "bg-positive text-positive" : "bg-negative text-negative")} />

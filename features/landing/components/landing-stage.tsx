@@ -288,21 +288,27 @@ export function LandingStage({
       let y = 0;
       let scale = 1;
       let opacity = 1;
-      if (vw >= 1024) {
-        x = at(STOPS.side, p) * Math.min(vw * 0.21, 320);
+      if (vw >= 768) {
+        // The middle of the free column, and small enough to fit it: the phone and its cards span about 720px, the
+        // column is half the page (a tablet or a phone asking for the desktop site gets a smaller phone).
+        x = at(STOPS.side, p) * Math.min(vw * 0.25 - 16, 320);
         y = at(STOPS.y, p) * vh;
-        scale = at(STOPS.scale, p) * Math.min(1, (vh * 0.9) / H);
+        scale = at(STOPS.scale, p) * Math.min(1, (vh * 0.9) / H, (vw * 0.5 - 24) / 720);
       } else {
         // No free column on a narrow screen: the phone fills the room the hero keeps for it and scrolls away
-        // with it, fading; then it fades in where the theme section keeps room, and leaves with that section.
-        const [hero, themes] = sections.slice(0, 2).map((s) => s.querySelector("[data-stage-slot]")?.getBoundingClientRect());
+        // with it, fading; then it fades in where the theme section keeps room, and leaves with that section. It
+        // comes back above the closing call, as on a wide screen.
+        const rect = (s: HTMLElement | undefined) => s?.querySelector("[data-stage-slot]")?.getBoundingClientRect();
+        const closing = p > sections.length - 2;
         const e = clamp01(p);
-        const slot = e < 0.5 ? hero : themes;
+        const slot = closing ? rect(sections.at(-1)) : rect(sections[e < 0.5 ? 0 : 1]);
         if (slot) {
           x = slot.left + slot.width / 2 - vw / 2;
           y = slot.top + slot.height / 2 - vh / 2;
           scale = slot.width / W;
-          opacity = smooth(clamp01(Math.abs(e - 0.5) * 4)) * (1 - clamp01((p - 1) * 3));
+          opacity = closing
+            ? smooth(clamp01((p - (sections.length - 1.7)) * 2.5))
+            : smooth(clamp01(Math.abs(e - 0.5) * 4)) * (1 - clamp01((p - 1) * 3));
         } else opacity = 0;
       }
       stage.style.transform = `translate3d(${x}px, ${y + bob}px, 0) scale(${scale})`;
