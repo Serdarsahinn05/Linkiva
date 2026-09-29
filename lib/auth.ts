@@ -85,12 +85,12 @@ export const auth = betterAuth({
 
   account: {
     // Implicit linking only onto locally verified accounts (Better Auth's default, stated explicitly).
-    // This is what closes v1's account-takeover hole (docs/AUDIT.md S2).
+    // This is what closes v1's account-takeover hole (docs/private/AUDIT.md S2).
     accountLinking: { enabled: true, requireLocalEmailVerified: true },
   },
 
   user: {
-    // The stored address only changes after the new one is verified (docs/AUDIT.md S4).
+    // The stored address only changes after the new one is verified (docs/private/AUDIT.md S4).
     changeEmail: {
       enabled: true,
       // A verified account must approve the change from its current address first; only then does the

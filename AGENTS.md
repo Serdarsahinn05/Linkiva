@@ -12,10 +12,12 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 | [DESIGN.md](DESIGN.md) | Görsel sistem: token'lar, tipografi, bileşen dili, temalar (**tasarım otoritesi**) |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Stack, klasör yapısı, veri modeli, auth, takip hattı, i18n |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Fazlar, kabul kriterleri, backlog |
-| [docs/DEPLOY.md](docs/DEPLOY.md) | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
-| [docs/AUDIT.md](docs/AUDIT.md) | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
+| `docs/private/DEPLOY.md` | Yayın adımları: Supabase, Vercel env, Blob, Resend, Google OAuth, posta kutusu |
+| `docs/private/AUDIT.md` | Eski (v1) sistemin denetimi, yeniden yapılmaması gereken hatalar |
 
-> **Durum (2026-09-28):** v2 canlıda (`linkiva.space`, `master`). v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Faz 0–12 ve v2.1 canlıda; Faz 13 (kırık link, hassas içerik kapısı, 2FA, PWA) ve güvenlik denetimi düzeltmeleri (`docs/SECURITY-AUDIT-2026-09-28.md`) `master`'a birleşti; canlıya push'tan önce production DB'ye iki migration (`db:deploy`) uygulanır. Sonraki plan Faz 14–19 (2026-09-28, ROADMAP → "Vitrin, yasal ve yönetim"): yasal metinler, dil/SEO, yükleme hissi, landing + 3D (3D'ye geçmeden kullanıcıya sorulur), yeni gelen rehberi, en son admin paneli. Faz 14–16 `master`'da; Faz 17 (landing: gezen cam telefon) `faz-17-vitrin` dalında. v2 sonrası iş Faz 6–13 olarak planlandı (ROADMAP → "v2 sonrası yol haritası"): her faz ayrı dalda, "Bilinçli olarak yapılmayanlar" listesi yeniden önerilmez. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
+> `docs/private/` yalnızca geliştiricinin makinesinde durur, repoya girmez (`.gitignore`). Depo herkese açık: yayın, altyapı ve güvenlik denetimi ayrıntıları oraya yazılır, public belgelere değil.
+
+> **Durum (2026-09-28):** v2 canlıda (`linkiva.space`, `master`). v1 kodu `HEAD 53b1dcc` / `legacy-v1` etiketinde duruyor. Faz 0–12 ve v2.1 canlıda; Faz 13 (kırık link, hassas içerik kapısı, 2FA, PWA) ve güvenlik denetimi düzeltmeleri (`docs/private/SECURITY-AUDIT-2026-09-28.md`) `master`'a birleşti; canlıya push'tan önce production DB'ye iki migration (`db:deploy`) uygulanır. Sonraki plan Faz 14–19 (2026-09-28, ROADMAP → "Vitrin, yasal ve yönetim"): yasal metinler, dil/SEO, yükleme hissi, landing + 3D (3D'ye geçmeden kullanıcıya sorulur), yeni gelen rehberi, en son admin paneli. Faz 14–16 `master`'da; Faz 17 (landing: gezen cam telefon) `faz-17-vitrin` dalında. v2 sonrası iş Faz 6–13 olarak planlandı (ROADMAP → "v2 sonrası yol haritası"): her faz ayrı dalda, "Bilinçli olarak yapılmayanlar" listesi yeniden önerilmez. Bir işe başlamadan önce ROADMAP'te hangi fazda olunduğuna bak.
 
 ## Stack
 
@@ -43,7 +45,7 @@ npm run build
 - Kullanıcıdan gelen URL'ler şema beyaz listesinden geçer: `https:`, `http:`, `mailto:`, `tel:`.
 - Hata mesajları hesabın var olup olmadığını sızdırmaz. İç hata mesajı istemciye dönmez.
 - Yeni üst seviye route eklersen `lib/validation/username.ts` içindeki rezerve listeye ekle. Senkron testi bunu yakalar.
-- `.env` asla commit edilmez. Lokal URL için `.env.local` kullanılır. **Dikkat:** v1'den kalan `.env` canlı Supabase DB'sini gösteriyor, v2 için yeni DB bağlanmadan `db:migrate` çalıştırma. Yeni env değişkeni hem `lib/env.ts`'e hem `.env.example`'a eklenir.
+- `.env` asla commit edilmez. Lokal URL için `.env.local` kullanılır. **Dikkat:** `.env`'deki adreslere karşı `db:migrate` çalıştırma; production'a migration `docs/private/DEPLOY.md`'deki adımla uygulanır. Yeni env değişkeni hem `lib/env.ts`'e hem `.env.example`'a eklenir.
 
 **Veri**
 - Şema değişikliği her zaman migration ile yapılır (`migrate dev`). `db push` kullanma, v1'de şema ile migration bu yüzden ayrıştı (AUDIT B2).
