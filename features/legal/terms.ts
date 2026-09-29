@@ -2,7 +2,7 @@ import { site } from "@/lib/site";
 import type { LegalDoc } from "./types";
 
 // The rules users agree to at sign-up (features/legal/components/terms-consent.tsx). Behaviour this text promises:
-// account deletion and export (Settings), the 90-day username redirect (features/profile), the 18+ link warning
+// account deletion and export (Settings), the 30-day username redirect (features/profile), the 18+ link warning
 // (app/l/[blockId]), notice and takedown (docs/DEPLOY.md → İçerik kaldırma).
 
 const OWNER = "Serdar Şahin";
@@ -45,7 +45,7 @@ export const terms: Record<"tr" | "en", LegalDoc> = {
         title: "Kullanıcı adı ve adresin",
         body: [
           "Kullanıcı adları ilk alan kişiye verilir. Bazı adlar sistem ve güvenlik için ayrılmıştır.",
-          "Kullanıcı adını değiştirdiğinde eski adresin 90 gün boyunca yeni adresine yönlenir, sonra başkası alabilir.",
+          "Kullanıcı adını değiştirdiğinde eski adresin 30 gün boyunca yeni adresine yönlenir, sonra başkası alabilir.",
           "Başka bir kişiyi, markayı ya da kurumu taklit eden, marka hakkını ihlal eden ya da ziyaretçiyi yanıltan bir kullanıcı adını geri alabiliriz.",
           "Özel alan adı bağlıyorsan o alan adını kullanma hakkına sahip olmalısın.",
         ],
@@ -94,7 +94,7 @@ export const terms: Record<"tr" | "en", LegalDoc> = {
         id: "kapanis",
         title: "Hesabın kapanması",
         body: [
-          "Hesabını istediğin zaman Ayarlar'dan silebilirsin. Silmeden önce verilerini dışa aktarabilirsin.",
+          "Hesabını istediğin zaman Ayarlar'dan silebilirsin. Silmeden önce verilerini dışa aktarabilirsin. Sayfan hemen yayından kalkar; 15 gün içinde giriş yaparsan hesabını geri yükleyebilirsin, sonra kalıcı olarak silinir.",
           "Bu koşulları ihlal edersen içeriğini kaldırabilir, sayfanı yayından kaldırabilir ya da hesabını kapatabiliriz. Çocuk istismarı ya da dolandırıcılık gibi ağır ihlallerde önceden haber vermeden işlem yapabiliriz.",
         ],
       },
@@ -162,7 +162,7 @@ export const terms: Record<"tr" | "en", LegalDoc> = {
         title: "Your username and address",
         body: [
           "Usernames go to whoever claims them first. Some names are reserved for the system and for security.",
-          "When you change your username, your old address redirects to the new one for 90 days; after that someone else can claim it.",
+          "When you change your username, your old address redirects to the new one for 30 days; after that someone else can claim it.",
           "We may take back a username that impersonates a person, brand or organisation, infringes a trademark or misleads visitors.",
           "If you connect a custom domain, you must have the right to use it.",
         ],
@@ -211,7 +211,7 @@ export const terms: Record<"tr" | "en", LegalDoc> = {
         id: "closing",
         title: "Closing your account",
         body: [
-          "You can delete your account at any time under Settings, and export your data first.",
+          "You can delete your account at any time under Settings, and export your data first. Your page goes offline at once; sign in within 15 days to restore your account, after that it is deleted permanently.",
           "If you break these terms we may remove your content, unpublish your page or close your account. For serious violations such as child abuse or fraud we may act without notice.",
         ],
       },

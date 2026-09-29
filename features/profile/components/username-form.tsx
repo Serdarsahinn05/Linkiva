@@ -9,7 +9,7 @@ import { USERNAME_REDIRECT_DAYS } from "@/lib/validation/username";
 import { changeUsername, type ChangeUsernameResult } from "../actions";
 import { UsernameField, useUsernameCheck } from "./username-field";
 
-/** Settings → Profile: move the page to a new address; the old one keeps redirecting for 90 days. */
+/** Settings → Profile: move the page to a new address; the old one keeps redirecting for 30 days. */
 export function UsernameForm({ current: initial, host }: { current: string; host: string }) {
   const t = useTranslations("username");
   const tc = useTranslations("common");

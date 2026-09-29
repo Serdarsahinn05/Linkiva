@@ -102,7 +102,7 @@
       ],
       "redirect": [
         "Your link survives a new name",
-        "Change your username and the old address forwards to the new one for 90 days."
+        "Change your username and the old address forwards to the new one for 30 days."
       ]
     },
     "closeTitle": "Is your address still free?",
@@ -149,7 +149,7 @@
       },
       "rename": {
         "q": "Will my old link break if I change my username?",
-        "a": "No. Your old address forwards to the new one for 90 days, so the links you shared keep working."
+        "a": "No. Your old address forwards to the new one for 30 days, so the links you shared keep working."
       },
       "data": {
         "q": "Where is my data, and who gets it?",
@@ -302,11 +302,19 @@
       "cta": "It wasn't me, reset my password",
       "security": "If you made this change, there is nothing else to do."
     },
+    "accountDeletionScheduled": {
+      "subject": "Linkiva: your account will be deleted in 15 days",
+      "preheader": "Changed your mind? Just sign in within 15 days.",
+      "heading": "Your account is about to be deleted",
+      "body": "Your page is offline and all your sessions were ended. Sign in within 15 days and you can restore your account with everything in it. After that, your page, stats, subscriber list and uploaded images are deleted permanently. Until then nobody can take your address.",
+      "cta": "Sign in and restore",
+      "security": "If this wasn't you, sign in now, restore your account and change your password."
+    },
     "accountDeleted": {
       "subject": "Linkiva: your account was deleted",
       "preheader": "Your account and all data were deleted.",
       "heading": "Your account was deleted",
-      "body": "As requested, your Linkiva account, page, stats and subscriber list were permanently deleted. Your address is now free for others.",
+      "body": "The 15-day waiting period after your request is over. Your Linkiva account, page, stats and subscriber list were permanently deleted. Your address is now free for others.",
       "cta": "",
       "security": "If this wasn't you, write to us right away: hello@linkiva.space"
     },
@@ -1010,11 +1018,15 @@
     "dataHint": "Your account, page, subscribers and stats in one JSON file.",
     "download": "Download my data",
     "danger": "Delete account",
-    "dangerHint": "Your page, blocks, subscribers, stats and uploaded images are deleted permanently. This cannot be undone.",
+    "dangerHint": "Your page goes offline at once and all your sessions end. Sign in within {days} days to restore your account; after that your page, blocks, subscribers, stats and uploaded images are deleted permanently.",
     "deleteOpen": "Delete my account",
-    "deleteTitle": "Delete account permanently",
+    "deleteTitle": "Delete account",
     "deleteConfirmLabel": "Type your username to confirm: {username}",
-    "deleteConfirm": "Delete account permanently",
+    "deleteConfirm": "Delete account",
+    "restoreTitle": "Your account is about to be deleted",
+    "restoreBody": "Your page is offline. On {date} your account, page, stats and subscriber list will be deleted permanently. Restore it and everything comes back as you left it.",
+    "restore": "Restore my account",
+    "restoring": "Restoring",
     "deleting": "Deleting",
     "deleteMismatch": "The username does not match.",
     "cancel": "Cancel",

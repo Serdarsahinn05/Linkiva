@@ -121,9 +121,9 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         body: [
           {
             list: [
-              "Hesap ve sayfa verileri, istatistikler ve abone listen: hesabın silinene kadar. Hesabını sildiğinde hepsi, yüklediğin dosyalarla birlikte kalıcı olarak silinir.",
+              "Hesap ve sayfa verileri, istatistikler ve abone listen: hesabın silinene kadar. Hesabını silmek istediğinde sayfan hemen yayından kalkar; 15 gün içinde giriş yapıp geri yüklemezsen hepsi, yüklediğin dosyalarla birlikte kalıcı olarak silinir.",
               "Oturum kayıtları (IP adresi ve tarayıcı bilgisiyle): güvenlik için hesabın silinene kadar. Açık oturumlarını Ayarlar'dan istediğin zaman kapatabilirsin; kapattığın oturumun kaydı silinir.",
-              "Eski kullanıcı adların: 90 gün boyunca yeni adresine yönlenir, sonra silinir ve ad serbest kalır.",
+              "Eski kullanıcı adların: 30 gün boyunca yeni adresine yönlenir, sonra silinir ve ad serbest kalır.",
               "Hız sınırı sayaçları: birkaç dakikadan en geç bir güne kadar, sonra kendiliğinden silinir.",
               "E-posta doğrulama ve şifre sıfırlama bağlantıları: süresi dolunca geçersiz olur, en geç bir gün içinde silinir.",
             ],
@@ -308,9 +308,9 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         body: [
           {
             list: [
-              "Account and page data, statistics and your subscriber list: until you delete your account. Deleting it permanently removes all of it, together with the files you uploaded.",
+              "Account and page data, statistics and your subscriber list: until you delete your account. When you ask for that, your page goes offline at once; unless you sign in and restore it within 15 days, all of it is then permanently removed, together with the files you uploaded.",
               "Session records (with IP address and browser details): for security, until you delete your account. You can end your open sessions under Settings at any time; the record of a session you end is deleted.",
-              "Past usernames: they redirect to your new address for 90 days, then they are deleted and the name becomes free.",
+              "Past usernames: they redirect to your new address for 30 days, then they are deleted and the name becomes free.",
               "Rate-limit counters: from a few minutes up to one day, then they are deleted automatically.",
               "Email verification and password reset links: invalid once expired, deleted within a day.",
             ],

@@ -35,7 +35,8 @@ const fail = (error: ActionError): ActionResult<never> => ({ ok: false, error })
 async function withProfile<T>(body: (profile: { id: string; username: string; userId: string }) => Promise<ActionResult<T>>): Promise<ActionResult<T>> {
   try {
     const user = await requireUser();
-    const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { id: true, username: true } });
+    // A page waiting to be deleted stays as it is (and offline) until its owner restores the account.
+    const profile = await db.profile.findFirst({ where: { userId: user.id, user: { deletion: { is: null } } }, select: { id: true, username: true } });
     if (!profile) return fail("notFound");
     const result = await body({ ...profile, userId: user.id });
     if (result.ok) updateTag(profileTag(profile.username));

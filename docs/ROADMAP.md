@@ -432,6 +432,13 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 - [x] Landing'de sol üstteki Linkiva yazısı ana sayfaya (dilin adresine) gider. Diğer sayfalarda zaten bağlantıydı.
 - [x] 404 sayfaları (site, adres eşleşmeyen genel 404, profil 404) kartsız: yazı solda, sağda büyük kil maskot; elinde ucu kopuk zincir fizikle sarkar, imleç geçince sallanır; başlık "Bu link kopmuş." / "This link is broken." (profil 404 başlığı değişmedi). three.js yalnızca burada, tembel; DESIGN §8'e istisna olarak yazıldı.
 
+### Hesap silmede bekleme, kısa ad yönlendirmesi (`faz-hesap-bekleme`, 2026-09-29)
+
+- [x] Hesap silme 15 gün bekler (`features/account/deletion.ts`, tablo `account_deletion`): sayfa hemen yayından kalkar (önceki yayın durumu saklanır), bütün oturumlar kapanır, kullanıcıya geri alma maili gider. Bu sürede giriş yapan panel yerine "Hesabını geri yükle" ekranını görür; onboarding ve editör action'ları kapalı. Günlük cron süresi dolanı dosyaları ve özel alan adıyla birlikte siler, "hesabın silindi" maili o zaman gider. Haftalık özet bekleyen hesaba gitmez.
+- [x] Eski kullanıcı adı 90 yerine 30 gün yönlenir; migration yürüyen yönlendirmeleri de 30 güne kısaltır.
+- [x] Gizlilik ve Koşullar'daki saklama/silme cümleleri güncellendi.
+- [x] Test: `tests/integration/account-deletion.test.ts` (yanlış onay, yayından kalkma, oturumlar, editör kilidi, başkası geri yükleyemez, eski yayın durumuna dönüş, 14. gün kalır / 15. gün silinir), `tests/e2e/account.spec.ts` (sil → 404 + mail → giriş → geri yükle → sayfa 200).
+
 ### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
 
 - [ ] Editörün üstünde kapatılabilir "Başlangıç" kartı (ilk link, fotoğraf, tema, adresi paylaş); adımlar mevcut veriden kendiliğinden işaretlenir. Açılışta modal tur yok (ilk 60 saniye ilkesi).
