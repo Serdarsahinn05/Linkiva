@@ -446,8 +446,9 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 
 ### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
 
-- [ ] Editörün üstünde kapatılabilir "Başlangıç" kartı (ilk link, fotoğraf, tema, adresi paylaş); adımlar mevcut veriden kendiliğinden işaretlenir. Açılışta modal tur yok (ilk 60 saniye ilkesi).
-- [ ] Mobil alt çubukta bir kez gösterilen ipuçları, masaüstünde ⌘K tanıtımı.
+- [x] Editörün üstünde kapatılabilir "İlk adımlar" kartı (`features/editor/components/start-guide.tsx`; "Başlangıç" adı zamanlama alanıyla çakıştığı için değişti): ilk link, fotoğraf (yükleme kapalıysa adım yok), görünüm, adresi paylaş. Adımlar canlı editör durumundan işaretlenir; "paylaş" yalnızca ilk gerçek ziyaretçiyle (VIEW olayı) işaretlenir, tıklamayla değil. Her adımın düğmesi işi yapan alana götürür. Kapatma hesaba yazılır (`profile.guideDismissedAt`, migration `20261005090000_start_guide`; var olan sayfalar kapalı başlar). Modal tur yok.
+- [x] Bir kez gösterilen ipuçları (`features/dashboard/components/once-tip.tsx`, tarayıcıda saklanır): mobilde alt çubuğun önizleme düğmesi, masaüstünde kenar çubuğunda Ctrl K. Kapatınca ya da o düğme/arama kullanılınca bir daha çıkmaz.
+- [x] Test: `tests/e2e/phase18.spec.ts` (kart kendiliğinden işaretlenir, kopyalama "paylaş"ı işaretlemez, kapatma yeniden yüklemede kalır, iki ipucu bir kez), sahiplik testinde `dismissGuide`.
 
 ### Faz 19: Admin paneli ve kötüye kullanım yönetimi (`faz-19-admin`)
 

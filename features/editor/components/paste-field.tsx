@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/field";
 import { detectBlock, type Detected } from "../detect-block";
 
 /** One field that takes any link and lets the editor decide what it becomes (link, player, or an import). */
-export function PasteField({ onDetected, busy }: { onDetected: (detected: Detected) => Promise<void>; busy: boolean }) {
+export function PasteField({ id, onDetected, busy }: { id?: string; onDetected: (detected: Detected) => Promise<void>; busy: boolean }) {
   const t = useTranslations("paste");
   const [value, setValue] = useState("");
   const [invalid, setInvalid] = useState(false);
@@ -33,6 +33,7 @@ export function PasteField({ onDetected, busy }: { onDetected: (detected: Detect
         <div className="relative min-w-0 flex-1">
           <ClipboardPaste size={18} strokeWidth={1.75} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-ink-3" aria-hidden />
           <Input
+            id={id}
             aria-label={t("label")}
             aria-invalid={invalid}
             aria-describedby={invalid ? "paste-error" : undefined}

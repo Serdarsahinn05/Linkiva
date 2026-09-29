@@ -13,6 +13,7 @@ import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/account/components/logout-button";
 import { CommandPalette } from "./command-palette";
 import { useNavigationPending } from "./navigation-pending";
+import { markTipSeen, OnceTip } from "./once-tip";
 import { PreviewProvider, usePreview } from "./preview-context";
 import { SharePanel } from "./share-panel";
 
@@ -52,6 +53,15 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
   const navigating = useNavigationPending();
   const activeIndex = NAV.findIndex((item) => item.href === pathname);
   const home = localizedPath("/", pageLocale(useLocale()));
+  // Using the thing a hint points at is the same as reading the hint.
+  const openPreview = () => {
+    markTipSeen("preview");
+    setPreviewOpen(true);
+  };
+  const changePalette = (open: boolean) => {
+    if (open) markTipSeen("palette");
+    setPaletteOpen(open);
+  };
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[248px_1fr]">
@@ -65,13 +75,16 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
           </Link>
           <button
             type="button"
-            onClick={() => setPaletteOpen(true)}
+            onClick={() => changePalette(true)}
             className="glass-flat -mt-3 flex h-10 items-center gap-2 rounded-full px-4 text-sm text-ink-3 transition-colors hover:text-ink"
           >
             <Search size={16} strokeWidth={1.75} aria-hidden />
             {t("palette.search")}
             <kbd className="ml-auto font-mono text-xs">Ctrl K</kbd>
           </button>
+          <OnceTip tip="palette" stacked className="-mt-6">
+            {t("tips.palette", { keys: "Ctrl K" })}
+          </OnceTip>
           <nav aria-label={t("nav.main")}>
             <ul className="flex flex-col gap-1">
               {SIDEBAR.map(({ href, key, icon: Icon }) => {
@@ -98,7 +111,7 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
             {/* Below lg the page has no preview column (editor, appearance): it opens as a sheet, like on a phone. */}
             <button
               type="button"
-              onClick={() => setPreviewOpen(true)}
+              onClick={openPreview}
               className="glass-flat flex h-11 items-center gap-3 rounded-full px-4 font-medium text-ink-2 transition-colors hover:text-ink lg:hidden"
             >
               <Eye size={19} strokeWidth={1.75} aria-hidden />
@@ -129,6 +142,13 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
         {children}
       </main>
 
+      {/* Mobile, once: what the round button in the middle of the tab bar is for. */}
+      <div className="pointer-events-none fixed inset-x-3 bottom-[calc(max(0.75rem,env(safe-area-inset-bottom))+5rem)] z-40 flex justify-center md:hidden">
+        <OnceTip tip="preview" className="pointer-events-auto max-w-80">
+          {t("tips.preview")}
+        </OnceTip>
+      </div>
+
       {/* Mobile: Instagram-style floating glass tab bar with a liquid active indicator. */}
       <nav
         aria-label={t("nav.main")}
@@ -148,7 +168,7 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
           <div className="flex justify-center">
             <button
               type="button"
-              onClick={() => setPreviewOpen(true)}
+              onClick={openPreview}
               aria-label={t("nav.preview")}
               className="relative flex size-12 items-center justify-center rounded-full bg-accent text-accent-ink shadow-[0_6px_20px_-6px_rgb(0_0_0/0.5)] transition-transform duration-150 active:scale-95"
             >
@@ -166,7 +186,7 @@ function ShellFrame({ username, domain, children }: { username: string; domain: 
           {livePreview ?? <iframe src={`/${username}`} title={t("editor.previewTitle")} className="size-full border-0" />}
         </div>
       </Dialog>
-      <CommandPalette username={username} domain={domain} open={paletteOpen} onOpenChange={setPaletteOpen} onShare={() => setShareOpen(true)} />
+      <CommandPalette username={username} domain={domain} open={paletteOpen} onOpenChange={changePalette} onShare={() => setShareOpen(true)} />
       <Dialog open={shareOpen} onClose={() => setShareOpen(false)} title={t("share.share")} closeLabel={t("share.close")} variant="sheet">
         <div className="p-5">
           <SharePanel username={username} domain={domain} />

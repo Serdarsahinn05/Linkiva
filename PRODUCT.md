@@ -79,7 +79,7 @@ Kullanıcı açıkça istemedikçe yeniden önerilmez. Gerekçeler ROADMAP'te.
 4. **Doğru veri ya da hiç veri.** Analitik bot filtreli ve gerçektir. Sahte "canlı", sahte "sağlık kontrolü" yoktur.
 5. **Genişlemeye hazır, bugüne sade.** Blok modeli portfolyoyu taşıyabilir, ama bugün sadece gerekeni gösterir.
 6. **Verin satılmaz.** Kullanıcı ve ziyaretçi verisi yalnızca kullanıcıya hizmet için işlenir. Yapay zekâ eğitimi, üçüncü tarafla paylaşım ve reklam yoktur. Bir özellik bunu gerektiriyorsa yapılmaz.
-7. **Adres kırılmaz.** Kullanıcının biyografiye yapıştırdığı link, kullanıcı adı değişse bile 90 gün çalışmaya devam eder.
+7. **Adres kırılmaz.** Kullanıcının biyografiye yapıştırdığı link, kullanıcı adı değişse bile 30 gün çalışmaya devam eder.
 
 ## Accessibility & Inclusion
 

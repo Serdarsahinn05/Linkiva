@@ -195,3 +195,12 @@ describe("bulk delete and its undo stay inside the caller's profile", () => {
     expect(await db.block.count({ where: { id: snapshot.id } })).toBe(0);
   });
 });
+
+describe("the getting started card (Faz 18)", () => {
+  it("closing it only closes the caller's own card", async () => {
+    await db.profile.updateMany({ where: { userId: { in: Object.values(ids) } }, data: { guideDismissedAt: null } });
+    expect(await actions.dismissGuide()).toEqual({ ok: true, data: undefined });
+    expect((await db.profile.findUniqueOrThrow({ where: { userId: ids.bob } })).guideDismissedAt).not.toBeNull();
+    expect((await db.profile.findUniqueOrThrow({ where: { userId: ids.alice } })).guideDismissedAt).toBeNull();
+  });
+});

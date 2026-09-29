@@ -416,6 +416,16 @@ export async function updateProfileBasics(input: { displayName: string; bio: str
   });
 }
 
+// ─── Getting started ─────────────────────────────────────────────────────────
+
+/** Closes the editor's "Getting started" card for good (on every device). */
+export async function dismissGuide(): Promise<ActionResult> {
+  return withProfile(async (profile) => {
+    await db.profile.update({ where: { id: profile.id }, data: { guideDismissedAt: new Date() } });
+    return ok(undefined);
+  });
+}
+
 // ─── Socials ─────────────────────────────────────────────────────────────────
 
 /** Empty value removes the platform. Returns the stored (normalised) value. */

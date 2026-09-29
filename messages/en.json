@@ -585,6 +585,24 @@
       "listInvalid": "Too many items, or one is too long."
     }
   },
+  "guide": {
+    "title": "First steps",
+    "body": "The steps to a page that is ready to share. Each one ticks itself as you go.",
+    "doneTitle": "Your page is ready",
+    "doneBody": "All done. You can close this card.",
+    "close": "Close the first steps card",
+    "progress": "{done} of {total} steps done",
+    "stepDone": "done",
+    "link": { "label": "Add your first link", "action": "Paste a link" },
+    "photo": { "label": "Add a profile photo", "action": "Choose a photo" },
+    "theme": { "label": "Pick your look", "action": "See themes" },
+    "share": { "label": "Share your address", "hint": "Ticks itself when your first visitor arrives.", "action": "Copy address", "copied": "Copied" }
+  },
+  "tips": {
+    "preview": "See how visitors see your page from here.",
+    "palette": "Reach everything from the keyboard with {keys}.",
+    "dismiss": "Got it"
+  },
   "templates": {
     "title": "Or start from a template",
     "hint": "Blocks are added; you fill in the addresses. A link without an address stays off your page.",
