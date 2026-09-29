@@ -61,13 +61,22 @@ test("email change, password change, data export and account deletion", async ({
   await page.getByRole("button", { name: "Hesabımı sil" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("textbox").fill("wrong-name");
-  await expect(dialog.getByRole("button", { name: "Hesabı kalıcı olarak sil" })).toBeDisabled();
+  await expect(dialog.getByRole("button", { name: "Hesabı sil", exact: true })).toBeDisabled();
   await dialog.getByRole("textbox").fill(username);
-  await dialog.getByRole("button", { name: "Hesabı kalıcı olarak sil" }).click();
+  const deleted = Date.now();
+  await dialog.getByRole("button", { name: "Hesabı sil", exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
 
-  // Gone: public page 404, and the credentials no longer work.
+  // Offline at once, with a mail that explains the waiting period.
   expect((await request.get(`/${username}`)).status()).toBe(404);
+  expect(await lastMail(newEmail, "accountDeletionScheduled", deleted)).toContain("/login");
+
+  // Signing in during the waiting period offers the restore instead of the editor; restoring brings the page back.
   await login(page, newEmail, "brand-new-pass-2");
-  await expect(page.getByRole("alert").filter({ hasText: "E-posta veya şifre hatalı." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hesabın silinmek üzere" })).toBeVisible();
+  await page.goto("/onboarding");
+  await expect(page.getByRole("heading", { name: "Hesabın silinmek üzere" })).toBeVisible();
+  await page.getByRole("button", { name: "Hesabımı geri yükle" }).click();
+  await expect(page.getByRole("heading", { name: "Sayfan" })).toBeVisible();
+  expect((await request.get(`/${username}`)).status()).toBe(200);
 });

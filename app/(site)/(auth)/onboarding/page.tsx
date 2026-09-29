@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { pendingDeletion } from "@/features/account/deletion";
 import { OnboardingForm } from "@/features/profile/components/onboarding-form";
 import { getOwnProfile } from "@/features/profile/queries";
 import { requireSession } from "@/lib/session";
@@ -13,7 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function OnboardingPage({ searchParams }: PageProps<"/onboarding">) {
   const session = await requireSession();
-  if (await getOwnProfile(session.user.id)) redirect("/dashboard");
+  // A pending deletion shows the restore screen there instead of a fresh page.
+  if ((await getOwnProfile(session.user.id)) || (await pendingDeletion(session.user.id))) redirect("/dashboard");
 
   // Prefill: the name claimed on the landing page, else one derived from the account name.
   const { username } = await searchParams;

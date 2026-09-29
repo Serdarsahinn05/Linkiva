@@ -76,6 +76,8 @@ export async function createProfile(_prev: CreateProfileResult | null, formData:
     if (error instanceof UnauthorizedError) return { ok: false, error: "unauthorized" };
     throw error;
   }
+  // No new page while the account waits to be deleted: the dashboard offers the restore instead.
+  if (await db.accountDeletion.findUnique({ where: { userId }, select: { userId: true } })) redirect("/dashboard");
 
   const parsed = createProfileSchema.safeParse({
     username: formData.get("username"),

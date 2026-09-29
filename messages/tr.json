@@ -102,7 +102,7 @@
       ],
       "redirect": [
         "Adın değişse de linkin çalışır",
-        "Kullanıcı adını değiştirirsen eski adresin 90 gün yenisine yönlenir."
+        "Kullanıcı adını değiştirirsen eski adresin 30 gün yenisine yönlenir."
       ]
     },
     "closeTitle": "Adresin boşta mı?",
@@ -149,7 +149,7 @@
       },
       "rename": {
         "q": "Kullanıcı adımı değiştirirsem eski linkim bozulur mu?",
-        "a": "Hayır. Eski adresin 90 gün boyunca yenisine yönlenir, paylaştığın linkler çalışmaya devam eder."
+        "a": "Hayır. Eski adresin 30 gün boyunca yenisine yönlenir, paylaştığın linkler çalışmaya devam eder."
       },
       "data": {
         "q": "Verilerim nerede, kiminle paylaşılıyor?",
@@ -302,11 +302,19 @@
       "cta": "Ben değiştirmedim, şifremi sıfırla",
       "security": "Bu değişikliği sen yaptıysan başka bir şey yapmana gerek yok."
     },
+    "accountDeletionScheduled": {
+      "subject": "Linkiva: hesabın 15 gün sonra silinecek",
+      "preheader": "Fikrini değiştirirsen 15 gün içinde giriş yapman yeterli.",
+      "heading": "Hesabın silinmek üzere",
+      "body": "Sayfan yayından kaldırıldı ve bütün oturumların kapatıldı. 15 gün içinde giriş yaparsan hesabını her şeyiyle geri yükleyebilirsin. Bu süre dolunca sayfan, istatistiklerin, abone listen ve yüklediğin görseller kalıcı olarak silinir. O zamana kadar adresini kimse alamaz.",
+      "cta": "Giriş yap ve geri yükle",
+      "security": "Bunu sen yapmadıysan hemen giriş yap, hesabını geri yükle ve şifreni değiştir."
+    },
     "accountDeleted": {
       "subject": "Linkiva: hesabın silindi",
       "preheader": "Hesabın ve tüm verilerin silindi.",
       "heading": "Hesabın silindi",
-      "body": "İsteğin üzerine Linkiva hesabın, sayfan, istatistiklerin ve abone listen kalıcı olarak silindi. Adresin artık başkaları tarafından alınabilir.",
+      "body": "İsteğin üzerine başlayan 15 günlük bekleme süresi doldu. Linkiva hesabın, sayfan, istatistiklerin ve abone listen kalıcı olarak silindi. Adresin artık başkaları tarafından alınabilir.",
       "cta": "",
       "security": "Bunu sen yapmadıysan hemen bize yaz: hello@linkiva.space"
     },
@@ -1018,11 +1026,15 @@
     "dataHint": "Hesabın, sayfan, abonelerin ve istatistiklerin tek bir JSON dosyasında.",
     "download": "Verilerimi indir",
     "danger": "Hesabı sil",
-    "dangerHint": "Sayfan, blokların, abonelerin, istatistiklerin ve yüklediğin görseller kalıcı olarak silinir. Geri alınamaz.",
+    "dangerHint": "Sayfan hemen yayından kalkar ve bütün oturumların kapanır. {days} gün içinde giriş yaparsan hesabını geri yükleyebilirsin; sonra sayfan, blokların, abonelerin, istatistiklerin ve yüklediğin görseller kalıcı olarak silinir.",
     "deleteOpen": "Hesabımı sil",
-    "deleteTitle": "Hesabı kalıcı olarak sil",
+    "deleteTitle": "Hesabı sil",
     "deleteConfirmLabel": "Onaylamak için kullanıcı adını yaz: {username}",
-    "deleteConfirm": "Hesabı kalıcı olarak sil",
+    "deleteConfirm": "Hesabı sil",
+    "restoreTitle": "Hesabın silinmek üzere",
+    "restoreBody": "Sayfan yayında değil. {date} tarihinde hesabın, sayfan, istatistiklerin ve abone listen kalıcı olarak silinecek. Geri yüklersen her şey bıraktığın gibi döner.",
+    "restore": "Hesabımı geri yükle",
+    "restoring": "Geri yükleniyor",
     "deleting": "Siliniyor",
     "deleteMismatch": "Kullanıcı adı eşleşmiyor.",
     "cancel": "Vazgeç",

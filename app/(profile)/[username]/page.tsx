@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps<"/[username]">): Pr
 export default async function ProfilePage({ params }: PageProps<"/[username]">) {
   const profile = await load(params);
   if (!profile) {
-    // A renamed profile keeps its old address working for 90 days (docs/ARCHITECTURE.md §6).
+    // A renamed profile keeps its old address working for 30 days (docs/ARCHITECTURE.md §6).
     const moved = await getUsernameRedirect(decodeURIComponent((await params).username).toLowerCase());
     if (moved) permanentRedirect(`/${moved}`);
     notFound();

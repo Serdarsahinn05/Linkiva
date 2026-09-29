@@ -4,7 +4,7 @@ export const USERNAME_MIN = 3;
 export const USERNAME_MAX = 30;
 
 /** A past username redirects to the current one, and nobody else can claim it, for this long. */
-export const USERNAME_REDIRECT_DAYS = 90;
+export const USERNAME_REDIRECT_DAYS = 30;
 /** At most this many username changes per rolling 30 days (a redirect chain is not a feature). */
 export const USERNAME_CHANGES_PER_30_DAYS = 2;
 

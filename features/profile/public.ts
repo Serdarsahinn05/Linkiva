@@ -113,7 +113,7 @@ export async function getLiveBlock(blockId: string) {
 
 /**
  * Where a past username now lives, while its redirect is still valid (UsernameHistory). Cached under the old name's tag,
- * which changeUsername invalidates; the expiry is checked per request so a cached row cannot outlive its 90 days.
+ * which changeUsername invalidates; the expiry is checked per request so a cached row cannot outlive its 30 days.
  */
 export async function getUsernameRedirect(username: string): Promise<string | null> {
   const past = await unstable_cache(

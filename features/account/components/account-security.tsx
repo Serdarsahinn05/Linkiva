@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { parseUserAgent } from "@/lib/ua";
 import { emailSchema, PASSWORD_MIN, passwordSchema } from "@/lib/validation/auth";
 import { deleteAccount } from "../actions";
+import { ACCOUNT_DELETE_DAYS } from "../policy";
 import { TwoFactor } from "./two-factor";
 
 export type SessionInfo = { token: string; userAgent: string | null; createdAt: string; current: boolean };
@@ -115,7 +116,7 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
       return setDeleteError(result.error === "confirm" ? t("account.deleteMismatch") : t("common.genericError"));
     }
     await authClient.signOut().catch(() => {});
-    // No refresh(): it would re-render the settings route for a user that no longer exists.
+    // No refresh(): the sessions are gone, the settings route would only bounce to /login.
     router.replace("/");
   }
 
@@ -248,7 +249,7 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
       </Section>
 
       <Section title={t("account.danger")} className="border-negative/30">
-        <p className="text-ink-2">{t("account.dangerHint")}</p>
+        <p className="text-ink-2">{t("account.dangerHint", { days: ACCOUNT_DELETE_DAYS })}</p>
         <Button variant="danger" size="md" className="self-start" onClick={() => setDeleteOpen(true)}>
           {t("account.deleteOpen")}
         </Button>
@@ -256,7 +257,7 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
 
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} title={t("account.deleteTitle")} closeLabel={t("account.cancel")}>
         <form onSubmit={confirmDelete} className="flex flex-col gap-4 p-5">
-          <p className="text-ink-2">{t("account.dangerHint")}</p>
+          <p className="text-ink-2">{t("account.dangerHint", { days: ACCOUNT_DELETE_DAYS })}</p>
           <Field label={t("account.deleteConfirmLabel", { username })} error={deleteError}>
             {({ id, describedBy, invalid }) => (
               <Input id={id} autoCapitalize="none" autoComplete="off" spellCheck={false} value={confirmation} aria-invalid={invalid} aria-describedby={describedBy} onChange={(e) => setConfirmation(e.target.value)} />

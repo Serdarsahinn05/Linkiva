@@ -1,19 +1,16 @@
 "use server";
 
-import { del, list } from "@vercel/blob";
 import { updateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { LOCALE_COOKIE, locales } from "@/i18n/config";
 import { db } from "@/lib/db";
 import { sendMailQuietly } from "@/lib/mail/send";
-import { env } from "@/lib/env";
-import { features } from "@/lib/features";
 import { requireUser, UnauthorizedError } from "@/lib/session";
+import { site } from "@/lib/site";
 import { THEME_COOKIE } from "@/lib/theme-preference";
-import { userUploadPrefix } from "@/lib/uploads";
-import { removeDomain } from "@/lib/vercel-domains";
 import { profileTag } from "@/features/profile/public";
+import { restoreAccount as restore, scheduleDeletion } from "./deletion";
 
 const YEAR = 60 * 60 * 24 * 365;
 
@@ -35,40 +32,38 @@ export async function setLocalePreference(value: string) {
 export type DeleteAccountResult = { ok: true } | { ok: false; error: "unauthorized" | "confirm" | "unknown" };
 
 /**
- * Permanently deletes the account: uploaded files first (v1 left them behind), then the user row,
- * which cascades to sessions, accounts, profile, blocks, events and subscribers.
+ * Deletes the account after a waiting period (features/account/deletion.ts): the page goes offline and every session
+ * ends now; signing in within ACCOUNT_DELETE_DAYS brings it all back, after that the daily cron erases it.
  * The caller must type their username to confirm.
  */
 export async function deleteAccount(confirmation: string): Promise<DeleteAccountResult> {
   try {
     const user = await requireUser();
-    const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { username: true, customDomain: { select: { hostname: true } } } });
+    const profile = await db.profile.findUnique({ where: { userId: user.id }, select: { username: true } });
     const expected = profile?.username ?? user.email;
     if (typeof confirmation !== "string" || confirmation.trim().toLowerCase() !== expected.toLowerCase()) return { ok: false, error: "confirm" };
 
-    if (env.BLOB_READ_WRITE_TOKEN) {
-      let cursor: string | undefined;
-      do {
-        const page = await list({ prefix: userUploadPrefix(user.id), cursor, token: env.BLOB_READ_WRITE_TOKEN });
-        if (page.blobs.length) await del(page.blobs.map((b) => b.url), { token: env.BLOB_READ_WRITE_TOKEN });
-        cursor = page.hasMore ? page.cursor : undefined;
-      } while (cursor);
-    }
-
-    // The custom domain leaves the Vercel project too. If Vercel cannot be reached the account still goes: without its
-    // row the proxy answers 404 for that name, and the orphan is logged for manual removal.
-    if (profile?.customDomain && features.domains) {
-      await removeDomain(profile.customDomain.hostname).catch((error) => console.error("custom domain removal failed", profile.customDomain?.hostname, error));
-    }
-
-    await db.$transaction([db.verification.deleteMany({ where: { identifier: user.email } }), db.user.delete({ where: { id: user.id } })]);
-    if (profile) updateTag(profileTag(profile.username));
+    const { username } = await scheduleDeletion(user.id);
+    if (username) updateTag(profileTag(username));
     const locale = (await cookies()).get(LOCALE_COOKIE)?.value === "en" ? "en" : "tr";
-    await sendMailQuietly({ to: user.email, kind: "accountDeleted", locale });
+    await sendMailQuietly({ to: user.email, kind: "accountDeletionScheduled", locale, url: `${site.url}/login` });
     return { ok: true };
   } catch (error) {
     if (error instanceof UnauthorizedError) return { ok: false, error: "unauthorized" };
     console.error("deleteAccount failed", error);
     return { ok: false, error: "unknown" };
+  }
+}
+
+/** Cancels the signed-in user's own pending deletion and puts the page back as it was. */
+export async function restoreDeletedAccount(): Promise<{ ok: boolean }> {
+  try {
+    const user = await requireUser();
+    const restored = await restore(user.id);
+    if (restored?.username) updateTag(profileTag(restored.username));
+    return { ok: restored !== null };
+  } catch (error) {
+    if (!(error instanceof UnauthorizedError)) console.error("restoreDeletedAccount failed", error);
+    return { ok: false };
   }
 }

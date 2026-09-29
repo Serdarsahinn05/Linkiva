@@ -23,8 +23,23 @@ model User {
   accounts      Account[]
   twoFactors    TwoFactor[]
   profile       Profile?
+  deletion      AccountDeletion?
 
   @@map("user")
+}
+
+/// A deletion the owner asked for: the page is taken offline at once and everything is erased at purgeAt
+/// (features/account/deletion.ts) unless the owner signs in and restores the account first.
+model AccountDeletion {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestedAt  DateTime @default(now())
+  purgeAt      DateTime
+  /// Profile.isPublished before the request, given back on restore.
+  wasPublished Boolean
+
+  @@index([purgeAt])
+  @@map("account_deletion")
 }
 
 /// Better Auth twoFactor plugin: the TOTP secret and the backup codes, both encrypted with BETTER_AUTH_SECRET.

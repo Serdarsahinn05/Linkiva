@@ -48,7 +48,7 @@ export async function runWeeklyDigest({ now = new Date(), profileIds }: { now?: 
   const due = { OR: [{ digestSentAt: null }, { digestSentAt: { lt: since } }] };
   const candidates = await db.profile.findMany({
     // profileIds narrows a run to some profiles (integration tests share the local database).
-    where: { weeklyDigest: true, user: { emailVerified: true }, ...due, ...(profileIds ? { id: { in: profileIds } } : {}) },
+    where: { weeklyDigest: true, user: { emailVerified: true, deletion: { is: null } }, ...due, ...(profileIds ? { id: { in: profileIds } } : {}) },
     select: { id: true, timezone: true, locale: true, digestSentAt: true, user: { select: { email: true } } },
     orderBy: { digestSentAt: { sort: "asc", nulls: "first" } },
     take: DIGEST_BATCH,
