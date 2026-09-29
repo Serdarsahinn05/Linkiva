@@ -299,40 +299,87 @@ export async function setBlockSchedule(id: string, schedule: { startsAt: string 
 
 export type DeletedBlock = { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean; size: BlockSize; startsAt: string | null; endsAt: string | null };
 
+const snapshotOf = (block: { id: string; type: BlockType; data: unknown; position: number; isVisible: boolean; isHighlighted: boolean; size: BlockSize; startsAt: Date | null; endsAt: Date | null }): DeletedBlock => ({
+  id: block.id,
+  type: block.type,
+  data: block.data,
+  position: block.position,
+  isVisible: block.isVisible,
+  isHighlighted: block.isHighlighted,
+  size: block.size,
+  startsAt: block.startsAt?.toISOString() ?? null,
+  endsAt: block.endsAt?.toISOString() ?? null,
+});
+
 export async function deleteBlock(id: string): Promise<ActionResult<DeletedBlock>> {
   return withProfile(async (profile) => {
     const block = await db.block.findFirst({ where: { id, profileId: profile.id } });
     if (!block) return fail("notFound");
     await db.block.delete({ where: { id } });
-    return ok({ id: block.id, type: block.type, data: block.data, position: block.position, isVisible: block.isVisible, isHighlighted: block.isHighlighted, size: block.size, startsAt: block.startsAt?.toISOString() ?? null, endsAt: block.endsAt?.toISOString() ?? null });
+    return ok(snapshotOf(block));
   });
+}
+
+const idsSchema = z.array(z.string().min(1).max(40)).min(1).max(500);
+
+/**
+ * Deletes several of the caller's blocks at once ("delete all", undoing a template or an import) and returns them
+ * for undo. Ids that are not the caller's are ignored, never deleted.
+ */
+export async function deleteBlocks(ids: string[]): Promise<ActionResult<DeletedBlock[]>> {
+  const parsed = idsSchema.safeParse(ids);
+  if (!parsed.success) return fail("invalid");
+  return withProfile(async (profile) => {
+    const blocks = await db.block.findMany({ where: { profileId: profile.id, id: { in: parsed.data } } });
+    if (blocks.length === 0) return fail("notFound");
+    await db.block.deleteMany({ where: { profileId: profile.id, id: { in: blocks.map((b) => b.id) } } });
+    return ok(blocks.sort((a, b) => a.position - b.position).map(snapshotOf));
+  });
+}
+
+const snapshotSchema = z.object({
+  id: z.string().min(1).max(40),
+  type: z.enum(BlockType),
+  data: z.unknown(),
+  position: z.number().int(),
+  isVisible: z.boolean(),
+  isHighlighted: z.boolean(),
+  size: z.enum(BlockSize).default("WIDE"),
+  startsAt: z.iso.datetime({ offset: true }).nullable(),
+  endsAt: z.iso.datetime({ offset: true }).nullable(),
+});
+
+/** A snapshot checked like any other write: draft fields only, and images only from the caller's own folder. */
+function restorable(snapshot: unknown) {
+  const parsed = snapshotSchema.safeParse(snapshot);
+  if (!parsed.success) return null;
+  const draft = draftSchema.safeParse(parsed.data.data);
+  if (!draft.success) return null;
+  const { startsAt, endsAt, ...rest } = parsed.data;
+  return { ...rest, data: draft.data, startsAt: startsAt ? new Date(startsAt) : null, endsAt: endsAt ? new Date(endsAt) : null };
 }
 
 /** Undo for deleteBlock: recreates the block (same id) on the caller's own profile. */
 export async function restoreBlock(snapshot: DeletedBlock): Promise<ActionResult<EditorBlock>> {
-  const parsed = z
-    .object({
-      id: z.string().min(1).max(40),
-      type: z.enum(BlockType),
-      data: z.unknown(),
-      position: z.number().int(),
-      isVisible: z.boolean(),
-      isHighlighted: z.boolean(),
-      size: z.enum(BlockSize).default("WIDE"),
-      startsAt: z.iso.datetime({ offset: true }).nullable(),
-      endsAt: z.iso.datetime({ offset: true }).nullable(),
-    })
-    .safeParse(snapshot);
-  if (!parsed.success) return fail("invalid");
-  const draft = draftSchema.safeParse(parsed.data.data);
-  if (!draft.success) return fail("invalid");
+  const block = restorable(snapshot);
+  if (!block) return fail("invalid");
   return withProfile(async (profile) => {
-    if (foreignImage(draft.data, profile.userId)) return fail("invalid");
-    const { startsAt, endsAt, ...rest } = parsed.data;
-    const block = await db.block.create({
-      data: { ...rest, data: draft.data, profileId: profile.id, startsAt: startsAt ? new Date(startsAt) : null, endsAt: endsAt ? new Date(endsAt) : null },
-    });
-    return ok(toEditorBlock(block));
+    if (foreignImage(block.data, profile.userId)) return fail("invalid");
+    return ok(toEditorBlock(await db.block.create({ data: { ...block, profileId: profile.id } })));
+  });
+}
+
+/** Undo for deleteBlocks: recreates all of them (same ids and positions) on the caller's own profile, or none. */
+export async function restoreBlocks(snapshots: DeletedBlock[]): Promise<ActionResult<EditorBlock[]>> {
+  if (!Array.isArray(snapshots) || snapshots.length === 0 || snapshots.length > 500) return fail("invalid");
+  const blocks = snapshots.map(restorable);
+  if (blocks.some((b) => b === null)) return fail("invalid");
+  const valid = blocks.filter((b): b is NonNullable<typeof b> => b !== null);
+  if (new Set(valid.map((b) => b.id)).size !== valid.length) return fail("invalid");
+  return withProfile(async (profile) => {
+    if (valid.some((b) => foreignImage(b.data, profile.userId))) return fail("invalid");
+    const created = await db.$transaction(valid.map((b) => db.block.create({ data: { ...b, profileId: profile.id } })));
+    return ok(created.sort((a, b) => a.position - b.position).map(toEditorBlock));
   });
 }
 

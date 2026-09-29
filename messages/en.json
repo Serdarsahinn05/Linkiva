@@ -424,6 +424,12 @@
     "moveDown": "Move down",
     "delete": "Delete",
     "deleted": "Block deleted.",
+    "deleteAll": "Delete all",
+    "deleteAllTitle": "Delete every block?",
+    "deleteAllBody": "{count, plural, one {# block} other {# blocks}} will be removed from your page. You can undo it right after.",
+    "deleteAllConfirm": "Delete all",
+    "deletedAll": "{count, plural, one {# block deleted.} other {# blocks deleted.}}",
+    "blockCount": "{count, plural, one {# block} other {# blocks}}",
     "undo": "Undo",
     "drag": "Drag to reorder",
     "more": "More actions",
@@ -575,6 +581,7 @@
     "title": "Or start from a template",
     "hint": "Blocks are added; you fill in the addresses. A link without an address stays off your page.",
     "applied": "Template added. Links appear on your page once you fill in their addresses.",
+    "undone": "Template removed.",
     "names": {
       "student": "Student",
       "musician": "Musician",
@@ -651,6 +658,7 @@
     "apply": "Add selected",
     "applying": "Adding",
     "done": "Added {count} blocks.",
+    "undone": "Import undone.",
     "skipped": "Skipped {count} invalid items.",
     "back": "Another address",
     "errors": {

@@ -2,13 +2,15 @@
 
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { BlockSize, SocialPlatform } from "@/prisma/generated/enums";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
-import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
+import { Button, buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, inputClass } from "@/components/ui/field";
 import { ScrollRow } from "@/components/ui/scroll-row";
 import { useToast } from "@/components/ui/toast";
@@ -19,7 +21,21 @@ import { displayHost } from "@/lib/validation/url";
 import { resolveAppearance } from "@/themes";
 import type { AppliedImport } from "@/features/import/actions";
 import { ImportDialog } from "@/features/import/components/import-dialog";
-import { addBlock, applyTemplate, deleteBlock, reorderBlocks, restoreBlock, setBlockFlags, setBlockSchedule, setBlockSize, setSocial, updateBlock, updateProfileBasics } from "../actions";
+import {
+  addBlock,
+  applyTemplate,
+  deleteBlock,
+  deleteBlocks,
+  reorderBlocks,
+  restoreBlock,
+  restoreBlocks,
+  setBlockFlags,
+  setBlockSchedule,
+  setBlockSize,
+  setSocial,
+  updateBlock,
+  updateProfileBasics,
+} from "../actions";
 import { detectBlock, type Detected } from "../detect-block";
 import type { TemplateKey } from "../templates";
 import type { EditorBlock, EditorProfile, EditorSocials, LinkIssue } from "../types";
@@ -56,6 +72,8 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
   const [adding, setAdding] = useState<EditableBlockType | null>(null);
   const [pasting, setPasting] = useState(false);
   const [templating, setTemplating] = useState<TemplateKey | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
   // null: closed; a string: open, prefilled with that address.
   const [importUrl, setImportUrl] = useState<string | null>(null);
   // Tile sizes are only offered while the page uses the grid layout (Appearance → Layout).
@@ -168,6 +186,9 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     toast({
       tone: "success",
       message: [t("import.done", { count: result.blocks.length }), result.skipped ? t("import.skipped", { count: result.skipped }) : ""].filter(Boolean).join(" "),
+      duration: 10000,
+      // Takes the imported blocks back out (name, bio and socials stay: they only filled empty fields).
+      action: result.blocks.length ? { label: t("editor.undo"), onClick: () => void takeBack(result.blocks.map((b) => b.id), t("import.undone")) } : undefined,
     });
   }
 
@@ -177,7 +198,54 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     setTemplating(null);
     if (!result.ok) return saveError();
     setBlocks((list) => [...list, ...result.data]);
-    toast({ tone: "success", message: t("templates.applied") });
+    toast({
+      tone: "success",
+      message: t("templates.applied"),
+      duration: 10000,
+      action: { label: t("editor.undo"), onClick: () => void takeBack(result.data.map((b) => b.id), t("templates.undone")) },
+    });
+  }
+
+  /** Removes blocks that were just added (a template, an import) in one step. */
+  async function takeBack(ids: string[], message: string) {
+    const gone = new Set(ids);
+    let removed: EditorBlock[] = [];
+    setBlocks((list) => {
+      removed = list.filter((b) => gone.has(b.id));
+      return list.filter((b) => !gone.has(b.id));
+    });
+    const result = await deleteBlocks(ids);
+    // notFound: they were already deleted one by one; nothing left to take back.
+    if (!result.ok && result.error !== "notFound") {
+      setBlocks((list) => [...list, ...removed]);
+      return saveError();
+    }
+    toast({ tone: "success", message });
+  }
+
+  /** "Delete all", after the confirmation dialog; the toast offers the whole page back. */
+  async function clearAll() {
+    setClearing(true);
+    const result = await deleteBlocks(blocks.map((b) => b.id));
+    setClearing(false);
+    setConfirmClear(false);
+    if (!result.ok) return saveError();
+    setBlocks([]);
+    toast({
+      tone: "success",
+      message: t("editor.deletedAll", { count: result.data.length }),
+      duration: 10000,
+      action: {
+        label: t("editor.undo"),
+        onClick: async () => {
+          // Recreated with their ids and positions; blocks added since stay after them.
+          const restored = await restoreBlocks(result.data);
+          if (!restored.ok) return saveError();
+          const back = new Set(restored.data.map((b) => b.id));
+          setBlocks((list) => [...restored.data, ...list.filter((b) => !back.has(b.id))]);
+        },
+      },
+    });
   }
 
   function changeBlock(id: string, data: Record<string, string>) {
@@ -321,9 +389,21 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
 
         {/* Blocks */}
         <section aria-labelledby="blocks-heading" className="flex flex-col gap-3">
-          <h2 id="blocks-heading" className="px-1 text-[0.9375rem] font-semibold text-ink-2">
-            {t("editor.blocks")}
-          </h2>
+          <div className="flex items-center justify-between gap-3 px-1">
+            <h2 id="blocks-heading" className="text-[0.9375rem] font-semibold text-ink-2">
+              {t("editor.blocks")}
+            </h2>
+            {blocks.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setConfirmClear(true)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm text-ink-3 transition-colors hover:bg-glass hover:text-negative focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+              >
+                <Trash2 size={15} aria-hidden />
+                {t("editor.deleteAll")}
+              </button>
+            )}
+          </div>
           <ScrollRow>
             {EDITABLE_BLOCK_TYPES.map((type) => {
               const Icon = BLOCK_ICON[type];
@@ -378,6 +458,21 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           )}
         </section>
       </div>
+
+      <Dialog open={confirmClear} onClose={() => setConfirmClear(false)} title={t("editor.deleteAllTitle")} closeLabel={t("account.cancel")}>
+        <div className="flex flex-col gap-4 p-5">
+          <p className="text-ink-2">{t("editor.deleteAllBody", { count: blocks.length })}</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" size="md" onClick={() => setConfirmClear(false)}>
+              {t("account.cancel")}
+            </Button>
+            <Button variant="danger" size="md" pending={clearing} onClick={() => void clearAll()}>
+              <Trash2 size={16} aria-hidden />
+              {t("editor.deleteAllConfirm")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
       {(importUrl !== null || importRequested) && <ImportDialog open initialUrl={importUrl ?? ""} onClose={closeImport} onImported={imported} />}
 
