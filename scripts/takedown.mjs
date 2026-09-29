@@ -1,4 +1,4 @@
-// Removes reported content from the live site (docs/DEPLOY.md → İçerik kaldırma). Calls /api/takedown.
+// Removes reported content from the live site (docs/private/DEPLOY.md → İçerik kaldırma). Calls /api/takedown.
 //
 //   node scripts/takedown.mjs unpublish <username>       page off the air (the owner can publish again)
 //   node scripts/takedown.mjs remove-images <username>   profile photo + background image, files deleted
@@ -15,7 +15,7 @@ if (!actions[action] || !target) {
   process.exit(1);
 }
 if (!secret || !base) {
-  console.error("Set TAKEDOWN_SECRET and TAKEDOWN_URL first (see docs/DEPLOY.md → İçerik kaldırma).");
+  console.error("Set TAKEDOWN_SECRET and TAKEDOWN_URL first (see docs/private/DEPLOY.md → İçerik kaldırma).");
   process.exit(1);
 }
 

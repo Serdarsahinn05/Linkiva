@@ -1,7 +1,7 @@
 # Linkiva v2: Yeniden Kurulum Yol Haritası
 
 > Durum: **Onaylandı 2026-09-24, uygulanıyor.** Fazlar sırayla uygulanır. Her faz kendi içinde çalışır durumda (yeşil build + testler) biter.
-> Dayanak belgeler: [AUDIT.md](AUDIT.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · [../DESIGN.md](../DESIGN.md) · [../PRODUCT.md](../PRODUCT.md)
+> Dayanak belgeler: `private/AUDIT.md` (yerel) · [ARCHITECTURE.md](ARCHITECTURE.md) · [../DESIGN.md](../DESIGN.md) · [../PRODUCT.md](../PRODUCT.md)
 
 ---
 
@@ -134,7 +134,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] Harita üzerine gelince cam kart (ülke, görüntülenme, pay; ziyaretsiz ülkede "Henüz ziyaret yok"), yumuşak belirme, `prefers-reduced-motion`'a uyar. Editörde dnd-kit hydration uyuşmazlığı giderildi (`DndContext id`).
 - ⚠️ `account.spec.ts` production'da 3 çalışanla ara sıra (6 tam koşuda 2) bir `toHaveURL` adımında düşüyor, tek başına hep geçiyor. Kök nedeni bulunmadı.
 - [x] Panel geçişleri: her sayfaya kendi düzeninde cam iskelet (`loading.tsx`, `components/ui/skeleton.tsx`). Tek ışık süzmesi tüm iskelette ortak akar, iskelet 150 ms gecikmeyle belirir (hızlı geçişte görünmez). Sayfa React `<ViewTransition>` ile buğusu çözülerek gelir (`PageReveal`). Destek yoksa ya da `prefers-reduced-motion` açıksa anında geçer.
-- [x] `docs/DEPLOY.md`: Supabase, Vercel env, Blob, Resend alan adı, Google Branding/redirect, `hello@` yönlendirme, preview → birleştirme sırası.
+- [x] `docs/private/DEPLOY.md`: Supabase, Vercel env, Blob, Resend alan adı, Google Branding/redirect, `hello@` yönlendirme, preview → birleştirme sırası.
 - [x] **Yayın:** preview'da denendi, `master`'a birleştirildi, `linkiva.space` v2'de canlı (kullanıcı, 2026-09-27'den önce). Lighthouse ölçümü Faz 6'ya taşındı.
 - [x] `DESIGN.md` build'den yeniden kaydedildi (gerçek token değerleri, köşeler, hareket, denetim kaydı).
 
@@ -314,7 +314,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] `lib/site.ts` → `profileUrl(profile)` özel alan adı varsa onu döndürür. QR, OG, kanonik URL ve paylaşım kartı bunu kullanır. `/l/` ve `/api/e` göreli adreslerle özel alan adında da çalışır.
 - [x] Arayüz: Ayarlar → Alan adı. Hostname zod ile doğrulanır (yalnızca alan adı; ana alan adının alt alanları ve IP yasak). Eklenince gereken DNS kaydı (CNAME/A) gösterilir, "Doğrula" düğmesi durumu yeniler. Kaldırma ve hesap silmede Vercel'den de silinir.
 - [x] Güvenlik: profil başına bir alan adı, ekleme rate limit'i, başka profilde kayıtlı host reddedilir (aynı cevap, sızıntı yok). Sahiplik testi.
-- [x] `docs/DEPLOY.md`'ye Vercel token'ı oluşturma adımları (adım adım, tıklanacak yerle).
+- [x] `docs/private/DEPLOY.md`'ye Vercel token'ı oluşturma adımları (adım adım, tıklanacak yerle).
 
 **Kabul:** Test alan adı preview'da profili açıyor, tıklama ve görüntülenme doğru profile sayılıyor, alan adı kaldırılınca 404.
 
@@ -382,7 +382,7 @@ Kullanıcı Faz 2 sonunda Etiket yönünü reddetti ("oyuncak gibi") ve yönü k
 - [x] İletişim: landing ve yasal sayfaların alt bilgisinde `hello@linkiva.space` (`site.email`), Gizlilik, Koşullar. Ayrı iletişim sayfası yok (`mailto:` yeter).
 - [x] Saklama sürelerini doğru kılmak: günlük cron bir günden eski hız sınırı sayaçlarını, süresi dolmuş doğrulama kayıtlarını ve 90 günü dolmuş eski kullanıcı adlarını siler (`features/maintenance/cleanup.ts`). Oturumlar bilinçli olarak silinmez (güvenlik; metin "hesap silinene kadar" diyor).
 - [x] +18 kapısı testi: kart görseli olan kapılı linkin görsel adresi profil HTML'inde yok, liste ve ızgarada (`tests/e2e/phase13.spec.ts`).
-- [x] Kaldırma yolu (admin paneli gelene kadar): `POST /api/takedown` (`TAKEDOWN_SECRET` Bearer, yoksa 404) ve onu çağıran `scripts/takedown.mjs`: bloğu görseliyle sil, profil fotoğrafı ve arka planı sil, sayfayı yayından kaldır; önbellek hemen düşer. Adımlar `docs/DEPLOY.md` §5d.
+- [x] Kaldırma yolu (admin paneli gelene kadar): `POST /api/takedown` (`TAKEDOWN_SECRET` Bearer, yoksa 404) ve onu çağıran `scripts/takedown.mjs`: bloğu görseliyle sil, profil fotoğrafı ve arka planı sil, sayfayı yayından kaldır; önbellek hemen düşer. Adımlar `docs/private/DEPLOY.md` §5d.
 
 **Kabul:** `/terms` ve `/privacy` iki dilde, 390px'te taşmıyor; kayıt formundan ve onboarding'den ikisine de gidiliyor; metindeki her iddia koddaki bir davranışa karşılık geliyor.
 
@@ -472,4 +472,4 @@ Faz 6–13'e taşınanlar: kullanıcı adı yönlendirmesi (6), Linktree içe ak
 5. Herkese açık API + webhooks (yeni abone, günlük özet).
 6. `DailyStat` özet tablosu (analitik ölçeği büyüyünce; Faz 9'un cron'u kullanılır).
 7. bio.link / Beacons içe aktarıcıları (Faz 7'deki `importers.ts` haritasına).
-8. **Tam CSP** (güvenlik denetimi 2026-09-28, `docs/SECURITY-AUDIT-2026-09-28.md` → D-1). Bugün yalnızca `frame-ancestors` var. `script-src 'nonce-…' 'strict-dynamic'` için proxy'de istek başına nonce üretilir (Next rehberi: `node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md`). Nonce, statik/ISR profil önbelleğini bozabilir, önce bunun etkisi ölçülür. Embed iframe'leri (YouTube, Spotify…) ve Vercel Blob görselleri `frame-src`/`img-src` listesine girer. Olası XSS'in etkisini sınırlar (oturum token'ları ayarlar sayfasında istemciye gidiyor, denetim B-3).
+8. **Tam CSP** (güvenlik denetimi 2026-09-28, `docs/private/SECURITY-AUDIT-2026-09-28.md` → D-1). Bugün yalnızca `frame-ancestors` var. `script-src 'nonce-…' 'strict-dynamic'` için proxy'de istek başına nonce üretilir (Next rehberi: `node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md`). Nonce, statik/ISR profil önbelleğini bozabilir, önce bunun etkisi ölçülür. Embed iframe'leri (YouTube, Spotify…) ve Vercel Blob görselleri `frame-src`/`img-src` listesine girer. Olası XSS'in etkisini sınırlar (oturum token'ları ayarlar sayfasında istemciye gidiyor, denetim B-3).

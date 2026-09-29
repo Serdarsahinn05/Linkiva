@@ -1,7 +1,7 @@
 # Linkiva: Hedef Mimari (v2)
 
 > Durum: **Onaylandı (2026-09-24).** Auth: Better Auth. Yeni paketler onaylı: zod, next-intl, Vitest, Playwright, @prisma/adapter-pg.
-> Eski sistemin analizi: [AUDIT.md](AUDIT.md) · Uygulama sırası: [ROADMAP.md](ROADMAP.md)
+> Eski sistemin analizi: `private/AUDIT.md` (yerel) · Uygulama sırası: [ROADMAP.md](ROADMAP.md)
 
 ---
 

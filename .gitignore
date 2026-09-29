@@ -27,3 +27,6 @@ Thumbs.db
 
 # Local dev mailbox
 tmp/
+
+# Operational notes kept off the public repo (deploy runbook, audits): local only, back them up yourself
+docs/private/

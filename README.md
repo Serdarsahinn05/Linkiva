@@ -121,7 +121,6 @@ tests/          unit, integration, e2e
 | [DESIGN.md](DESIGN.md) | Görsel sistem: token'lar, tipografi, bileşenler, temalar |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Veri modeli, auth, takip hattı, i18n, güvenlik kontrol listesi |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Fazlar ve backlog |
-| [docs/DEPLOY.md](docs/DEPLOY.md) | Supabase, Vercel, Resend, Google OAuth kurulumu |
 | [AGENTS.md](AGENTS.md) | Kod kuralları (insanlar ve kodlama ajanları için) |
 
 ## Katkı

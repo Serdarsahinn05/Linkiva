@@ -5,7 +5,7 @@ export const site = {
   name: "Linkiva",
   url: appUrl,
   host: new URL(appUrl).host,
-  /** The real mailbox people write to (docs/DEPLOY.md §5): contact, rights requests, abuse reports. */
+  /** The real mailbox people write to (docs/private/DEPLOY.md §5): contact, rights requests, abuse reports. */
   email: "hello@linkiva.space",
 } as const;
 
