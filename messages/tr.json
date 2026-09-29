@@ -1037,6 +1037,7 @@
     "restoring": "Geri yükleniyor",
     "deleting": "Siliniyor",
     "deleteMismatch": "Kullanıcı adı eşleşmiyor.",
+    "signInAgain": "Güvenliğin için bu işlemden önce çıkış yapıp yeniden giriş yapman gerekiyor.",
     "cancel": "Vazgeç",
     "showAllSessions": "Tümünü göster ({count})"
   },
