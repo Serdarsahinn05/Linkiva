@@ -5,6 +5,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { DismissReport } from "@/features/admin/components/dismiss-report";
+import { ModerationActions } from "@/features/admin/components/moderation-actions";
 import { getReport } from "@/features/admin/queries";
 import { getPublicProfile } from "@/features/profile/public";
 import { requireStaffPage } from "@/lib/admin";
@@ -16,7 +17,7 @@ function blockFields(data: unknown): [string, string][] {
 }
 
 export default async function AdminReportPage({ params }: PageProps<"/admin/reports/[id]">) {
-  await requireStaffPage();
+  const staff = await requireStaffPage();
   const report = await getReport((await params).id);
   if (!report) notFound();
   const t = await getTranslations("admin.reports");
@@ -71,11 +72,21 @@ export default async function AdminReportPage({ params }: PageProps<"/admin/repo
           </section>
         )}
 
-        {report.status === "OPEN" && (
+        {(report.status === "OPEN" || report.profile.suspended) && (
           <section className="flex flex-col gap-3">
             <h2 className="px-1 text-[0.9375rem] font-semibold text-ink-2">{t("decide")}</h2>
+            {report.profile.suspended && <p className="px-1 text-sm font-medium text-negative">{t("suspended")}</p>}
             <div className="flex flex-wrap gap-2">
-              <DismissReport id={report.id} />
+              <ModerationActions
+                reportId={report.id}
+                profileId={report.profile.id}
+                username={report.profile.username}
+                open={report.status === "OPEN"}
+                hasBlock={report.block !== null}
+                suspended={report.profile.suspended}
+                stepUpUntil={staff.steppedUpUntil?.toISOString() ?? null}
+              />
+              {report.status === "OPEN" && <DismissReport id={report.id} />}
             </div>
           </section>
         )}

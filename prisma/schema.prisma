@@ -230,6 +230,8 @@ model Profile {
   digestSentAt   DateTime?
   /// The editor's "Getting started" card was closed (Faz 18); it stays closed on every device.
   guideDismissedAt DateTime?
+  /// Suspended by staff (Faz 19): offline ("Bu sayfaya şu an ulaşılamıyor"), and the owner cannot publish it again.
+  suspendedAt    DateTime?
   blocks         Block[]
   socials        SocialLink[]
   events         Event[]

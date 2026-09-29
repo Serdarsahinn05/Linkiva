@@ -15,6 +15,7 @@ vi.mock("@/lib/auth", () => ({
   },
 }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
+vi.mock("next/cache", () => ({ updateTag: () => {}, unstable_cache: (fn: () => unknown) => fn }));
 vi.mock("next/navigation", () => ({
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
@@ -23,7 +24,7 @@ vi.mock("next/navigation", () => ({
 
 const { db } = await import("@/lib/db");
 const { requireStaff, requireStaffPage } = await import("@/lib/admin");
-const { confirmStepUp, dismissReport } = await import("@/features/admin/actions");
+const { actOnReport, confirmStepUp, dismissReport, unsuspendPage } = await import("@/features/admin/actions");
 
 const suffix = Date.now().toString(36);
 const ids = {
@@ -156,6 +157,61 @@ describe("dismissing a report", () => {
     const lines = await db.adminAudit.findMany({ where: { targetId: report.id } });
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatchObject({ action: "reportDismissed", actorId: ids.moderator, targetLabel: `@${ids.user}`, reason: "Kural ihlali yok" });
+  });
+});
+
+describe("acting on a report", () => {
+  it("needs staff, and a confirmed code on this session", async () => {
+    const page = await db.profile.findUniqueOrThrow({ where: { userId: ids.user } });
+    const report = await db.report.create({ data: { profileId: page.id, reason: "SCAM" } });
+
+    signIn(ids.user);
+    expect(await actOnReport({ reportId: report.id, action: "suspend", reason: "Dolandırıcılık" })).toEqual({ ok: false, error: "notFound" });
+    signIn(ids.moderator);
+    expect(await actOnReport({ reportId: report.id, action: "suspend", reason: "Dolandırıcılık" })).toEqual({ ok: false, error: "stepUp" });
+    expect((await db.profile.findUniqueOrThrow({ where: { id: page.id } })).suspendedAt).toBeNull();
+  });
+
+  it("suspends a page and lifts it again, each with a reason in the log", async () => {
+    const page = await db.profile.findUniqueOrThrow({ where: { userId: ids.user } });
+    const report = await db.report.create({ data: { profileId: page.id, reason: "SCAM" } });
+    signIn(ids.moderator);
+    await confirmStepUp(GOOD_CODE);
+
+    expect(await actOnReport({ reportId: report.id, action: "suspend", reason: "x" })).toEqual({ ok: false, error: "invalid" });
+    expect(await actOnReport({ reportId: report.id, action: "suspend", reason: "Kimlik avı sayfası" })).toEqual({ ok: true, data: undefined });
+    const suspended = await db.profile.findUniqueOrThrow({ where: { id: page.id } });
+    expect(suspended.suspendedAt).not.toBeNull();
+    expect(suspended.isPublished).toBe(false);
+    expect((await db.report.findUniqueOrThrow({ where: { id: report.id } })).status).toBe("ACTIONED");
+    // A closed report cannot be acted on twice.
+    expect(await actOnReport({ reportId: report.id, action: "removeImages", reason: "Tekrar" })).toEqual({ ok: false, error: "notFound" });
+
+    expect(await unsuspendPage(page.id, "İtiraz haklı çıktı")).toEqual({ ok: true, data: undefined });
+    const lifted = await db.profile.findUniqueOrThrow({ where: { id: page.id } });
+    expect(lifted.suspendedAt).toBeNull();
+    expect(lifted.isPublished).toBe(true);
+    expect(await unsuspendPage(page.id, "İkinci kez")).toEqual({ ok: false, error: "notFound" });
+
+    const lines = await db.adminAudit.findMany({ where: { targetId: page.id, actorId: ids.moderator }, orderBy: { id: "asc" } });
+    expect(lines.map((l) => [l.action, l.reason])).toEqual([
+      ["pageSuspended", "Kimlik avı sayfası"],
+      ["pageUnsuspended", "İtiraz haklı çıktı"],
+    ]);
+  });
+
+  it("removes only the reported block", async () => {
+    const page = await db.profile.findUniqueOrThrow({ where: { userId: ids.user } });
+    const [bad, good] = await Promise.all([
+      db.block.create({ data: { profileId: page.id, type: "LINK", position: 1, data: { title: "bad", url: "https://bad.example/" } } }),
+      db.block.create({ data: { profileId: page.id, type: "LINK", position: 2, data: { title: "good", url: "https://good.example/" } } }),
+    ]);
+    const report = await db.report.create({ data: { profileId: page.id, blockId: bad.id, reason: "SCAM" } });
+    signIn(ids.moderator);
+    await confirmStepUp(GOOD_CODE);
+    expect(await actOnReport({ reportId: report.id, action: "removeBlock", reason: "Kimlik avı linki" })).toEqual({ ok: true, data: undefined });
+    expect(await db.block.findUnique({ where: { id: bad.id } })).toBeNull();
+    expect(await db.block.findUnique({ where: { id: good.id } })).not.toBeNull();
   });
 });
 

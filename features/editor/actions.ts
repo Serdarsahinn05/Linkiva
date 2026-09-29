@@ -486,10 +486,12 @@ export async function updatePublishing(input: z.input<typeof publishingSchema>):
   const parsed = publishingSchema.safeParse(input);
   if (!parsed.success) return fail("invalid");
   return withProfile(async (profile) => {
+    // A page suspended by staff stays offline whatever the owner asks; the SEO fields can still change.
+    const { suspendedAt } = await db.profile.findUniqueOrThrow({ where: { id: profile.id }, select: { suspendedAt: true } });
     await db.profile.update({
       where: { id: profile.id },
-      data: { isPublished: parsed.data.isPublished, seoTitle: parsed.data.seoTitle || null, seoDescription: parsed.data.seoDescription || null },
+      data: { isPublished: parsed.data.isPublished && suspendedAt === null, seoTitle: parsed.data.seoTitle || null, seoDescription: parsed.data.seoDescription || null },
     });
-    return ok(undefined);
+    return suspendedAt === null || !parsed.data.isPublished ? ok(undefined) : fail("invalid");
   });
 }

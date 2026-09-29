@@ -37,7 +37,8 @@ export async function restoreAccount(userId: string) {
   if (!pending) return null;
   const [, profile] = await db.$transaction([
     db.accountDeletion.delete({ where: { userId } }),
-    db.profile.updateMany({ where: { userId }, data: { isPublished: pending.wasPublished } }),
+    // A page suspended by staff meanwhile stays offline.
+    db.profile.updateMany({ where: { userId, suspendedAt: null }, data: { isPublished: pending.wasPublished } }),
   ]);
   if (profile.count === 0) return { username: null };
   const row = await db.profile.findUnique({ where: { userId }, select: { username: true } });

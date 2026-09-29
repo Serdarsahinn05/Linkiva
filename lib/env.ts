@@ -17,7 +17,6 @@ const schema = z.object({
   /** Vercel Cron sends it as a Bearer token to /api/cron/daily. Without it, scheduled jobs are off. */
   CRON_SECRET: z.string().min(16).optional(),
   /** Content takedown (Faz 14): Bearer token for /api/takedown (scripts/takedown.mjs). Without it the endpoint is off. */
-  TAKEDOWN_SECRET: z.string().min(32).optional(),
   /** Custom domains (Faz 11): a Vercel token with access to this project. Without all three, the feature is hidden. */
   VERCEL_API_TOKEN: optional,
   VERCEL_PROJECT_ID: optional,

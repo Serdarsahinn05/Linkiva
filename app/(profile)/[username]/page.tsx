@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { profileLabels } from "@/components/blocks/labels";
 import { ProfileView } from "@/components/blocks/profile-view";
 import { ViewBeacon } from "@/components/blocks/view-beacon";
+import { StatusPage } from "@/components/ui/status-page";
 import { withLatestVideos } from "@/features/profile/latest-video";
 import { getPublicProfile, getUsernameRedirect } from "@/features/profile/public";
 import { liveBlocks } from "@/lib/schedule";
@@ -43,6 +44,12 @@ export async function generateMetadata({ params }: PageProps<"/[username]">): Pr
 export default async function ProfilePage({ params }: PageProps<"/[username]">) {
   const profile = await load(params);
   if (!profile) {
+    // Suspended by staff: say so plainly (no reason for visitors), rather than a 404 that looks like a broken link.
+    const held = await getPublicProfile(decodeURIComponent((await params).username).toLowerCase());
+    if (held?.suspended) {
+      const t = await getTranslations({ locale: isLocale(held.locale) ? held.locale : defaultLocale });
+      return <StatusPage code="" title={t("profile.unavailableTitle")} body={t("profile.unavailableBody")} actions={null} />;
+    }
     // A renamed profile keeps its old address working for 30 days (docs/ARCHITECTURE.md §6).
     const moved = await getUsernameRedirect(decodeURIComponent((await params).username).toLowerCase());
     if (moved) permanentRedirect(`/${moved}`);

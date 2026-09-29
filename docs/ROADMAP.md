@@ -463,9 +463,11 @@ Backlog #4'ün genişletilmişi. En çok güvenlik önlemi isteyen faz; ayrı te
 - [ ] Supabase Data API: public şemadaki tablolarda RLS kapalı; Data API açıksa tablolar anon anahtarla okunabilir. Kontrol edilip kapatılacak (Data API kapatma ya da RLS açma; uygulama `postgres` rolüyle bağlanır, RLS'ten etkilenmez).
 - [x] Kötüye kullanım bildirimi: her yayındaki profilin altında sessiz "Bu sayfayı bildir" bağlantısı (marka gizlense de kalır) → `/report/<kullanıcıadı>` (rezerve ad `report`). Sebep listesi, isteğe bağlı açıklama ve e-posta; bot tuzağı; IP başına saatte 5, aynı sayfaya günde 2 (hash'li sayaç); yalnızca yayındaki sayfa ve o sayfanın görünür bloğu. Tablo `report` (profil silinince gider; sonuçlananlar 180 gün sonra günlük temizlikte silinir, `REPORT_KEEP_DAYS`). Gizlilik metnine "Bir sayfayı bildirdiğinde" ve saklama satırı eklendi.
 - [x] Bildirim kuyruğu `/admin/reports` (açık: en eski üstte, aynı sayfaya kaç açık bildirim olduğu; sonuçlanan), detay: bildirim, bildirilen bloğun alanları düz metin (link açılmaz), sayfanın ziyaretçi görünümü (etkisiz önizleme), aynı sayfanın diğer bildirimleri. "Yok say" (moderatör, not günlüğe; yarışta tek günlük satırı). Kenar çubuğunda açık bildirim sayısı.
-- [ ] İçerik kaldırma, hesap askıya alma ("Bu sayfaya şu an ulaşılamıyor"), geri alma, adminden anında hesap silme.
+- [x] 3a: bildirim detayından bloğu kaldır, görselleri kaldır, sayfayı askıya al / askıyı kaldır (`actOnReport`, `unsuspendPage`): moderatör + 2FA + yeniden doğrulama, gerekçe zorunlu, günlük, sahibine e-posta (`contentRemoved`, `pageSuspended`, `pageRestored`). Askı `profile.suspendedAt` (migration `20261009090000_suspension`) + yayından kaldırma: ziyaretçi "Bu sayfaya şu an ulaşılamıyor" görür (gerekçe yok), link/takip/abone/sitemap mevcut yayın kontrolleriyle kapanır; sahip panelde uyarı görür, yayın ayarı ve hesap geri yükleme askıyı delmez. `/api/takedown`, `scripts/takedown.mjs` ve `TAKEDOWN_SECRET` kaldırıldı.
+- [ ] 3b: kullanıcı listesi ve rol verme, adminden anında hesap silme.
+- [ ] 3c: denetim günlüğü ekranı, tehdit modeli ve güvenlik kapanışı.
 - [ ] Denetim günlüğü: her admin işlemi kim, ne zaman, neyi, neden; silinemez.
-- [ ] Faz 14'teki `scripts/takedown.mjs` panelin eylemleriyle değiştirilir.
+- [x] Faz 14'teki `scripts/takedown.mjs` panelin eylemleriyle değiştirildi (3a).
 
 ---
 

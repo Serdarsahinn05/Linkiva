@@ -72,6 +72,7 @@ export async function getReport(id: string) {
           id: true,
           username: true,
           isPublished: true,
+          suspendedAt: true,
           createdAt: true,
           reports: { where: { id: { not: id } }, orderBy: { createdAt: "desc" }, take: 20, select: { id: true, reason: true, status: true, createdAt: true } },
         },
@@ -85,6 +86,8 @@ export async function getReport(id: string) {
     resolvedAt: report.resolvedAt?.toISOString() ?? null,
     profile: {
       ...report.profile,
+      suspended: report.profile.suspendedAt !== null,
+      suspendedAt: report.profile.suspendedAt?.toISOString() ?? null,
       createdAt: report.profile.createdAt.toISOString(),
       reports: report.profile.reports.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })),
     },

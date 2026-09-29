@@ -3,7 +3,7 @@ import type { LegalDoc } from "./types";
 
 // The rules users agree to at sign-up (features/legal/components/terms-consent.tsx). Behaviour this text promises:
 // account deletion and export (Settings), the 30-day username redirect (features/profile), the 18+ link warning
-// (app/l/[blockId]), notice and takedown (docs/private/DEPLOY.md → İçerik kaldırma).
+// (app/l/[blockId]), notice and takedown (the report form and the admin panel, Faz 19).
 
 const OWNER = "Serdar Şahin";
 

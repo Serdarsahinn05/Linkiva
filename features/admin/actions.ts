@@ -1,11 +1,16 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { AdminDenied, audit, requireStaff, type AdminDenial } from "@/lib/admin";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { sendMailQuietly } from "@/lib/mail/send";
 import { allow } from "@/lib/ratelimit";
+import { site } from "@/lib/site";
+import { removeBlockContent, removeProfileImages } from "@/features/moderation/takedown";
+import { profileTag } from "@/features/profile/public";
 
 export type AdminResult<T = undefined> = { ok: true; data: T } | { ok: false; error: AdminDenial | "invalid" | "tooMany" | "unknown" };
 
@@ -41,6 +46,76 @@ export async function dismissReport(id: string, note?: string): Promise<AdminRes
     return closed ? { ok: true, data: undefined } : fail("notFound");
   } catch (error) {
     return denied(error, "dismissReport");
+  }
+}
+
+const actionSchema = z.object({
+  reportId: idSchema,
+  action: z.enum(["removeBlock", "removeImages", "suspend"]),
+  // A decision needs a reason: it is what the log (and an appeal) will be read against.
+  reason: z.string().trim().min(3).max(500),
+});
+
+export type ReportAction = z.infer<typeof actionSchema>["action"];
+
+const ownerOf = (profileId: string) =>
+  db.profile.findUniqueOrThrow({ where: { id: profileId }, select: { username: true, locale: true, user: { select: { email: true } } } });
+
+/**
+ * Acts on an open report: removes the reported block (and its file), removes the page's photo and background, or
+ * suspends the page. Sensitive: moderator, two-step verification and a code confirmed on this session. The content
+ * goes first, then the report closes and the audit line is written; the owner gets an email either way.
+ */
+export async function actOnReport(input: { reportId: string; action: ReportAction; reason: string }): Promise<AdminResult> {
+  try {
+    const staff = await requireStaff("MODERATOR", { stepUp: true });
+    const parsed = actionSchema.safeParse(input);
+    if (!parsed.success) return fail("invalid");
+    const { reportId, action, reason } = parsed.data;
+    const report = await db.report.findUnique({ where: { id: reportId }, select: { status: true, blockId: true, profileId: true } });
+    if (!report || report.status !== "OPEN") return fail("notFound");
+    const owner = await ownerOf(report.profileId);
+
+    let done: unknown;
+    if (action === "removeBlock") done = report.blockId ? await removeBlockContent(report.blockId) : null;
+    else if (action === "removeImages") done = await removeProfileImages(report.profileId);
+    else done = await db.profile.update({ where: { id: report.profileId }, data: { suspendedAt: new Date(), isPublished: false } });
+    if (!done) return fail("notFound");
+
+    const logged = { removeBlock: "blockRemoved", removeImages: "imagesRemoved", suspend: "pageSuspended" } as const;
+    await db.$transaction(async (tx) => {
+      await tx.report.update({ where: { id: reportId }, data: { status: "ACTIONED", resolvedAt: new Date(), resolvedBy: staff.userId } });
+      await audit(staff, { action: logged[action], target: { type: "profile", id: report.profileId, label: `@${owner.username}` }, reason, meta: { reportId, blockId: report.blockId } }, tx);
+    });
+    updateTag(profileTag(owner.username));
+    await sendMailQuietly({ to: owner.user.email, kind: action === "suspend" ? "pageSuspended" : "contentRemoved", locale: owner.locale === "en" ? "en" : "tr", url: `${site.url}/dashboard` });
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return denied(error, "actOnReport");
+  }
+}
+
+/** Lifts a suspension: the page is published again and its owner is told. Sensitive, with a reason, like suspending. */
+export async function unsuspendPage(profileId: string, reason: string): Promise<AdminResult> {
+  try {
+    const staff = await requireStaff("MODERATOR", { stepUp: true });
+    const parsed = z.object({ profileId: idSchema, reason: z.string().trim().min(3).max(500) }).safeParse({ profileId, reason });
+    if (!parsed.success) return fail("invalid");
+    const lifted = await db.$transaction(async (tx) => {
+      const { count } = await tx.profile.updateMany({ where: { id: parsed.data.profileId, suspendedAt: { not: null } }, data: { suspendedAt: null, isPublished: true } });
+      if (count) {
+        const { username } = await tx.profile.findUniqueOrThrow({ where: { id: parsed.data.profileId }, select: { username: true } });
+        await audit(staff, { action: "pageUnsuspended", target: { type: "profile", id: parsed.data.profileId, label: `@${username}` }, reason: parsed.data.reason }, tx);
+      }
+      return count;
+    });
+    if (!lifted) return fail("notFound");
+    const owner = await ownerOf(parsed.data.profileId);
+    updateTag(profileTag(owner.username));
+    await sendMailQuietly({ to: owner.user.email, kind: "pageRestored", locale: owner.locale === "en" ? "en" : "tr", url: `${site.url}/${owner.username}` });
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return denied(error, "unsuspendPage");
   }
 }
 

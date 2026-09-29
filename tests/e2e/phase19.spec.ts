@@ -49,6 +49,22 @@ test("the admin panel does not exist for anyone but staff with two-step verifica
   await expect(page.getByText("Hatalı doğrulama kodu").first()).toBeVisible();
 });
 
+test("a suspended page tells visitors it is unavailable and its owner why", async ({ page, request }, info) => {
+  test.skip(info.project.name !== "desktop", "one run is enough");
+  const owner = `sus-${uid()}`;
+  const { email } = await createUser(page, owner);
+  // Suspended before anyone visits it (the action itself is covered by tests/integration/admin.test.ts).
+  await sql(`UPDATE "profile" SET "suspendedAt" = now(), "isPublished" = false WHERE "userId" = (SELECT id FROM "user" WHERE email = $1)`, [email]);
+
+  const visit = await request.get(`/${owner}`);
+  expect(await visit.text()).toContain("Bu sayfaya şu an ulaşılamıyor");
+  expect((await request.get(`/report/${owner}`)).status()).toBe(404);
+
+  await page.goto("/dashboard");
+  await expect(page.getByText("Sayfan Kullanım Koşullarına aykırı bulunduğu için askıya alındı")).toBeVisible();
+  if (shots) await page.screenshot({ path: `${shots}/suspended-owner-1440.png` });
+});
+
 test("a visitor reports a page from its foot, and staff dismiss it from the queue", async ({ page, browser }, info) => {
   test.skip(info.project.name !== "desktop", "one run of the whole flow; the report page is checked at 390px below");
   const owner = `rpt-${uid()}`;

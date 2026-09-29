@@ -252,6 +252,7 @@
     }
   },
   "dashboard": {
+    "suspended": "Sayfan Kullanım Koşullarına aykırı bulunduğu için askıya alındı; ziyaretçiler şu an göremiyor ve yeniden yayına alamazsın. Gerekçe ve itiraz için hello@linkiva.space adresine yaz.",
     "welcome": "Sayfan yayında."
   },
   "mail": {
@@ -318,6 +319,30 @@
       "cta": "",
       "security": "Bunu sen yapmadıysan hemen bize yaz: hello@linkiva.space"
     },
+    "contentRemoved": {
+      "subject": "Linkiva: sayfandan bir içerik kaldırıldı",
+      "preheader": "Kurallarımıza aykırı bulunan bir içerik kaldırıldı.",
+      "heading": "Sayfandan bir içerik kaldırıldı",
+      "body": "Gelen bir bildirimi inceledik ve sayfandaki bir içeriği Kullanım Koşullarına aykırı bulduğumuz için kaldırdık. Sayfanın geri kalanı yayında. Neyin, neden kaldırıldığını öğrenmek ya da itiraz etmek için bu maile yanıt ver ya da hello@linkiva.space adresine yaz.",
+      "cta": "Panelime git",
+      "security": ""
+    },
+    "pageSuspended": {
+      "subject": "Linkiva: sayfan askıya alındı",
+      "preheader": "Sayfan şu an ziyaretçilere kapalı.",
+      "heading": "Sayfan askıya alındı",
+      "body": "Gelen bir bildirimi inceledik ve sayfanı Kullanım Koşullarına aykırı bulduğumuz için askıya aldık. Ziyaretçiler şu an \"Bu sayfaya şu an ulaşılamıyor\" görüyor ve sayfayı yeniden yayına alamazsın. Hesabın ve verilerin duruyor. Gerekçeyi öğrenmek ya da itiraz etmek için bu maile yanıt ver ya da hello@linkiva.space adresine yaz.",
+      "cta": "Panelime git",
+      "security": ""
+    },
+    "pageRestored": {
+      "subject": "Linkiva: sayfan yeniden yayında",
+      "preheader": "Askı kaldırıldı.",
+      "heading": "Sayfan yeniden yayında",
+      "body": "Sayfandaki askıyı kaldırdık. Sayfan yeniden ziyaretçilere açık.",
+      "cta": "Sayfamı gör",
+      "security": ""
+    },
     "twoFactorOff": {
       "subject": "Linkiva: iki adımlı doğrulama kapatıldı",
       "preheader": "Hesabın girişte artık kod istemiyor.",
@@ -358,6 +383,8 @@
   "profile": {
     "madeWith": "Linkiva ile yapıldı",
     "report": "Bu sayfayı bildir",
+    "unavailableTitle": "Bu sayfaya şu an ulaşılamıyor",
+    "unavailableBody": "Sayfa geçici olarak erişime kapalı.",
     "notFoundTitle": "Bu adreste kimse yok.",
     "claim": "Bu adresi al",
     "claimable": "{username} adı henüz kimsenin değilse senin olabilir.",
@@ -648,7 +675,23 @@
       "stepUpFailed": "Hatalı doğrulama kodu",
       "stepUpLimited": "Doğrulama denemesi sınırı aşıldı",
       "roleSet": "Rol değiştirildi",
-      "reportDismissed": "Bildirim yok sayıldı"
+      "reportDismissed": "Bildirim yok sayıldı",
+      "blockRemoved": "Blok kaldırıldı",
+      "imagesRemoved": "Görseller kaldırıldı",
+      "pageSuspended": "Sayfa askıya alındı",
+      "pageUnsuspended": "Askı kaldırıldı"
+    },
+    "actions": {
+      "reason": "Gerekçe",
+      "reasonHint": "Zorunlu. Yönetim günlüğüne yazılır; itiraz olursa buna bakılır.",
+      "needsStepUp": "Bu işlem için önce hassas işlemleri aç.",
+      "cancel": "Vazgeç",
+      "gone": "Bu bildirim ya da içerik artık yok; sayfayı yenile.",
+      "error": "İşlem yapılamadı. Tekrar dene.",
+      "removeBlock": { "button": "Bloğu kaldır", "title": "Bildirilen bloğu kaldır", "body": "Blok @{username} sayfasından silinir; yüklenmiş görseli varsa o da silinir. Geri alınamaz. Sahibine e-posta gider, bildirim kapanır.", "confirm": "Bloğu kaldır" },
+      "removeImages": { "button": "Görselleri kaldır", "title": "Profil fotoğrafını ve arka planı kaldır", "body": "@{username} sayfasının profil fotoğrafı ve arka plan görseli silinir. Geri alınamaz. Sahibine e-posta gider, bildirim kapanır.", "confirm": "Görselleri kaldır" },
+      "suspend": { "button": "Sayfayı askıya al", "title": "Sayfayı askıya al", "body": "@{username} ziyaretçilere \"Bu sayfaya şu an ulaşılamıyor\" gösterir; sahibi yeniden yayına alamaz. Hesap ve veriler kalır, askı kaldırılabilir. Sahibine e-posta gider, bildirim kapanır.", "confirm": "Askıya al" },
+      "unsuspend": { "button": "Askıyı kaldır", "title": "Askıyı kaldır", "body": "@{username} yeniden yayına girer ve sahibine e-posta gider.", "confirm": "Askıyı kaldır" }
     },
     "reports": {
       "title": "Bildirimler",
@@ -671,6 +714,7 @@
       "reportedBlock": "Bildirilen blok",
       "hidden": "gizlenmiş",
       "decide": "Karar",
+      "suspended": "Bu sayfa askıda.",
       "otherReports": "Bu sayfaya gelen diğer bildirimler",
       "noOtherReports": "Başka bildirim yok.",
       "pagePreview": "Sayfa, ziyaretçinin gördüğü hâliyle",

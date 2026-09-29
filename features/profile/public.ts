@@ -21,6 +21,8 @@ export type PublicProfile = {
   locale: string;
   timezone: string;
   isPublished: boolean;
+  /** Suspended by staff: the page says it is unavailable instead of 404 (Faz 19). Implies not published. */
+  suspended: boolean;
   seoTitle: string | null;
   seoDescription: string | null;
   /** Verified custom domain (the profile's canonical address), or null. */
@@ -60,7 +62,8 @@ async function loadProfile(username: string): Promise<PublicProfile | null> {
     showBranding: profile.showBranding,
     locale: profile.locale,
     timezone: profile.timezone,
-    isPublished: profile.isPublished,
+    isPublished: profile.isPublished && profile.suspendedAt === null,
+    suspended: profile.suspendedAt !== null,
     seoTitle: profile.seoTitle,
     seoDescription: profile.seoDescription,
     customDomain: profile.customDomain?.verifiedAt ? profile.customDomain.hostname : null,

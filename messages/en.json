@@ -252,6 +252,7 @@
     }
   },
   "dashboard": {
+    "suspended": "Your page was suspended because it breaks our Terms of Use; visitors cannot see it and you cannot publish it again. For the reason, or to appeal, write to hello@linkiva.space.",
     "welcome": "Your page is live."
   },
   "mail": {
@@ -318,6 +319,30 @@
       "cta": "",
       "security": "If this wasn't you, write to us right away: hello@linkiva.space"
     },
+    "contentRemoved": {
+      "subject": "Linkiva: content was removed from your page",
+      "preheader": "Content that breaks our rules was removed.",
+      "heading": "Content was removed from your page",
+      "body": "We reviewed a report and removed content from your page that breaks our Terms of Use. The rest of your page is still published. To find out what was removed and why, or to appeal, reply to this email or write to hello@linkiva.space.",
+      "cta": "Go to my dashboard",
+      "security": ""
+    },
+    "pageSuspended": {
+      "subject": "Linkiva: your page was suspended",
+      "preheader": "Your page is closed to visitors for now.",
+      "heading": "Your page was suspended",
+      "body": "We reviewed a report and suspended your page because it breaks our Terms of Use. Visitors now see \"This page is not available right now\" and you cannot publish it again. Your account and data are kept. To find out why, or to appeal, reply to this email or write to hello@linkiva.space.",
+      "cta": "Go to my dashboard",
+      "security": ""
+    },
+    "pageRestored": {
+      "subject": "Linkiva: your page is back",
+      "preheader": "The suspension was lifted.",
+      "heading": "Your page is back",
+      "body": "We lifted the suspension on your page. It is open to visitors again.",
+      "cta": "See my page",
+      "security": ""
+    },
     "twoFactorOff": {
       "subject": "Linkiva: two-step verification turned off",
       "preheader": "Your account no longer asks for a code at sign-in.",
@@ -358,6 +383,8 @@
   "profile": {
     "madeWith": "Made with",
     "report": "Report this page",
+    "unavailableTitle": "This page is not available right now",
+    "unavailableBody": "The page is temporarily unavailable.",
     "notFoundTitle": "Nobody lives here yet.",
     "claim": "Claim this address",
     "claimable": "If nobody has {username} yet, it could be yours.",
@@ -648,7 +675,23 @@
       "stepUpFailed": "Wrong confirmation code",
       "stepUpLimited": "Confirmation attempt limit reached",
       "roleSet": "Role changed",
-      "reportDismissed": "Report dismissed"
+      "reportDismissed": "Report dismissed",
+      "blockRemoved": "Block removed",
+      "imagesRemoved": "Images removed",
+      "pageSuspended": "Page suspended",
+      "pageUnsuspended": "Suspension lifted"
+    },
+    "actions": {
+      "reason": "Reason",
+      "reasonHint": "Required. Written to the admin log; an appeal is read against it.",
+      "needsStepUp": "Unlock sensitive actions first.",
+      "cancel": "Cancel",
+      "gone": "This report or content no longer exists; reload the page.",
+      "error": "Could not do that. Try again.",
+      "removeBlock": { "button": "Remove block", "title": "Remove the reported block", "body": "The block is deleted from @{username}'s page, with its uploaded image if it has one. This cannot be undone. The owner gets an email and the report closes.", "confirm": "Remove block" },
+      "removeImages": { "button": "Remove images", "title": "Remove the profile photo and background", "body": "@{username}'s profile photo and background image are deleted. This cannot be undone. The owner gets an email and the report closes.", "confirm": "Remove images" },
+      "suspend": { "button": "Suspend page", "title": "Suspend the page", "body": "@{username} shows visitors \"This page is not available right now\" and the owner cannot publish it again. The account and data stay, and the suspension can be lifted. The owner gets an email and the report closes.", "confirm": "Suspend" },
+      "unsuspend": { "button": "Lift suspension", "title": "Lift the suspension", "body": "@{username} is published again and the owner gets an email.", "confirm": "Lift suspension" }
     },
     "reports": {
       "title": "Reports",
@@ -671,6 +714,7 @@
       "reportedBlock": "Reported block",
       "hidden": "hidden",
       "decide": "Decision",
+      "suspended": "This page is suspended.",
       "otherReports": "Other reports on this page",
       "noOtherReports": "No other reports.",
       "pagePreview": "The page as visitors see it",
