@@ -49,9 +49,20 @@ describe("daily clean-up", () => {
       ],
     });
 
+    // Reports: resolved long ago goes; resolved recently and still open stay (an open one is never deleted by age).
+    const DAY = 24 * HOUR;
+    await db.report.createMany({
+      data: [
+        { id: key("r-old"), profileId: profile.id, reason: "SPAM", status: "DISMISSED", createdAt: new Date(NOW.getTime() - 200 * DAY), resolvedAt: new Date(NOW.getTime() - 181 * DAY) },
+        { id: key("r-recent"), profileId: profile.id, reason: "SPAM", status: "ACTIONED", createdAt: new Date(NOW.getTime() - 20 * DAY), resolvedAt: new Date(NOW.getTime() - 10 * DAY) },
+        { id: key("r-open"), profileId: profile.id, reason: "SPAM", createdAt: new Date(NOW.getTime() - 400 * DAY) },
+      ],
+    });
+
     const result = await runCleanup(NOW);
 
-    expect(result).toEqual({ rateLimits: 1, rateCounters: 1, verifications: 1, usernames: 1 });
+    expect(result).toEqual({ rateLimits: 1, rateCounters: 1, verifications: 1, reports: 1, usernames: 1 });
+    expect((await db.report.findMany({ where: { profileId: profile.id }, orderBy: { id: "asc" } })).map((r) => r.id)).toEqual([key("r-open"), key("r-recent")]);
     expect((await db.rateCounter.findMany({ where: { key: { startsWith: `cleanup-rc-` } } })).map((r) => r.key)).toEqual([key("rc-new")]);
     expect((await db.rateLimit.findMany({ where: { key: { startsWith: `cleanup-rl-` } } })).map((r) => r.key)).toEqual([key("rl-new")]);
     expect((await db.verification.findMany({ where: { identifier: { startsWith: `cleanup-v-` } } })).map((v) => v.identifier)).toEqual([key("v-new")]);

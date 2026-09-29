@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { REPORT_KEEP_DAYS } from "@/features/moderation/reasons";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -8,15 +9,17 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * - sign-in/sign-up rate-limit counters (keyed by IP; every window is at most ten minutes) after a day,
  * - the app's own rate counters (hashed keys, lib/ratelimit.ts) once their window has ended,
  * - expired email verification, password reset and pending two-step sign-in records,
+ * - reports resolved more than REPORT_KEEP_DAYS ago, with the reporter's optional email,
  * - past usernames whose 30-day redirect has ended (they stop redirecting at expiresAt already; this removes the row).
  * Sessions are kept until they are ended or the account is deleted, as the notice says.
  */
 export async function runCleanup(now = new Date()) {
-  const [rateLimits, rateCounters, verifications, usernames] = await db.$transaction([
+  const [rateLimits, rateCounters, verifications, reports, usernames] = await db.$transaction([
     db.rateLimit.deleteMany({ where: { lastRequest: { lt: BigInt(now.getTime() - DAY_MS) } } }),
     db.rateCounter.deleteMany({ where: { resetAt: { lte: now } } }),
     db.verification.deleteMany({ where: { expiresAt: { lt: now } } }),
+    db.report.deleteMany({ where: { status: { not: "OPEN" }, resolvedAt: { lt: new Date(now.getTime() - REPORT_KEEP_DAYS * DAY_MS) } } }),
     db.usernameHistory.deleteMany({ where: { expiresAt: { lte: now } } }),
   ]);
-  return { rateLimits: rateLimits.count, rateCounters: rateCounters.count, verifications: verifications.count, usernames: usernames.count };
+  return { rateLimits: rateLimits.count, rateCounters: rateCounters.count, verifications: verifications.count, reports: reports.count, usernames: usernames.count };
 }

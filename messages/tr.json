@@ -357,6 +357,7 @@
   },
   "profile": {
     "madeWith": "Linkiva ile yapıldı",
+    "report": "Bu sayfayı bildir",
     "notFoundTitle": "Bu adreste kimse yok.",
     "claim": "Bu adresi al",
     "claimable": "{username} adı henüz kimsenin değilse senin olabilir.",
@@ -585,11 +586,40 @@
       "listInvalid": "Çok fazla ya da çok uzun öğe var."
     }
   },
+  "report": {
+    "title": "Bu sayfayı bildir",
+    "intro": "{address} kurallarımıza aykırıysa bize bildir. İnceleyip gerekirse içeriği kaldırırız.",
+    "aboutBlock": "Bildirimin sayfadaki belirli bir bloğu kapsıyor.",
+    "reason": "Sorun ne?",
+    "reasons": {
+      "SCAM": { "label": "Dolandırıcılık ya da kimlik avı", "hint": "Para, şifre ya da kişisel bilgi toplamaya çalışıyor." },
+      "ILLEGAL": { "label": "Hukuka aykırı içerik", "hint": "Yasa dışı bahis, uyuşturucu, silah ya da benzeri." },
+      "ADULT": { "label": "Uyarısız müstehcen içerik", "hint": "Cinsel içerik ya da +18 uyarısı olmayan link." },
+      "HATE": { "label": "Nefret söylemi ya da taciz", "hint": "Bir kişiyi ya da grubu hedef alıyor." },
+      "IMPERSONATION": { "label": "Başkasını taklit ediyor", "hint": "Bir kişi ya da marka gibi davranıyor." },
+      "COPYRIGHT": { "label": "Telif hakkı ihlali", "hint": "Senin ya da temsil ettiğin birinin eseri izinsiz kullanılıyor." },
+      "SPAM": { "label": "Spam", "hint": "İstenmeyen reklam ya da yanıltıcı linkler." },
+      "OTHER": { "label": "Başka bir sorun", "hint": "Aşağıda kısaca anlat." }
+    },
+    "details": "Ayrıntı",
+    "detailsHint": "İsteğe bağlı. Hangi link, ne gördün? En fazla 1000 karakter.",
+    "email": "E-posta adresin",
+    "emailHint": "İsteğe bağlı. Yalnızca sana dönüş yapmak için kullanırız.",
+    "submit": "Bildirimi gönder",
+    "doneTitle": "Bildirimin bize ulaştı",
+    "doneBody": "Teşekkürler. Bildirimleri inceliyor, kurallara aykırı içeriği kaldırıyoruz. E-posta bıraktıysan gerekirse sana yazarız.",
+    "backToPage": "Sayfaya dön",
+    "invalid": "Bir sebep seç. E-posta yazdıysan geçerli bir adres olmalı.",
+    "tooMany": "Kısa sürede çok fazla bildirim gönderildi. Biraz sonra yeniden dene.",
+    "error": "Bildirim gönderilemedi. Sayfa artık yayında olmayabilir; biraz sonra yeniden dene.",
+    "privacyNote": "Bildirimin ve bıraktıysan e-postan yalnızca bu inceleme için tutulur.",
+    "privacyLink": "Gizlilik metni"
+  },
   "admin": {
     "title": "Yönetim",
     "back": "Kendi panelime dön",
     "roles": { "ADMIN": "Yönetici", "MODERATOR": "Moderatör" },
-    "nav": { "overview": "Genel bakış" },
+    "nav": { "overview": "Genel bakış", "reports": "Bildirimler" },
     "twoFactorTitle": "Önce iki adımlı doğrulama",
     "twoFactorBody": "Yönetim paneli yalnızca iki adımlı doğrulaması açık hesaplarla kullanılır. Ayarlar'dan aç, sonra buraya dön.",
     "twoFactorAction": "Ayarlara git",
@@ -606,10 +636,10 @@
       "error": "Doğrulanamadı. Tekrar dene."
     },
     "overview": {
+      "openReports": "Açık bildirim",
       "pages": "Sayfa",
       "published": "Yayında",
       "newThisWeek": "Bu hafta açılan",
-      "pendingDeletions": "Silinmeyi bekleyen",
       "recent": "Son işlemler",
       "recentEmpty": "Henüz bir yönetim işlemi yok."
     },
@@ -617,7 +647,43 @@
       "stepUp": "Kimlik doğrulandı",
       "stepUpFailed": "Hatalı doğrulama kodu",
       "stepUpLimited": "Doğrulama denemesi sınırı aşıldı",
-      "roleSet": "Rol değiştirildi"
+      "roleSet": "Rol değiştirildi",
+      "reportDismissed": "Bildirim yok sayıldı"
+    },
+    "reports": {
+      "title": "Bildirimler",
+      "open": "Açık",
+      "resolved": "Sonuçlanan",
+      "emptyOpen": "Açık bildirim yok.",
+      "emptyResolved": "Henüz sonuçlanan bildirim yok.",
+      "onBlock": "blok",
+      "openOnPage": "{count, plural, other {bu sayfaya # açık bildirim}}",
+      "openCount": "açık bildirim",
+      "status": { "OPEN": "Açık", "DISMISSED": "Yok sayıldı", "ACTIONED": "İşlem yapıldı" },
+      "report": "Bildirim",
+      "noDetails": "Ayrıntı yazılmamış.",
+      "reporter": "Bildiren",
+      "anonymous": "Anonim",
+      "pageState": "Sayfa",
+      "published": "Yayında",
+      "unpublished": "Yayında değil",
+      "pageSince": "Açılış",
+      "reportedBlock": "Bildirilen blok",
+      "hidden": "gizlenmiş",
+      "decide": "Karar",
+      "otherReports": "Bu sayfaya gelen diğer bildirimler",
+      "noOtherReports": "Başka bildirim yok.",
+      "pagePreview": "Sayfa, ziyaretçinin gördüğü hâliyle",
+      "pageGone": "Sayfa artık yok.",
+      "dismiss": "Yok say",
+      "dismissTitle": "Bildirimi yok say",
+      "dismissBody": "Sayfaya dokunulmaz, bildirim kapanır. Kural ihlali yoksa ya da aynı şey zaten ele alındıysa bunu seç.",
+      "note": "Not",
+      "noteHint": "İsteğe bağlı. Yalnızca yönetim günlüğünde görünür.",
+      "dismissConfirm": "Yok say ve kapat",
+      "cancel": "Vazgeç",
+      "alreadyClosed": "Bu bildirim az önce kapatılmış.",
+      "error": "Kaydedilemedi. Tekrar dene."
     }
   },
   "guide": {

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, LayoutGrid, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Flag, LayoutGrid, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -10,21 +10,25 @@ import { cn } from "@/lib/cn";
 import type { StaffRole } from "@/lib/admin";
 import { StepUp } from "./step-up";
 
-type NavItem = { href: "/admin"; key: "overview"; icon: LucideIcon };
-const NAV: NavItem[] = [{ href: "/admin", key: "overview", icon: LayoutGrid }];
+type NavItem = { href: "/admin" | "/admin/reports"; key: "overview" | "reports"; icon: LucideIcon };
+const NAV: NavItem[] = [
+  { href: "/admin", key: "overview", icon: LayoutGrid },
+  { href: "/admin/reports", key: "reports", icon: Flag },
+];
 
 /**
  * The admin panel's frame. It says "Yönetim" everywhere it can, so it is never mistaken for one's own dashboard;
  * the step-up state sits where the eye returns to before any sensitive act.
  */
-export function AdminShell({ role, stepUpUntil, children }: { role: StaffRole; stepUpUntil: string | null; children: ReactNode }) {
+export function AdminShell({ role, stepUpUntil, openReports, children }: { role: StaffRole; stepUpUntil: string | null; openReports: number; children: ReactNode }) {
   const t = useTranslations("admin");
   const pathname = usePathname();
 
   const nav = (
     <ul className="flex gap-1 md:flex-col">
       {NAV.map(({ href, key, icon: Icon }) => {
-        const active = pathname === href;
+        // A report's own page keeps "Reports" lit.
+        const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
         return (
           <li key={href}>
             <Link
@@ -37,6 +41,12 @@ export function AdminShell({ role, stepUpUntil, children }: { role: StaffRole; s
             >
               <Icon size={19} strokeWidth={1.75} aria-hidden />
               {t(`nav.${key}`)}
+              {key === "reports" && openReports > 0 && (
+                <span className="ml-auto rounded-full bg-accent px-2 py-0.5 font-mono text-xs text-accent-ink tabular-nums">
+                  {openReports}
+                  <span className="sr-only"> {t("reports.openCount")}</span>
+                </span>
+              )}
             </Link>
           </li>
         );

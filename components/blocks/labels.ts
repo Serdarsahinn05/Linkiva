@@ -4,6 +4,8 @@
  */
 export type ProfileLabels = {
   madeWith: string;
+  /** The quiet "report this page" link at the foot of the public page. */
+  report: string;
   embedPlay: string;
   embedListen: string;
   /** Editor preview only: a "latest video" embed, whose video is picked when the page renders. */
@@ -43,6 +45,7 @@ export function profileLabels(translator: AnyTranslator): ProfileLabels {
   const t = translator as unknown as (key: string) => string;
   return {
     madeWith: t("profile.madeWith"),
+    report: t("profile.report"),
     embedPlay: t("blocks.embedPlay"),
     embedListen: t("blocks.embedListen"),
     embedLatest: t("blocks.embedLatest"),

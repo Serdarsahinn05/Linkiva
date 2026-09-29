@@ -204,19 +204,27 @@ export function ProfileView({ profile, mode = "public", labels }: { profile: Pro
       {/* A portfolio widens to 60rem on a large screen; its wide layout switches on at 56rem of room (container query). */}
       <div className={cn("@container flex w-full flex-1 flex-col items-center", portfolio ? "max-w-[60rem]" : "max-w-[35rem]")}>{body}</div>
 
-      {profile.showBranding && (
-        <footer className="mt-14">
-          <a
-            href={site.url}
-            tabIndex={mode === "preview" ? -1 : undefined}
-            className="glass inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] text-ink-2 transition-colors hover:text-ink"
-          >
-            <span aria-hidden className="size-1.5 rounded-full bg-ink shadow-[0_0_8px_var(--c-ink)]" />
-            {labels.madeWith}{" "}
-            <span lang="en" translate="no" className="font-semibold text-ink">
-              Linkiva
-            </span>
-          </a>
+      {(profile.showBranding || mode === "public") && (
+        <footer className="mt-14 flex flex-col items-center gap-3">
+          {profile.showBranding && (
+            <a
+              href={site.url}
+              tabIndex={mode === "preview" ? -1 : undefined}
+              className="glass inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] text-ink-2 transition-colors hover:text-ink"
+            >
+              <span aria-hidden className="size-1.5 rounded-full bg-ink shadow-[0_0_8px_var(--c-ink)]" />
+              {labels.madeWith}{" "}
+              <span lang="en" translate="no" className="font-semibold text-ink">
+                Linkiva
+              </span>
+            </a>
+          )}
+          {/* Always there on the real page (the owner can hide the branding, not this); quiet, the page stays theirs. */}
+          {mode === "public" && (
+            <a href={`${site.url}/report/${profile.username}`} rel="nofollow" className="text-xs text-ink-3 underline-offset-4 transition-colors hover:text-ink-2 hover:underline">
+              {labels.report}
+            </a>
+          )}
         </footer>
       )}
     </div>

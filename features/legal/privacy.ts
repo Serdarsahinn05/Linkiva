@@ -51,6 +51,13 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         ],
       },
       {
+        id: "bildirimler",
+        title: "Bir sayfayı bildirdiğinde",
+        body: [
+          "Bir sayfayı ya da içindeki bir bloğu bildirdiğinde seçtiğin sebebi, yazdığın açıklamayı ve bıraktıysan e-posta adresini saklarız. E-posta isteğe bağlıdır ve yalnızca sana dönüş yapmak için kullanılır. Bildirimi yalnızca inceleyen yönetim ekibi görür; sayfa sahibine senin kim olduğun söylenmez. Kötüye kullanımı önlemek için IP adresinin tek yönlü özeti kısa süreli bir hız sınırı sayacında kullanılır.",
+        ],
+      },
+      {
         id: "hesap",
         title: "Hesap sahipleri hakkında işlediğimiz veriler",
         body: [
@@ -123,6 +130,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Hesap ve sayfa verileri, istatistikler ve abone listen: hesabın silinene kadar. Hesabını silmek istediğinde sayfan hemen yayından kalkar; 15 gün içinde giriş yapıp geri yüklemezsen hepsi, yüklediğin dosyalarla birlikte kalıcı olarak silinir.",
               "Oturum kayıtları (IP adresi ve tarayıcı bilgisiyle): güvenlik için hesabın silinene kadar. Açık oturumlarını Ayarlar'dan istediğin zaman kapatabilirsin; kapattığın oturumun kaydı silinir.",
               "Eski kullanıcı adların: 30 gün boyunca yeni adresine yönlenir, sonra silinir ve ad serbest kalır.",
+              "Bildirimler (ve bıraktıysan e-postan): sonuçlandıktan 180 gün sonra silinir. Bildirilen sayfa silinirse bildirimleri de silinir.",
               "Hız sınırı sayaçları: birkaç dakikadan en geç bir güne kadar, sonra kendiliğinden silinir.",
               "E-posta doğrulama ve şifre sıfırlama bağlantıları: süresi dolunca geçersiz olur, en geç bir gün içinde silinir.",
             ],
@@ -237,6 +245,13 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         ],
       },
       {
+        id: "reports",
+        title: "When you report a page",
+        body: [
+          "When you report a page or one of its blocks, we keep the reason you chose, what you wrote and, if you left it, your email address. The email is optional and used only to get back to you. Only the admin team reviewing it sees a report; the page owner is not told who you are. To prevent abuse, a one-way hash of your IP address is used in a short-lived rate-limit counter.",
+        ],
+      },
+      {
         id: "account",
         title: "What we process about account holders",
         body: [
@@ -309,6 +324,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Account and page data, statistics and your subscriber list: until you delete your account. When you ask for that, your page goes offline at once; unless you sign in and restore it within 15 days, all of it is then permanently removed, together with the files you uploaded.",
               "Session records (with IP address and browser details): for security, until you delete your account. You can end your open sessions under Settings at any time; the record of a session you end is deleted.",
               "Past usernames: they redirect to your new address for 30 days, then they are deleted and the name becomes free.",
+              "Reports (and your email, if you left one): deleted 180 days after they are resolved. If the reported page is deleted, its reports go with it.",
               "Rate-limit counters: from a few minutes up to one day, then they are deleted automatically.",
               "Email verification and password reset links: invalid once expired, deleted within a day.",
             ],

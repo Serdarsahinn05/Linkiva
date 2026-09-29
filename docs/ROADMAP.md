@@ -461,7 +461,9 @@ Backlog #4'ün genişletilmişi. En çok güvenlik önlemi isteyen faz; ayrı te
 - [x] Test: `tests/integration/admin.test.ts` (oturumsuz/normal/2FA'sız/moderatör/silinmeyi bekleyen, yeniden doğrulama süresi-oturumu-deneme sınırı, günlük değiştirilemez), `admin-role.test.ts` (kayıtta rol gönderilemez), `ratelimit.test.ts`, `tests/e2e/phase19.spec.ts`.
 - [ ] Kullanıcılar listesi ve rol değiştirme (yalnız admin, yeniden doğrulamalı, son admin kendini düşüremez).
 - [ ] Supabase Data API: public şemadaki tablolarda RLS kapalı; Data API açıksa tablolar anon anahtarla okunabilir. Kontrol edilip kapatılacak (Data API kapatma ya da RLS açma; uygulama `postgres` rolüyle bağlanır, RLS'ten etkilenmez).
-- [ ] Kötüye kullanım bildirimi (profilde "Bildir"), bildirim kuyruğu, içerik kaldırma, hesap askıya alma (profil 404 ya da bilgilendirme sayfası), geri alma.
+- [x] Kötüye kullanım bildirimi: her yayındaki profilin altında sessiz "Bu sayfayı bildir" bağlantısı (marka gizlense de kalır) → `/report/<kullanıcıadı>` (rezerve ad `report`). Sebep listesi, isteğe bağlı açıklama ve e-posta; bot tuzağı; IP başına saatte 5, aynı sayfaya günde 2 (hash'li sayaç); yalnızca yayındaki sayfa ve o sayfanın görünür bloğu. Tablo `report` (profil silinince gider; sonuçlananlar 180 gün sonra günlük temizlikte silinir, `REPORT_KEEP_DAYS`). Gizlilik metnine "Bir sayfayı bildirdiğinde" ve saklama satırı eklendi.
+- [x] Bildirim kuyruğu `/admin/reports` (açık: en eski üstte, aynı sayfaya kaç açık bildirim olduğu; sonuçlanan), detay: bildirim, bildirilen bloğun alanları düz metin (link açılmaz), sayfanın ziyaretçi görünümü (etkisiz önizleme), aynı sayfanın diğer bildirimleri. "Yok say" (moderatör, not günlüğe; yarışta tek günlük satırı). Kenar çubuğunda açık bildirim sayısı.
+- [ ] İçerik kaldırma, hesap askıya alma ("Bu sayfaya şu an ulaşılamıyor"), geri alma, adminden anında hesap silme.
 - [ ] Denetim günlüğü: her admin işlemi kim, ne zaman, neyi, neden; silinemez.
 - [ ] Faz 14'teki `scripts/takedown.mjs` panelin eylemleriyle değiştirilir.
 

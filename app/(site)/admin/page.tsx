@@ -11,10 +11,10 @@ export default async function AdminOverviewPage() {
   const data = await getOverview();
 
   const figures = [
+    { key: "openReports", value: data.openReports },
     { key: "pages", value: data.pages },
     { key: "published", value: data.published },
     { key: "newThisWeek", value: data.newThisWeek },
-    { key: "pendingDeletions", value: data.pendingDeletions },
   ] as const;
 
   return (

@@ -357,6 +357,7 @@
   },
   "profile": {
     "madeWith": "Made with",
+    "report": "Report this page",
     "notFoundTitle": "Nobody lives here yet.",
     "claim": "Claim this address",
     "claimable": "If nobody has {username} yet, it could be yours.",
@@ -585,11 +586,40 @@
       "listInvalid": "Too many items, or one is too long."
     }
   },
+  "report": {
+    "title": "Report this page",
+    "intro": "If {address} breaks our rules, let us know. We review it and remove the content if needed.",
+    "aboutBlock": "Your report is about one block on the page.",
+    "reason": "What's wrong?",
+    "reasons": {
+      "SCAM": { "label": "Scam or phishing", "hint": "Tries to collect money, passwords or personal details." },
+      "ILLEGAL": { "label": "Illegal content", "hint": "Illegal betting, drugs, weapons or similar." },
+      "ADULT": { "label": "Explicit content without a warning", "hint": "Sexual content, or an 18+ link without the warning." },
+      "HATE": { "label": "Hate speech or harassment", "hint": "Targets a person or a group." },
+      "IMPERSONATION": { "label": "Pretends to be someone else", "hint": "Poses as a person or a brand." },
+      "COPYRIGHT": { "label": "Copyright infringement", "hint": "Your work, or the work of someone you represent, used without permission." },
+      "SPAM": { "label": "Spam", "hint": "Unwanted ads or misleading links." },
+      "OTHER": { "label": "Something else", "hint": "Describe it briefly below." }
+    },
+    "details": "Details",
+    "detailsHint": "Optional. Which link, what did you see? Up to 1000 characters.",
+    "email": "Your email",
+    "emailHint": "Optional. Only used to get back to you.",
+    "submit": "Send report",
+    "doneTitle": "We got your report",
+    "doneBody": "Thank you. We review reports and remove content that breaks the rules. If you left an email, we may write to you.",
+    "backToPage": "Back to the page",
+    "invalid": "Pick a reason. If you typed an email, it must be a valid address.",
+    "tooMany": "Too many reports in a short time. Try again a little later.",
+    "error": "The report could not be sent. The page may no longer be published; try again a little later.",
+    "privacyNote": "Your report, and your email if you left one, are kept only for this review.",
+    "privacyLink": "Privacy notice"
+  },
   "admin": {
     "title": "Admin",
     "back": "Back to my dashboard",
     "roles": { "ADMIN": "Admin", "MODERATOR": "Moderator" },
-    "nav": { "overview": "Overview" },
+    "nav": { "overview": "Overview", "reports": "Reports" },
     "twoFactorTitle": "Two-step verification first",
     "twoFactorBody": "The admin panel only works for accounts with two-step verification on. Turn it on in Settings, then come back.",
     "twoFactorAction": "Go to settings",
@@ -606,10 +636,10 @@
       "error": "Could not confirm. Try again."
     },
     "overview": {
+      "openReports": "Open reports",
       "pages": "Pages",
       "published": "Published",
       "newThisWeek": "New this week",
-      "pendingDeletions": "Waiting to be deleted",
       "recent": "Recent actions",
       "recentEmpty": "No admin actions yet."
     },
@@ -617,7 +647,43 @@
       "stepUp": "Identity confirmed",
       "stepUpFailed": "Wrong confirmation code",
       "stepUpLimited": "Confirmation attempt limit reached",
-      "roleSet": "Role changed"
+      "roleSet": "Role changed",
+      "reportDismissed": "Report dismissed"
+    },
+    "reports": {
+      "title": "Reports",
+      "open": "Open",
+      "resolved": "Resolved",
+      "emptyOpen": "No open reports.",
+      "emptyResolved": "No resolved reports yet.",
+      "onBlock": "block",
+      "openOnPage": "{count, plural, one {# open report on this page} other {# open reports on this page}}",
+      "openCount": "open reports",
+      "status": { "OPEN": "Open", "DISMISSED": "Dismissed", "ACTIONED": "Acted on" },
+      "report": "Report",
+      "noDetails": "No details given.",
+      "reporter": "Reported by",
+      "anonymous": "Anonymous",
+      "pageState": "Page",
+      "published": "Published",
+      "unpublished": "Not published",
+      "pageSince": "Created",
+      "reportedBlock": "Reported block",
+      "hidden": "hidden",
+      "decide": "Decision",
+      "otherReports": "Other reports on this page",
+      "noOtherReports": "No other reports.",
+      "pagePreview": "The page as visitors see it",
+      "pageGone": "The page no longer exists.",
+      "dismiss": "Dismiss",
+      "dismissTitle": "Dismiss the report",
+      "dismissBody": "The page is left as it is and the report closes. Choose this when nothing breaks the rules, or the same thing was already handled.",
+      "note": "Note",
+      "noteHint": "Optional. Shown only in the admin log.",
+      "dismissConfirm": "Dismiss and close",
+      "cancel": "Cancel",
+      "alreadyClosed": "This report was closed a moment ago.",
+      "error": "Could not save. Try again."
     }
   },
   "guide": {

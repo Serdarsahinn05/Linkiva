@@ -23,7 +23,7 @@ vi.mock("next/navigation", () => ({
 
 const { db } = await import("@/lib/db");
 const { requireStaff, requireStaffPage } = await import("@/lib/admin");
-const { confirmStepUp } = await import("@/features/admin/actions");
+const { confirmStepUp, dismissReport } = await import("@/features/admin/actions");
 
 const suffix = Date.now().toString(36);
 const ids = {
@@ -135,6 +135,27 @@ describe("step-up", () => {
     expect(await confirmStepUp(GOOD_CODE)).toEqual({ ok: false, error: "tooMany" });
     await expect(requireStaff("MODERATOR", { stepUp: true })).rejects.toMatchObject({ reason: "stepUp" });
     expect((await auditFor(ids.limited)).at(-1)?.action).toBe("stepUpLimited");
+  });
+});
+
+describe("dismissing a report", () => {
+  it("is for staff only, closes the report once, and is logged once", async () => {
+    const page = await db.profile.findUniqueOrThrow({ where: { userId: ids.user } });
+    const report = await db.report.create({ data: { profileId: page.id, reason: "SPAM" } });
+
+    signIn(ids.user);
+    expect(await dismissReport(report.id)).toEqual({ ok: false, error: "notFound" });
+    expect((await db.report.findUniqueOrThrow({ where: { id: report.id } })).status).toBe("OPEN");
+
+    signIn(ids.moderator);
+    expect(await dismissReport(report.id, "Kural ihlali yok")).toEqual({ ok: true, data: undefined });
+    const closed = await db.report.findUniqueOrThrow({ where: { id: report.id } });
+    expect(closed).toMatchObject({ status: "DISMISSED", resolvedBy: ids.moderator });
+    expect(await dismissReport(report.id)).toEqual({ ok: false, error: "notFound" });
+
+    const lines = await db.adminAudit.findMany({ where: { targetId: report.id } });
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ action: "reportDismissed", actorId: ids.moderator, targetLabel: `@${ids.user}`, reason: "Kural ihlali yok" });
   });
 });
 

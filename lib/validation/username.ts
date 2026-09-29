@@ -18,7 +18,7 @@ const USERNAME_RE = /^[a-z0-9](?:[a-z0-9._-]{1,28})[a-z0-9]$/;
 export const RESERVED_USERNAMES = new Set([
   // routes
   "api", "l", "e", "login", "register", "forgot-password", "reset-password", "check-email", "verify-email",
-  "onboarding", "dashboard", "settings", "privacy", "terms", "unsubscribe",
+  "onboarding", "dashboard", "settings", "privacy", "terms", "unsubscribe", "report",
   // language prefixes of the site pages (i18n/marketing.ts); two letters are below the minimum length anyway
   "en", "tr",
   // framework / metadata files

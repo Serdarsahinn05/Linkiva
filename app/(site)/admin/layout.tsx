@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buttonBase, buttonSizes, buttonVariants } from "@/components/ui/button";
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { countOpenReports } from "@/features/admin/queries";
 import { requireStaffPage } from "@/lib/admin";
 import { cn } from "@/lib/cn";
 
@@ -31,7 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <AdminShell role={staff.role} stepUpUntil={staff.steppedUpUntil?.toISOString() ?? null}>
+    <AdminShell role={staff.role} stepUpUntil={staff.steppedUpUntil?.toISOString() ?? null} openReports={await countOpenReports()}>
       {children}
     </AdminShell>
   );

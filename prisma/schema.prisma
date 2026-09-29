@@ -38,6 +38,45 @@ enum UserRole {
   ADMIN
 }
 
+/// A visitor's report about a page or one of its blocks (Faz 19, /report/<username>). Gone with the page; resolved ones
+/// are deleted after REPORT_KEEP_DAYS by the daily clean-up. The reporter's email is optional and only for a reply.
+model Report {
+  id         String       @id @default(cuid())
+  profileId  String
+  profile    Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  blockId    String?
+  block      Block?       @relation(fields: [blockId], references: [id], onDelete: SetNull)
+  reason     ReportReason
+  details    String?
+  email      String?
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  resolvedAt DateTime?
+  /// Staff user id; the audit log has the full record.
+  resolvedBy String?
+
+  @@index([status, createdAt])
+  @@index([profileId])
+  @@map("report")
+}
+
+enum ReportReason {
+  SPAM
+  SCAM
+  ILLEGAL
+  ADULT
+  HATE
+  IMPERSONATION
+  COPYRIGHT
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  DISMISSED
+  ACTIONED
+}
+
 /// A staff member confirmed their two-step code on this session (lib/admin.ts): sensitive admin actions need it
 /// within the last ten minutes. Ends with the session.
 model AdminStepUp {
@@ -195,6 +234,7 @@ model Profile {
   socials        SocialLink[]
   events         Event[]
   subscribers    Subscriber[]
+  reports        Report[]
   pastUsernames  UsernameHistory[]
   customDomain   CustomDomain?
   createdAt      DateTime     @default(now())
@@ -243,6 +283,7 @@ model Block {
   endsAt        DateTime?
   events        Event[]
   linkCheck     LinkCheck?
+  reports       Report[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

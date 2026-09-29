@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { sql } from "./db";
-import { createUser, uid } from "./helpers";
+import { createUser, uid, visitorIp } from "./helpers";
 
 test.use({ locale: "tr-TR" });
 test.describe.configure({ timeout: 90_000 });
@@ -47,4 +47,49 @@ test("the admin panel does not exist for anyone but staff with two-step verifica
   await page.keyboard.press("Escape");
   await page.reload();
   await expect(page.getByText("Hatalı doğrulama kodu").first()).toBeVisible();
+});
+
+test("a visitor reports a page from its foot, and staff dismiss it from the queue", async ({ page, browser }, info) => {
+  test.skip(info.project.name !== "desktop", "one run of the whole flow; the report page is checked at 390px below");
+  const owner = `rpt-${uid()}`;
+  await createUser(page, owner);
+
+  // A visitor (another browser, no session) finds the quiet link at the foot of the page.
+  const visitor = await browser.newContext({ locale: "tr-TR", extraHTTPHeaders: { "x-forwarded-for": visitorIp() } });
+  const v = await visitor.newPage();
+  await v.goto(`/${owner}`);
+  await v.getByRole("link", { name: "Bu sayfayı bildir" }).click();
+  await expect(v).toHaveURL(new RegExp(`/report/${owner}$`));
+  await expect(v.getByRole("heading", { name: "Bu sayfayı bildir" })).toBeVisible();
+  if (shots) await v.screenshot({ path: `${shots}/report-1440.png`, fullPage: true });
+  await v.getByRole("radio", { name: /Dolandırıcılık ya da kimlik avı/ }).check();
+  await v.getByLabel("Ayrıntı").fill("Banka şifresi istiyor.");
+  await v.getByRole("button", { name: "Bildirimi gönder" }).click();
+  await expect(v.getByRole("heading", { name: "Bildirimin bize ulaştı" })).toBeVisible();
+  if (shots) {
+    await v.setViewportSize({ width: 390, height: 844 });
+    await v.goto(`/report/${owner}`);
+    await v.screenshot({ path: `${shots}/report-390.png`, fullPage: true });
+  }
+  await visitor.close();
+
+  // Staff: the queue shows it; its page shows the report and the page as visitors see it.
+  const staff = `stf-${uid()}`;
+  await page.context().clearCookies();
+  const { email } = await createUser(page, staff);
+  await sql(`UPDATE "user" SET role = 'MODERATOR', "twoFactorEnabled" = true WHERE email = $1`, [email]);
+  await page.goto("/admin/reports");
+  const row = page.getByRole("link", { name: new RegExp(`@${owner}`) });
+  await expect(row).toBeVisible();
+  if (shots) await page.screenshot({ path: `${shots}/admin-reports-1440.png` });
+  await row.click();
+  await expect(page.getByRole("heading", { name: "Dolandırıcılık ya da kimlik avı", level: 1 })).toBeVisible();
+  await expect(page.getByText("Banka şifresi istiyor.")).toBeVisible();
+  if (shots) await page.screenshot({ path: `${shots}/admin-report-1440.png` });
+
+  await page.getByRole("button", { name: "Yok say", exact: true }).click();
+  await page.getByLabel("Not").fill("Test");
+  await page.getByRole("button", { name: "Yok say ve kapat" }).click();
+  await expect(page).toHaveURL(/\/admin\/reports$/);
+  await expect(page.getByRole("link", { name: new RegExp(`@${owner}`) })).toHaveCount(0);
 });
