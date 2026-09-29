@@ -11,7 +11,7 @@ const OWNER = "Serdar Şahin";
 export const privacy: Record<"tr" | "en", LegalDoc> = {
   tr: {
     title: "Gizlilik ve Aydınlatma Metni",
-    updated: "Son güncelleme: 28 Eylül 2026",
+    updated: "Son güncelleme: 29 Eylül 2026",
     intro: [
       `Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (KVKK) 10. maddesi kapsamındaki aydınlatma metnidir ve Avrupa Birliği Genel Veri Koruma Tüzüğü'nün (GDPR) şeffaflık ilkesi gözetilerek hazırlanmıştır. ${site.name}'nın bugün gerçekten ne yaptığını anlatır.`,
       "Kısaca: profil ziyaretçilerini izlemeyiz, onlara çerez koymayız, istatistik için IP adresi saklamayız. Verini satmayız, reklam için kullanmayız ve hiçbir yapay zekâ sağlayıcısına göndermeyiz.",
@@ -78,7 +78,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Hukuka aykırı içerik bildirimlerini incelemek ve yetkili makamların taleplerini karşılamak: hukuki yükümlülük (m.5/2-ç) ve bir hakkın tesisi, kullanılması veya korunması (m.5/2-e).",
             ],
           },
-          "Açık rızaya dayanan bir işleme yapmayız. Pazarlama e-postası göndermeyiz.",
+          "Pazarlama e-postası göndermeyiz.",
         ],
       },
       {
@@ -128,7 +128,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "E-posta doğrulama ve şifre sıfırlama bağlantıları: süresi dolunca geçersiz olur, en geç bir gün içinde silinir.",
             ],
           },
-          "Silinen veriler, altyapı sağlayıcılarının otomatik yedeklerinden de kısa bir süre sonra kendiliğinden kalkar.",
+          "Silinen veriler, altyapı sağlayıcılarının otomatik yedeklerinden de o yedeklerin saklama süresi dolunca kendiliğinden kalkar.",
         ],
       },
       {
@@ -158,7 +158,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         id: "guvenlik",
         title: "Güvenlik",
         body: [
-          "Bütün bağlantılar şifrelidir (HTTPS). Şifreler yalnızca tek yönlü özet olarak, iki adımlı doğrulama anahtarları şifreli olarak saklanır. Her değişiklikte kaydın sana ait olup olmadığı sunucuda kontrol edilir. Veritabanına yalnızca veri sorumlusu erişebilir.",
+          "Bütün bağlantılar şifrelidir (HTTPS). Şifreler yalnızca tek yönlü özet olarak, iki adımlı doğrulama anahtarları şifreli olarak saklanır. Her değişiklikte kaydın sana ait olup olmadığı sunucuda kontrol edilir. Veritabanını yalnızca veri sorumlusu yönetir.",
         ],
       },
       {
@@ -183,7 +183,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Kanuna aykırı işleme nedeniyle zarara uğradıysan zararın giderilmesini istemek.",
             ],
           },
-          `Verini Ayarlar'dan görebilir, düzeltebilir, JSON olarak indirebilir ve hesabını silebilirsin. Diğer talepler için hesabına kayıtlı e-posta adresinden ${site.email} adresine yaz. Başvurunu en geç 30 gün içinde ücretsiz yanıtlarız. Yanıtımızdan memnun kalmazsan Kişisel Verileri Koruma Kurulu'na şikâyette bulunabilirsin; Avrupa Birliği'nde yaşıyorsan kendi ülkenin veri koruma otoritesine başvurabilirsin.`,
+          `Verini Ayarlar'dan görebilir, düzeltebilir, JSON olarak indirebilir ve hesabını silebilirsin. Diğer talepler için hesabına kayıtlı e-posta adresinden ${site.email} adresine yaz. Başvurunu en geç 30 gün içinde ücretsiz yanıtlarız. Avrupa Birliği'nde yaşıyorsan kendi ülkenin veri koruma otoritesine de başvurabilirsin.`,
         ],
       },
       {
@@ -198,7 +198,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
   },
   en: {
     title: "Privacy Notice",
-    updated: "Last updated: 28 September 2026",
+    updated: "Last updated: 29 September 2026",
     intro: [
       `This is the privacy notice required by Article 10 of Turkey's Personal Data Protection Law No. 6698 (KVKK), written with the transparency principle of the EU General Data Protection Regulation (GDPR) in mind. It describes what ${site.name} actually does today.`,
       "In short: we don't track the people who visit profiles, we put no cookies on them and we don't store IP addresses for statistics. We don't sell your data, use it for ads or send it to any AI provider.",
@@ -265,7 +265,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Reviewing reports of unlawful content and answering authorities: legal obligation (Art. 5/2-ç; GDPR Art. 6(1)(c)) and establishing, exercising or defending a right (Art. 5/2-e).",
             ],
           },
-          "Nothing we process relies on your explicit consent. We don't send marketing email.",
+          "We don't send marketing email.",
         ],
       },
       {
@@ -315,7 +315,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Email verification and password reset links: invalid once expired, deleted within a day.",
             ],
           },
-          "Deleted data also drops out of our infrastructure providers' automatic backups shortly afterwards.",
+          "Deleted data also drops out of our infrastructure providers' automatic backups once those backups reach the end of their retention period.",
         ],
       },
       {
@@ -345,7 +345,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
         id: "security",
         title: "Security",
         body: [
-          "All connections are encrypted (HTTPS). Passwords are stored only as one-way hashes and two-step verification keys are stored encrypted. Every change is checked on the server against who owns the record. Only the data controller can access the database.",
+          "All connections are encrypted (HTTPS). Passwords are stored only as one-way hashes and two-step verification keys are stored encrypted. Every change is checked on the server against who owns the record. Only the data controller administers the database.",
         ],
       },
       {
@@ -370,7 +370,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "claim compensation if unlawful processing caused you damage.",
             ],
           },
-          `You can view, correct and download your data as JSON, and delete your account, under Settings. For anything else, write to ${site.email} from the address registered to your account. We answer free of charge within 30 days. If you are not satisfied with our answer you can complain to Turkey's Personal Data Protection Board; if you live in the EU, to your own country's data protection authority.`,
+          `You can view, correct and download your data as JSON, and delete your account, under Settings. For anything else, write to ${site.email} from the address registered to your account. We answer free of charge within 30 days. If you live in the EU, you can also complain to your own country's data protection authority.`,
         ],
       },
       {

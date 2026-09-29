@@ -10,7 +10,7 @@ const OWNER = "Serdar Şahin";
 export const terms: Record<"tr" | "en", LegalDoc> = {
   tr: {
     title: "Kullanım Koşulları",
-    updated: "Son güncelleme: 28 Eylül 2026",
+    updated: "Son güncelleme: 29 Eylül 2026",
     intro: [
       `Bu koşullar ${site.name}'yı (linkiva.space ve kullanıcıların bağladığı alan adları) kullanman için geçerlidir. ${site.name} bireysel bir projedir ve ${OWNER} tarafından işletilir. Hesap açarak ya da sayfanı yayınlayarak bu koşulları kabul etmiş olursun.`,
       "Kişisel verilerinin nasıl işlendiği ayrı bir belgede, Gizlilik ve Aydınlatma Metni'nde anlatılır.",
@@ -127,7 +127,7 @@ export const terms: Record<"tr" | "en", LegalDoc> = {
   },
   en: {
     title: "Terms of Use",
-    updated: "Last updated: 28 September 2026",
+    updated: "Last updated: 29 September 2026",
     intro: [
       `These terms apply to your use of ${site.name} (linkiva.space and the domains users connect to it). ${site.name} is an individual project run by ${OWNER}. By opening an account or publishing your page you accept these terms.`,
       "How your personal data is handled is described in a separate document, the Privacy Notice.",

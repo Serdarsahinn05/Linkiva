@@ -439,6 +439,11 @@ Geri bildirim (2026-09-28): "hızlı sayfada sorun yok, yavaş sayfada ekran don
 - [x] Gizlilik ve Koşullar'daki saklama/silme cümleleri güncellendi.
 - [x] Test: `tests/integration/account-deletion.test.ts` (yanlış onay, yayından kalkma, oturumlar, editör kilidi, başkası geri yükleyemez, eski yayın durumuna dönüş, 14. gün kalır / 15. gün silinir), `tests/e2e/account.spec.ts` (sil → 404 + mail → giriş → geri yükle → sayfa 200).
 
+### Yasal metin sadeleştirmesi (`duzeltme-yasal`, 2026-09-29)
+
+- [x] Gizlilik: Kurul'a şikâyet cümlesi çıkarıldı (KVKK aydınlatmasında zorunlu değil; AB'deki kullanıcıya kendi otoritesi GDPR m.13 gereği yazıyor). Kanıtlanamayan iddialar yumuşatıldı: "açık rızaya dayanan işleme yapmayız" çıktı, "veritabanına yalnızca veri sorumlusu erişir" → "yönetir", yedeklerden silinme "kısa sürede" yerine yedeklerin saklama süresine bağlandı. Tarih 29 Eylül 2026.
+- [ ] Hukukçu okuması hâlâ açık; en önemli soru yurt dışı aktarımın (m.9) dayanağı (yukarıdaki Faz 14 notu).
+
 ### Faz 18: Yeni gelen rehberi (`faz-18-rehber`)
 
 - [ ] Editörün üstünde kapatılabilir "Başlangıç" kartı (ilk link, fotoğraf, tema, adresi paylaş); adımlar mevcut veriden kendiliğinden işaretlenir. Açılışta modal tur yok (ilk 60 saniye ilkesi).
