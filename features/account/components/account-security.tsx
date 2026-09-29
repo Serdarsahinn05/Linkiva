@@ -99,7 +99,8 @@ export function AccountSecurity({ email, username, hasPassword, googleAccountId,
   async function toggleGoogle() {
     if (googleLinked) {
       const { error } = await authClient.unlinkAccount({ accountId: googleAccountId! });
-      if (error) return toast({ tone: "error", message: t("common.genericError") });
+      // Better Auth wants a sign-in from the last day before an account is unlinked.
+      if (error) return toast({ tone: "error", message: error.code === "SESSION_NOT_FRESH" ? t("account.signInAgain") : t("common.genericError") });
       router.refresh();
     } else {
       await authClient.linkSocial({ provider: "google", callbackURL: "/dashboard/settings" });

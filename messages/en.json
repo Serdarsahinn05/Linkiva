@@ -1037,6 +1037,7 @@
     "restoring": "Restoring",
     "deleting": "Deleting",
     "deleteMismatch": "The username does not match.",
+    "signInAgain": "For your security, sign out and sign in again before doing this.",
     "cancel": "Cancel",
     "showAllSessions": "Show all ({count})"
   },

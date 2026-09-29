@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AccountSecurity } from "@/features/account/components/account-security";
 import { LogoutButton } from "@/features/account/components/logout-button";
@@ -11,7 +11,6 @@ import { DomainForm } from "@/features/domains/components/domain-form";
 import { toDomainView } from "@/features/domains/view";
 import { UsernameForm } from "@/features/profile/components/username-form";
 import { getOwnProfile } from "@/features/profile/queries";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { features } from "@/lib/features";
 import { site } from "@/lib/site";
@@ -32,7 +31,13 @@ export default async function SettingsPage() {
   const [profile, accounts, sessions, domain, user] = await Promise.all([
     getOwnProfile(session.user.id),
     db.account.findMany({ where: { userId: session.user.id }, select: { providerId: true, accountId: true } }),
-    auth.api.listSessions({ headers: await headers() }),
+    // Straight from the database: Better Auth's listSessions demands a session younger than a day ("not fresh"
+    // otherwise), which broke this page for everyone who stayed signed in.
+    db.session.findMany({
+      where: { userId: session.user.id, expiresAt: { gt: new Date() } },
+      select: { token: true, userAgent: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    }),
     features.domains ? db.customDomain.findFirst({ where: { profile: { userId: session.user.id } } }) : null,
     // From the database, not the session: the session cookie cache can be up to five minutes old.
     db.user.findUnique({ where: { id: session.user.id }, select: { twoFactorEnabled: true } }),

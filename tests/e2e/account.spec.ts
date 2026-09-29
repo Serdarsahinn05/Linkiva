@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { sql } from "./db";
 import { createUser, lastMail, uid } from "./helpers";
 
 test.skip(({ isMobile }) => isMobile, "runs once on desktop");
@@ -79,4 +80,13 @@ test("email change, password change, data export and account deletion", async ({
   await page.getByRole("button", { name: "Hesabımı geri yükle" }).click();
   await expect(page.getByRole("heading", { name: "Sayfan" })).toBeVisible();
   expect((await request.get(`/${username}`)).status()).toBe(200);
+});
+
+test("settings open for a session that is days old (Better Auth 'session is not fresh')", async ({ page }) => {
+  const username = `old-${uid()}`;
+  const { email } = await createUser(page, username);
+  await sql(`UPDATE "session" SET "createdAt" = now() - interval '3 days' WHERE "userId" = (SELECT id FROM "user" WHERE email = $1)`, [email]);
+  const response = await page.goto("/dashboard/settings");
+  expect(response?.status()).toBe(200);
+  await expect(page.getByText("Bu cihaz")).toBeVisible();
 });
