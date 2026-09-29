@@ -14,6 +14,7 @@ const userId = key("user");
 afterAll(async () => {
   await db.rateLimit.deleteMany({ where: { key: { startsWith: `cleanup-` } } });
   await db.verification.deleteMany({ where: { identifier: { startsWith: `cleanup-` } } });
+  await db.rateCounter.deleteMany({ where: { key: { startsWith: `cleanup-` } } });
   await db.user.deleteMany({ where: { id: userId } });
 });
 
@@ -41,9 +42,17 @@ describe("daily clean-up", () => {
       ],
     });
 
+    await db.rateCounter.createMany({
+      data: [
+        { key: key("rc-old"), count: 5, resetAt: new Date(NOW.getTime() - HOUR) },
+        { key: key("rc-new"), count: 5, resetAt: new Date(NOW.getTime() + HOUR) },
+      ],
+    });
+
     const result = await runCleanup(NOW);
 
-    expect(result).toEqual({ rateLimits: 1, verifications: 1, usernames: 1 });
+    expect(result).toEqual({ rateLimits: 1, rateCounters: 1, verifications: 1, usernames: 1 });
+    expect((await db.rateCounter.findMany({ where: { key: { startsWith: `cleanup-rc-` } } })).map((r) => r.key)).toEqual([key("rc-new")]);
     expect((await db.rateLimit.findMany({ where: { key: { startsWith: `cleanup-rl-` } } })).map((r) => r.key)).toEqual([key("rl-new")]);
     expect((await db.verification.findMany({ where: { identifier: { startsWith: `cleanup-v-` } } })).map((v) => v.identifier)).toEqual([key("v-new")]);
     expect((await db.usernameHistory.findMany({ where: { profileId: profile.id } })).map((u) => u.username)).toEqual([key("kept")]);

@@ -42,7 +42,7 @@ Başarı ölçütü şudur: yeni bir kullanıcı kayıttan sonra 60 saniye için
 
 ## Capabilities and Constraints
 
-- Stack: Next.js (App Router) + TypeScript + Tailwind CSS v4 + Prisma + PostgreSQL (Supabase), Vercel'de yayında. E-posta: Resend. Rate limit: Upstash Redis. Dosya: Vercel Blob. Mevcut kod tabanı bunu belirler.
+- Stack: Next.js (App Router) + TypeScript + Tailwind CSS v4 + Prisma + PostgreSQL (Supabase), Vercel'de yayında. E-posta: Resend. Rate limit: Postgres (Supabase). Dosya: Vercel Blob. Mevcut kod tabanı bunu belirler.
 - Kimlik doğrulama: e-posta + şifre (e-posta doğrulamalı) ve Google OAuth.
 - Arayüz dili: Türkçe (varsayılan) ve İngilizce (i18n).
 - Yeniden kurulum temiz bir veritabanıyla başlar. Mevcut kullanıcı verisi taşınmaz.

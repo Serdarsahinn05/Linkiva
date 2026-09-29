@@ -28,7 +28,7 @@
 | Doğrulama | **zod 4** (onaylandı) | |
 | i18n | **next-intl 4** (onaylandı) | TR varsayılan, EN; URL öneki yok (bkz. §8) |
 | E-posta | Resend | Şablonlar `lib/mail/` altında, TR/EN |
-| Rate limit | Upstash Redis + @upstash/ratelimit | Env yoksa lokal ortamda no-op (çökmez) |
+| Rate limit | Postgres `rate_counter` (`lib/ratelimit.ts`) + Better Auth `rate_limit` | Anahtar hash'li, sabit pencere, tek atomik upsert; DB hatasında istek geçer (çökmez) |
 | Dosya | Vercel Blob (client upload + token) | |
 | Sürükle-bırak | @dnd-kit (mevcut) | |
 | Grafik | **recharts** (zaten kurulu) | chart.js kaldırılır |
@@ -305,7 +305,6 @@ BETTER_AUTH_SECRET             # auth adresi NEXT_PUBLIC_APP_URL
 NEXT_PUBLIC_APP_URL            # https://linkiva.space, lokal: http://localhost:3000
 GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 RESEND_API_KEY, MAIL_FROM      # "Linkiva <hello@linkiva.space>"
-UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN   # opsiyonel lokal
 BLOB_READ_WRITE_TOKEN
 TRACKING_SALT_SECRET
 CRON_SECRET                    # Faz 9: /api/cron/daily için Bearer (yoksa uç 404); ayrıca özet maili çıkış token'ının HMAC anahtarı

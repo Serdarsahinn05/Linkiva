@@ -21,7 +21,7 @@ Bu dosya, bu depoda çalışan her kodlama ajanı (Claude Code, Codex, Cursor, C
 
 ## Stack
 
-Next.js 16.3 (App Router, React 19.3) · TypeScript strict · Tailwind CSS v4 · Prisma 7 + PostgreSQL (Supabase) · Better Auth · zod · next-intl · Resend · Upstash Redis · Vercel Blob · @dnd-kit · recharts · lucide-react (+ react-icons yalnızca marka ikonları) · Vitest + Playwright · Vercel.
+Next.js 16.3 (App Router, React 19.3) · TypeScript strict · Tailwind CSS v4 · Prisma 7 + PostgreSQL (Supabase) · Better Auth · zod · next-intl · Resend · Vercel Blob · @dnd-kit · recharts · lucide-react (+ react-icons yalnızca marka ikonları) · Vitest + Playwright · Vercel.
 
 ## Komutlar
 

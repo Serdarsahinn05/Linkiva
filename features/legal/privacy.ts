@@ -32,7 +32,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
           "IP adresini istatistik için saklamayız. Tekil ziyaretçileri sayabilmek için IP adresi, tarayıcı bilgisi ve profil kimliği her gün değişen gizli bir anahtarla tek yönlü olarak özetlenir. Bu özet ertesi gün değişir; aynı kişiyi günler ya da profiller arasında eşleştirmek mümkün değildir.",
           "Ziyaretçilere çerez ya da benzeri bir tanımlayıcı koymayız. Botlar, bağlantı önizlemeleri (WhatsApp, Telegram, X vb.), tarayıcı ön yüklemeleri ve profil sahibinin kendi ziyaretleri sayılmaz.",
           "Profil sahibi yalnızca toplu sayıları görür (kaç görüntülenme, hangi ülkelerden, hangi cihazlardan). Tek bir ziyaretçinin hareketleri gösterilmez ve kimseyi tanımlamak için kullanılmaz.",
-          "Kötüye kullanımı önlemek için IP adresin birkaç dakikalık bir hız sınırı sayacında anahtar olarak kullanılır ve süresi dolunca silinir.",
+          "Kötüye kullanımı önlemek için IP adresinin tek yönlü özeti birkaç dakikalık bir hız sınırı sayacında anahtar olarak kullanılır; sayaç süresi dolunca silinir. IP adresinin kendisi bu sayaçta saklanmaz.",
         ],
       },
       {
@@ -106,7 +106,6 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Vercel: uygulamanın çalıştığı altyapı ve yüklediğin dosyalar (Vercel Blob). Uygulama sunucuları Frankfurt'ta (Almanya) çalışır. Özel alan adı bağlarsan alan adın Vercel'e iletilir.",
               "Supabase: veritabanı, Frankfurt (Almanya) veri merkezinde.",
               "Resend: e-postaların gönderimi.",
-              "Upstash: kötüye kullanımı önlemek için birkaç dakikalık hız sınırı sayaçları.",
               `Google: yalnızca Google ile giriş yaparsan kimlik doğrulama. Ayrıca ${site.email} adresine yazdığın e-postalar ImprovMX üzerinden yönlendirilir ve Google'ın e-posta hizmetinde (Gmail) saklanır.`,
               "GitHub: yalnızca GitHub'dan içe aktarma yaparsan, verdiğin kullanıcı adı GitHub'a sorulur.",
               "Yetkili kamu kurum ve kuruluşları: yalnızca kanunen zorunlu olduğunda.",
@@ -219,7 +218,7 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
           "We don't store IP addresses for statistics. To count unique visitors, the IP address, browser details and profile id are hashed one-way with a secret key that changes every day. The hash changes the next day; the same person cannot be linked across days or across profiles.",
           "We put no cookies or similar identifiers on visitors. Bots, link previews (WhatsApp, Telegram, X…), browser prefetches and the profile owner's own visits are not counted.",
           "The profile owner only sees totals (how many views, from which countries, on which devices). A single visitor's activity is never shown and is not used to identify anyone.",
-          "To prevent abuse, your IP address is used as the key of a rate-limit counter that lasts a few minutes and is deleted when it expires.",
+          "To prevent abuse, a one-way hash of your IP address is used as the key of a rate-limit counter that lasts a few minutes; the counter is deleted when it expires. The IP address itself is not stored in it.",
         ],
       },
       {
@@ -293,7 +292,6 @@ export const privacy: Record<"tr" | "en", LegalDoc> = {
               "Vercel: the infrastructure the app runs on and the files you upload (Vercel Blob). App servers run in Frankfurt, Germany. If you connect a custom domain, the domain name is passed to Vercel.",
               "Supabase: the database, in its Frankfurt (Germany) data centre.",
               "Resend: sending email.",
-              "Upstash: rate-limit counters that last a few minutes, to prevent abuse.",
               `Google: sign-in, only if you use Google to sign in. Email you send to ${site.email} is forwarded through ImprovMX and stored in Google's email service (Gmail).`,
               "GitHub: only if you import from GitHub, the username you give is looked up on GitHub.",
               "Public authorities: only when the law requires it.",

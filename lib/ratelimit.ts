@@ -1,40 +1,28 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import { env } from "@/lib/env";
-
-const redis = env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN ? new Redis({ url: env.UPSTASH_REDIS_REST_URL, token: env.UPSTASH_REDIS_REST_TOKEN }) : null;
-const limiters = new Map<string, Ratelimit>();
-
-// Single-process fallback when Upstash is not configured (local development). Not shared across instances.
-const memory = new Map<string, { count: number; reset: number }>();
+import { createHash } from "node:crypto";
+import { db } from "@/lib/db";
 
 /**
- * Sliding-window limit for public endpoints (subscribe, tracking beacon). Auth has its own limits.
- * Returns true when the request may proceed.
+ * Fixed-window limit for public endpoints (subscribe, tracking beacon) and costly actions (import, domains, link card).
+ * One atomic upsert per call in the shared database, so every serverless instance sees the same count. Sign-in and
+ * sign-up have their own limits in Better Auth. Returns true when the request may proceed.
  */
 export async function allow(name: string, key: string, max: number, windowSeconds: number): Promise<boolean> {
-  if (redis) {
-    const id = `${name}:${max}:${windowSeconds}`;
-    let limiter = limiters.get(id);
-    if (!limiter) {
-      limiter = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(max, `${windowSeconds} s`), prefix: `linkiva:${name}` });
-      limiters.set(id, limiter);
-    }
-    try {
-      return (await limiter.limit(key)).success;
-    } catch (error) {
-      // Never let the limiter take the feature down: fall back to the in-process window.
-      console.error("rate limiter unavailable, using memory fallback", error);
-    }
-  }
-  const now = Date.now();
-  const slot = memory.get(`${name}:${key}`);
-  if (!slot || slot.reset < now) {
-    memory.set(`${name}:${key}`, { count: 1, reset: now + windowSeconds * 1000 });
+  // Hashed: the table never holds an IP address, only a counter per (limit, caller).
+  const id = createHash("sha256").update(`${name}:${key}`).digest("hex");
+  try {
+    const [row] = await db.$queryRaw<{ count: number }[]>`
+      INSERT INTO "rate_counter" ("key", "count", "resetAt")
+      VALUES (${id}, 1, now() + make_interval(secs => ${windowSeconds}))
+      ON CONFLICT ("key") DO UPDATE SET
+        "count" = CASE WHEN "rate_counter"."resetAt" <= now() THEN 1 ELSE "rate_counter"."count" + 1 END,
+        "resetAt" = CASE WHEN "rate_counter"."resetAt" <= now() THEN now() + make_interval(secs => ${windowSeconds}) ELSE "rate_counter"."resetAt" END
+      RETURNING "count"`;
+    return (row?.count ?? 1) <= max;
+  } catch (error) {
+    // Never let the limiter take the feature down: a database hiccup lets this one request through.
+    console.error("rate limiter unavailable", error);
     return true;
   }
-  slot.count += 1;
-  return slot.count <= max;
 }
 
 /** Client IP from the proxy headers (first x-forwarded-for hop), for rate-limit keys only; never stored. */

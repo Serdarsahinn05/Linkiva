@@ -12,8 +12,6 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: optional,
   RESEND_API_KEY: optional,
   MAIL_FROM: z.string().default("Linkiva <hello@linkiva.space>"),
-  UPSTASH_REDIS_REST_URL: optional,
-  UPSTASH_REDIS_REST_TOKEN: optional,
   BLOB_READ_WRITE_TOKEN: optional,
   TRACKING_SALT_SECRET: z.string().min(16).default("dev-only-tracking-salt-secret"),
   /** Vercel Cron sends it as a Bearer token to /api/cron/daily. Without it, scheduled jobs are off. */

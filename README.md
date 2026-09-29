@@ -50,7 +50,7 @@ Rakiplerin premium katmanda sattığı özellikler (detaylı analitik, özel tem
 | Kimlik | Better Auth |
 | Doğrulama | zod |
 | Dil | next-intl (TR, EN) |
-| Servisler | Resend (mail), Vercel Blob (görseller), Upstash Redis (hız sınırı, isteğe bağlı) |
+| Servisler | Resend (mail), Vercel Blob (görseller) |
 | Arayüz | @dnd-kit, recharts, lucide-react |
 | Test | Vitest (unit + integration), Playwright (e2e) |
 | Yayın | Vercel |
@@ -84,7 +84,7 @@ npx prisma migrate deploy     # tabloları kur
 npm run dev                   # http://localhost:3000
 ```
 
-Google, Resend, Blob ve Upstash anahtarları geliştirmede zorunlu değil. Resend anahtarı yoksa mailler gönderilmez, `http://localhost:3000/api/dev/mail` adresinde önizlenir.
+Google, Resend ve Blob anahtarları geliştirmede zorunlu değil. Resend anahtarı yoksa mailler gönderilmez, `http://localhost:3000/api/dev/mail` adresinde önizlenir.
 
 ## Komutlar
 
