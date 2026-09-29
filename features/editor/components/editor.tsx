@@ -38,13 +38,14 @@ import {
 } from "../actions";
 import { detectBlock, type Detected } from "../detect-block";
 import type { TemplateKey } from "../templates";
-import type { EditorBlock, EditorProfile, EditorSocials, LinkIssue } from "../types";
+import type { EditorBlock, EditorProfile, EditorSocials, GuideData, LinkIssue } from "../types";
 import { AvatarUploader } from "./avatar-uploader";
 import { PageHeader, Section } from "@/features/dashboard/components/page";
 import { useRegisterPreview } from "@/features/dashboard/components/preview-context";
 import { BLOCK_ICON, BlockRow } from "./block-row";
 import { PasteField } from "./paste-field";
 import { SocialsEditor } from "./socials-editor";
+import { GUIDE_TARGET, StartGuide, type GuideStep } from "./start-guide";
 import { StartOptions } from "./start-options";
 import { SaveIndicator } from "./save-indicator";
 import { useAutosave } from "./use-autosave";
@@ -55,11 +56,12 @@ type Props = {
   socials: EditorSocials;
   sparklines: Record<string, number[]>;
   linkIssues: Record<string, LinkIssue>;
+  guide: GuideData;
   userId: string;
   uploadsEnabled: boolean;
 };
 
-export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, sparklines, linkIssues, userId, uploadsEnabled }: Props) {
+export function Editor({ profile: initialProfile, blocks: initialBlocks, socials: initialSocials, sparklines, linkIssues, guide, userId, uploadsEnabled }: Props) {
   const t = useTranslations();
   const toast = useToast();
   const { state: saveState, schedule } = useAutosave();
@@ -354,6 +356,16 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
     socials: Object.entries(socials).map(([platform, handle]) => ({ platform: platform as SocialPlatform, handle: handle ?? "" })),
   };
   const preview = <ProfileView profile={previewProfile} mode="preview" labels={profileLabels(t)} />;
+
+  // Getting started: ticked from the live editor state, so a step turns done the moment it is done.
+  const guideSteps: GuideStep[] = uploadsEnabled ? ["link", "photo", "theme", "share"] : ["link", "theme", "share"];
+  const guideDone: Record<GuideStep, boolean> = {
+    link: blocks.some((b) => b.type === "LINK" && Boolean(b.data.url?.trim())),
+    photo: Boolean(profile.avatarUrl),
+    // The default look (Cam, nothing customised) does not count as a choice.
+    theme: profile.theme !== "cam" || (typeof profile.appearance === "object" && profile.appearance !== null && Object.keys(profile.appearance).length > 0),
+    share: guide.visited,
+  };
   // The mobile tab bar's "Preview" shows this live (unsaved) preview while the editor is open.
   useRegisterPreview(preview);
 
@@ -364,9 +376,13 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
           <SaveIndicator state={saveState} />
         </PageHeader>
 
+        {guide.open && <StartGuide done={guideDone} steps={guideSteps} shareUrl={guide.shareUrl} />}
+
         {/* Profile header */}
         <Section title={t("editor.profile")}>
-          <AvatarUploader userId={userId} url={profile.avatarUrl} enabled={uploadsEnabled} onChange={(avatarUrl) => setProfile((p) => ({ ...p, avatarUrl }))} />
+          <div id={GUIDE_TARGET.photo} className="scroll-mt-6">
+            <AvatarUploader userId={userId} url={profile.avatarUrl} enabled={uploadsEnabled} onChange={(avatarUrl) => setProfile((p) => ({ ...p, avatarUrl }))} />
+          </div>
           <Field label={t("editor.displayName")}>
             {({ id }) => <Input id={id} value={profile.displayName} maxLength={60} onChange={(e) => changeBasics({ displayName: e.target.value })} />}
           </Field>
@@ -423,7 +439,7 @@ export function Editor({ profile: initialProfile, blocks: initialBlocks, socials
             })}
           </ScrollRow>
 
-          <PasteField onDetected={addDetected} busy={pasting} />
+          <PasteField id={GUIDE_TARGET.link} onDetected={addDetected} busy={pasting} />
 
           {blocks.length === 0 ? (
             <StartOptions onImport={() => setImportUrl("")} onTemplate={startFromTemplate} busy={templating} />

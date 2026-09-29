@@ -26,6 +26,9 @@ export type EditorProfile = {
 
 export type EditorSocials = Partial<Record<SocialPlatform, string>>;
 
+/** The editor's "Getting started" card (Faz 18): open until closed; visited once a real visitor has seen the page. */
+export type GuideData = { open: boolean; visited: boolean; shareUrl: string };
+
 /** A block destination that failed the daily link check (features/link-check); shown while the block still points there. */
 export type LinkIssue = { url: string; checkedAt: string };
 

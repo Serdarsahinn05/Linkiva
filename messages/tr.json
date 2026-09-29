@@ -585,6 +585,24 @@
       "listInvalid": "Çok fazla ya da çok uzun öğe var."
     }
   },
+  "guide": {
+    "title": "İlk adımlar",
+    "body": "Sayfanı paylaşmaya hazırlayan adımlar. Yaptıkça kendiliğinden işaretlenir.",
+    "doneTitle": "Sayfan hazır",
+    "doneBody": "Hepsi tamam. Bu kartı kapatabilirsin.",
+    "close": "İlk adımlar kartını kapat",
+    "progress": "{total} adımdan {done} tanesi tamam",
+    "stepDone": "tamam",
+    "link": { "label": "İlk linkini ekle", "action": "Link yapıştır" },
+    "photo": { "label": "Profil fotoğrafı koy", "action": "Fotoğraf seç" },
+    "theme": { "label": "Görünümünü seç", "action": "Temalara bak" },
+    "share": { "label": "Adresini paylaş", "hint": "İlk ziyaretçin geldiğinde işaretlenir.", "action": "Adresi kopyala", "copied": "Kopyalandı" }
+  },
+  "tips": {
+    "preview": "Sayfanın ziyaretçiye nasıl göründüğüne buradan bak.",
+    "palette": "{keys} ile her şeye klavyeden ulaş.",
+    "dismiss": "Anladım"
+  },
   "templates": {
     "title": "Ya da bir şablonla başla",
     "hint": "Bloklar eklenir, adreslerini sen doldurursun. Adresi olmayan link sayfanda görünmez.",

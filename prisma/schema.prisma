@@ -137,6 +137,8 @@ model Profile {
   weeklyDigest   Boolean      @default(true)
   /// Last weekly summary claimed for this profile; guards against double sends.
   digestSentAt   DateTime?
+  /// The editor's "Getting started" card was closed (Faz 18); it stays closed on every device.
+  guideDismissedAt DateTime?
   blocks         Block[]
   socials        SocialLink[]
   events         Event[]
