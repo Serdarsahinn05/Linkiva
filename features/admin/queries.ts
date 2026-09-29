@@ -54,6 +54,52 @@ export async function listReports(view: "open" | "resolved"): Promise<ReportList
   }));
 }
 
+/**
+ * Admin only (the page checks). Without a query: the newest accounts. A query with "@" matches one email exactly
+ * (no partial email search: the list is not a way to browse addresses); otherwise usernames that contain it.
+ */
+export async function findUsers(q: string) {
+  const query = q.trim().toLowerCase();
+  const where = !query ? {} : query.includes("@") ? { email: query } : { profile: { username: { contains: query } } };
+  const users = await db.user.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    take: 50,
+    select: { id: true, role: true, createdAt: true, profile: { select: { username: true, suspendedAt: true } }, deletion: { select: { userId: true } } },
+  });
+  return users.map((u) => ({
+    id: u.id,
+    role: u.role,
+    createdAt: u.createdAt.toISOString(),
+    username: u.profile?.username ?? null,
+    suspended: Boolean(u.profile?.suspendedAt),
+    leaving: u.deletion !== null,
+  }));
+}
+
+/** One account as an admin needs it for a role change or an erasure. The email is shown here, to admins only. */
+export async function getUser(id: string) {
+  const u = await db.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      twoFactorEnabled: true,
+      createdAt: true,
+      profile: { select: { username: true, isPublished: true, suspendedAt: true } },
+      deletion: { select: { purgeAt: true } },
+    },
+  });
+  if (!u) return null;
+  return {
+    ...u,
+    createdAt: u.createdAt.toISOString(),
+    profile: u.profile && { username: u.profile.username, isPublished: u.profile.isPublished, suspended: u.profile.suspendedAt !== null },
+    purgeAt: u.deletion?.purgeAt.toISOString() ?? null,
+  };
+}
+
 /** One report with what staff need to judge it: the page as visitors see it, the block, the page's other reports. */
 export async function getReport(id: string) {
   const report = await db.report.findUnique({

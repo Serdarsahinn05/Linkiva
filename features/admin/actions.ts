@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { sendMailQuietly } from "@/lib/mail/send";
 import { allow } from "@/lib/ratelimit";
 import { site } from "@/lib/site";
+import { eraseAccount } from "@/features/account/deletion";
 import { removeBlockContent, removeProfileImages } from "@/features/moderation/takedown";
 import { profileTag } from "@/features/profile/public";
 
@@ -116,6 +117,60 @@ export async function unsuspendPage(profileId: string, reason: string): Promise<
     return { ok: true, data: undefined };
   } catch (error) {
     return denied(error, "unsuspendPage");
+  }
+}
+
+const label = (profile: { username: string } | null, id: string) => (profile ? `@${profile.username}` : id);
+
+/**
+ * Admin only: gives a user a staff role or takes it away. Never leaves the panel without an admin (the last admin
+ * cannot step down or be demoted). A demoted member's step-ups end with the change.
+ */
+export async function setRole(userId: string, role: string, reason: string): Promise<AdminResult | { ok: false; error: "lastAdmin" }> {
+  try {
+    const staff = await requireStaff("ADMIN", { stepUp: true });
+    const parsed = z.object({ userId: idSchema, role: z.enum(["USER", "MODERATOR", "ADMIN"]), reason: z.string().trim().min(3).max(500) }).safeParse({ userId, role, reason });
+    if (!parsed.success) return fail("invalid");
+    const target = await db.user.findUnique({ where: { id: parsed.data.userId }, select: { role: true, profile: { select: { username: true } } } });
+    if (!target) return fail("notFound");
+    if (target.role === parsed.data.role) return { ok: true, data: undefined };
+    const changed = await db.$transaction(async (tx) => {
+      if (target.role === "ADMIN" && (await tx.user.count({ where: { role: "ADMIN" } })) <= 1) return false;
+      await tx.user.update({ where: { id: parsed.data.userId }, data: { role: parsed.data.role } });
+      await tx.adminStepUp.deleteMany({ where: { session: { userId: parsed.data.userId } } });
+      await audit(staff, { action: "roleSet", target: { type: "user", id: parsed.data.userId, label: label(target.profile, parsed.data.userId) }, reason: parsed.data.reason, meta: { from: target.role, to: parsed.data.role } }, tx);
+      return true;
+    });
+    return changed ? { ok: true, data: undefined } : { ok: false, error: "lastAdmin" };
+  } catch (error) {
+    return denied(error, "setRole");
+  }
+}
+
+/**
+ * Admin only: erases an account now, without the 15-day wait, when its owner asked for it from the account's own
+ * address. The admin types the username to confirm. Not for oneself (Settings does that) and not for another admin
+ * (take the role away first). The audit line keeps the username, never the email.
+ */
+export async function eraseAccountNow(userId: string, confirmation: string, reason: string): Promise<AdminResult | { ok: false; error: "confirm" | "protected" }> {
+  try {
+    const staff = await requireStaff("ADMIN", { stepUp: true });
+    const parsed = z.object({ userId: idSchema, reason: z.string().trim().min(3).max(500) }).safeParse({ userId, reason });
+    if (!parsed.success || typeof confirmation !== "string") return fail("invalid");
+    const target = await db.user.findUnique({ where: { id: parsed.data.userId }, select: { role: true, profile: { select: { username: true } } } });
+    if (!target) return fail("notFound");
+    if (parsed.data.userId === staff.userId || target.role === "ADMIN") return { ok: false, error: "protected" };
+    const name = target.profile?.username ?? parsed.data.userId;
+    if (confirmation.trim().toLowerCase() !== name.toLowerCase()) return { ok: false, error: "confirm" };
+
+    const erased = await eraseAccount(parsed.data.userId);
+    if (!erased) return fail("notFound");
+    await audit(staff, { action: "accountErased", target: { type: "user", id: parsed.data.userId, label: label(target.profile, parsed.data.userId) }, reason: parsed.data.reason });
+    if (target.profile) updateTag(profileTag(target.profile.username));
+    await sendMailQuietly({ to: erased.mailTo, kind: "accountErased", locale: erased.locale });
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return denied(error, "eraseAccountNow");
   }
 }
 

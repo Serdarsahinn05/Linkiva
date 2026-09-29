@@ -51,40 +51,44 @@ export function pendingDeletion(userId: string) {
 }
 
 /**
- * Daily: erases the accounts whose waiting period is over. Uploaded files and the custom domain go first (v1 left
- * files behind), then the user row, which cascades to sessions, accounts, profile, blocks, events and subscribers.
- * The row is deleted only while the deletion is still due, so a restore that lands mid-run keeps the account.
+ * Erases one account for good: uploaded files and the custom domain first (v1 left files behind), then the user row,
+ * which cascades to sessions, accounts, profile, blocks, events, subscribers and reports. `dueBy` (the daily run)
+ * deletes the row only while its deletion is still due, so a restore that lands mid-run keeps the account.
+ * Returns false when nothing was deleted. The caller sends the mail it needs (`mailTo`).
  */
-export async function purgeDueAccounts(now = new Date()) {
-  const due = await db.accountDeletion.findMany({
-    where: { purgeAt: { lte: now } },
-    select: { userId: true, user: { select: { email: true, profile: { select: { locale: true, customDomain: { select: { hostname: true } } } } } } },
-    orderBy: { purgeAt: "asc" },
-    take: PURGE_BATCH,
-  });
-  let purged = 0;
-  for (const { userId, user } of due) {
-    try {
-      if (env.BLOB_READ_WRITE_TOKEN) {
-        let cursor: string | undefined;
-        do {
-          const page = await list({ prefix: userUploadPrefix(userId), cursor, token: env.BLOB_READ_WRITE_TOKEN });
-          if (page.blobs.length) await del(page.blobs.map((b) => b.url), { token: env.BLOB_READ_WRITE_TOKEN });
-          cursor = page.hasMore ? page.cursor : undefined;
-        } while (cursor);
-      }
-      // If Vercel cannot be reached the account still goes: without its row the proxy answers 404 for that name, and
-      // the orphan is logged for manual removal.
-      const hostname = user.profile?.customDomain?.hostname;
-      if (hostname && features.domains) await removeDomain(hostname).catch((error) => console.error("custom domain removal failed", hostname, error));
+export async function eraseAccount(userId: string, { dueBy }: { dueBy?: Date } = {}): Promise<{ mailTo: string; locale: "tr" | "en" } | null> {
+  const user = await db.user.findUnique({ where: { id: userId }, select: { email: true, profile: { select: { locale: true, customDomain: { select: { hostname: true } } } } } });
+  if (!user) return null;
+  if (env.BLOB_READ_WRITE_TOKEN) {
+    let cursor: string | undefined;
+    do {
+      const page = await list({ prefix: userUploadPrefix(userId), cursor, token: env.BLOB_READ_WRITE_TOKEN });
+      if (page.blobs.length) await del(page.blobs.map((b) => b.url), { token: env.BLOB_READ_WRITE_TOKEN });
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor);
+  }
+  // If Vercel cannot be reached the account still goes: without its row the proxy answers 404 for that name, and
+  // the orphan is logged for manual removal.
+  const hostname = user.profile?.customDomain?.hostname;
+  if (hostname && features.domains) await removeDomain(hostname).catch((error) => console.error("custom domain removal failed", hostname, error));
 
-      const [, gone] = await db.$transaction([
-        db.verification.deleteMany({ where: { identifier: user.email } }),
-        db.user.deleteMany({ where: { id: userId, deletion: { is: { purgeAt: { lte: now } } } } }),
-      ]);
-      if (gone.count === 0) continue;
+  const [, gone] = await db.$transaction([
+    db.verification.deleteMany({ where: { identifier: user.email } }),
+    db.user.deleteMany({ where: dueBy ? { id: userId, deletion: { is: { purgeAt: { lte: dueBy } } } } : { id: userId } }),
+  ]);
+  return gone.count ? { mailTo: user.email, locale: user.profile?.locale === "en" ? "en" : "tr" } : null;
+}
+
+/** Daily: erases the accounts whose waiting period is over. */
+export async function purgeDueAccounts(now = new Date()) {
+  const due = await db.accountDeletion.findMany({ where: { purgeAt: { lte: now } }, select: { userId: true }, orderBy: { purgeAt: "asc" }, take: PURGE_BATCH });
+  let purged = 0;
+  for (const { userId } of due) {
+    try {
+      const erased = await eraseAccount(userId, { dueBy: now });
+      if (!erased) continue;
       purged += 1;
-      await sendMailQuietly({ to: user.email, kind: "accountDeleted", locale: user.profile?.locale === "en" ? "en" : "tr" });
+      await sendMailQuietly({ to: erased.mailTo, kind: "accountDeleted", locale: erased.locale });
     } catch (error) {
       console.error("account purge failed", userId, error);
     }

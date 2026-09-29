@@ -24,7 +24,7 @@ vi.mock("next/navigation", () => ({
 
 const { db } = await import("@/lib/db");
 const { requireStaff, requireStaffPage } = await import("@/lib/admin");
-const { actOnReport, confirmStepUp, dismissReport, unsuspendPage } = await import("@/features/admin/actions");
+const { actOnReport, confirmStepUp, dismissReport, eraseAccountNow, setRole, unsuspendPage } = await import("@/features/admin/actions");
 
 const suffix = Date.now().toString(36);
 const ids = {
@@ -212,6 +212,53 @@ describe("acting on a report", () => {
     expect(await actOnReport({ reportId: report.id, action: "removeBlock", reason: "Kimlik avı linki" })).toEqual({ ok: true, data: undefined });
     expect(await db.block.findUnique({ where: { id: bad.id } })).toBeNull();
     expect(await db.block.findUnique({ where: { id: good.id } })).not.toBeNull();
+  });
+});
+
+describe("roles and immediate erasure (admins only)", () => {
+  it("are refused to moderators, and to an admin without step-up", async () => {
+    signIn(ids.moderator);
+    await confirmStepUp(GOOD_CODE);
+    expect(await setRole(ids.user, "ADMIN", "Kendimi yükseltiyorum")).toEqual({ ok: false, error: "notFound" });
+    expect(await eraseAccountNow(ids.user, ids.user, "Silme")).toEqual({ ok: false, error: "notFound" });
+    expect((await db.user.findUniqueOrThrow({ where: { id: ids.user } })).role).toBe("USER");
+
+    signIn(ids.admin);
+    await db.adminStepUp.deleteMany({ where: { sessionId: session(ids.admin) } });
+    expect(await setRole(ids.user, "MODERATOR", "Ekip")).toEqual({ ok: false, error: "stepUp" });
+  });
+
+  it("an admin gives and takes a role, logged with from/to", async () => {
+    signIn(ids.admin);
+    await confirmStepUp(GOOD_CODE);
+    expect(await setRole(ids.user, "GOD", "Olmaz")).toEqual({ ok: false, error: "invalid" });
+    expect(await setRole(ids.user, "MODERATOR", "Ekibe katıldı")).toEqual({ ok: true, data: undefined });
+    expect((await db.user.findUniqueOrThrow({ where: { id: ids.user } })).role).toBe("MODERATOR");
+    expect(await setRole(ids.user, "USER", "Ekipten ayrıldı")).toEqual({ ok: true, data: undefined });
+    const lines = await db.adminAudit.findMany({ where: { action: "roleSet", targetId: ids.user }, orderBy: { id: "asc" } });
+    expect(lines.map((l) => l.meta)).toEqual([
+      { from: "USER", to: "MODERATOR" },
+      { from: "MODERATOR", to: "USER" },
+    ]);
+  });
+
+  it("erases an account at once only with the exact name, never oneself or another admin", async () => {
+    const doomed = `adm-x-${suffix}`;
+    await db.user.create({ data: { id: doomed, name: doomed, email: `${doomed}@example.com`, profile: { create: { username: doomed } } } });
+    signIn(ids.admin);
+    await confirmStepUp(GOOD_CODE);
+
+    expect(await eraseAccountNow(doomed, "someone-else", "Sahibi istedi")).toEqual({ ok: false, error: "confirm" });
+    expect(await eraseAccountNow(ids.admin, ids.admin, "Kendim")).toEqual({ ok: false, error: "protected" });
+    expect(await eraseAccountNow(ids.noTwoFactor, ids.noTwoFactor, "Başka yönetici")).toEqual({ ok: false, error: "protected" });
+    expect(await db.user.findUnique({ where: { id: doomed } })).not.toBeNull();
+
+    expect(await eraseAccountNow(doomed, doomed.toUpperCase(), "Sahibi kayıtlı adresinden istedi")).toEqual({ ok: true, data: undefined });
+    expect(await db.user.findUnique({ where: { id: doomed } })).toBeNull();
+    expect(await db.profile.findUnique({ where: { username: doomed } })).toBeNull();
+    const [line] = await db.adminAudit.findMany({ where: { action: "accountErased", targetId: doomed } });
+    expect(line).toMatchObject({ actorId: ids.admin, targetLabel: `@${doomed}`, reason: "Sahibi kayıtlı adresinden istedi" });
+    expect([line!.actorLabel, line!.targetLabel, line!.reason, JSON.stringify(line!.meta)].join(" ")).not.toContain("@example.com");
   });
 });
 

@@ -38,6 +38,15 @@ test("the admin panel does not exist for anyone but staff with two-step verifica
     if (shots) await page.screenshot({ path: `${shots}/admin-390.png` });
   }
 
+  // An admin finds accounts by name; the page shows the email, to admins only.
+  if (info.project.name === "desktop") {
+    await page.goto(`/admin/users?q=${username}`);
+    await page.getByRole("link", { name: new RegExp(`@${username}`) }).click();
+    await expect(page.getByText(email)).toBeVisible();
+    if (shots) await page.screenshot({ path: `${shots}/admin-user-1440.png` });
+    await page.goto("/admin");
+  }
+
   // A wrong code is refused and logged.
   await page.getByRole("button", { name: "Hassas işlemleri aç" }).filter({ visible: true }).click();
   await page.getByLabel("6 haneli kod").fill("000000");
@@ -94,6 +103,8 @@ test("a visitor reports a page from its foot, and staff dismiss it from the queu
   await page.context().clearCookies();
   const { email } = await createUser(page, staff);
   await sql(`UPDATE "user" SET role = 'MODERATOR', "twoFactorEnabled" = true WHERE email = $1`, [email]);
+  // Users (and their emails) are for admins only: a moderator gets the 404.
+  expect((await page.goto("/admin/users"))?.status()).toBe(404);
   await page.goto("/admin/reports");
   const row = page.getByRole("link", { name: new RegExp(`@${owner}`) });
   await expect(row).toBeVisible();
